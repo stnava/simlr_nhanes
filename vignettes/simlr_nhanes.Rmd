@@ -1,0 +1,186 @@
+---
+title: "simlr: nhanes application explained"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{simlr: nhanes application explained}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+
+
+```{r setup}
+# Load necessary libraries
+library(ggplot2)
+library(ggfortify)
+library(ellipse)
+library(ANTsR)
+library(subtyper)
+library( nhanesA )
+```
+
+
+## NHANES example
+
+
+The five publicly available data categories are: - Demographics (DEMO) - Dietary (DIET) - Examination (EXAM) - Laboratory (LAB) - Questionnaire (Q). The abbreviated forms in parentheses may be substituted for the long form in nhanesA commands.
+
+INDFMPIR: Poverty Income Ratio (0 = no income, higher values = higher income relative to poverty threshold).
+	•	INDHHIN2: Annual Household Income (categorized ranges).
+	•	DMDEDUC2: Education Level (for adults 20+ years).
+	•	OCD390G: Employment Status (in occupation questionnaire).
+
+```{r nhanes}
+
+
+# Demographic data (e.g., 2011-2012 cycle)
+demo_data <- nhanes('DEMO_G')
+cog_data <- nhanes('CFQ_G')
+depression_data <- nhanes('DPQ_G')
+sleep_data <- nhanes('SLQ_G')
+bp = nhanes( "BPX_G")
+bm = nhanes( "BMX_G")
+env_data <- nhanes('PBCD_G')  # Example for phthalates and blood metals
+
+# Demographic data (e.g., 2013-2014 cycle)
+demo_data13 <- nhanes('DEMO_H')
+cog_data13<- nhanes('CFQ_H')
+depression_data13 <- nhanes('DPQ_H')
+sleep_data13 <- nhanes('SLQ_H')
+bp13 = nhanes( "BPX_H")
+bm13 = nhanes( "BMX_H")
+env_data13 <- nhanes('PBCD_H')  # Example for phthalates and blood metals
+
+
+phdata <- nhanes('PHTHTE_G')  # Example for phthalates and blood metals
+phdata13 <- nhanes('PHTHTE_H')  # Example for phthalates and blood metals
+# pfasd <- nhanes('SSPFAS_G')  # Example for phthalates and blood metals
+# pfasd13 <- nhanes('SSPFAS_H')  # Example for phthalates and blood metals
+vocd <- nhanes('VOCWB_G')  # Example for phthalates and blood metals
+vocd13 <- nhanes('VOCWB_H')  # Example for phthalates and blood metals
+hvmt <- nhanes('UAS_G')  # Example for phthalates and blood metals
+hvmt13 <- nhanes('UAS_H')  # Example for phthalates and blood metals
+pst <- nhanes('PSTPOL_G')  # Example for phthalates and blood metals
+pst13 <- nhanes('PSTPOL_H')  # Example for phthalates and blood metals
+pfc <- nhanes('PFC_G')  # Example for phthalates and blood metals
+pfc13 <- nhanes('PFC_H')  # Example for phthalates and blood metals
+mm <- nhanes('UHM_G')  # Example for phthalates and blood metals
+mm13 <- nhanes('UHM_H')  # Example for phthalates and blood metals
+cu <- nhanes('CUSEZN_G')  # Example for phthalates and blood metals
+cu13 <- nhanes('CUSEZN_H')  # Example for phthalates and blood metals
+ig <- nhanes('IHgEM_G')  # Example for phthalates and blood metals
+ig13 <- nhanes('IHgEM_H')  # Example for phthalates and blood metals
+uh <- nhanes('UHG_G')  # Example for phthalates and blood metals
+uh13 <- nhanes('UHG_H')  # Example for phthalates and blood metals
+
+
+merge_nhanes_data <- function( joinid, nacol,  ...) {
+  datasets <- list(...)
+  dfout <- Reduce(function(x, y) {
+    left_join(x, y, by = joinid)  # Adjust "ID" to your common column name
+  }, datasets)
+  dfout = dfout[ !is.na( dfout[,nacol] ), ]
+  return( dfout )
+}
+
+merged_data <- merge_nhanes_data( 'SEQN', 'CFDDS',
+  merge_same_type_columns(cog_data, cog_data13),
+  merge_same_type_columns(demo_data,demo_data13),
+  merge_same_type_columns(depression_data,depression_data13),
+  merge_same_type_columns(sleep_data,sleep_data13),
+  merge_same_type_columns(bp,bp13),
+  merge_same_type_columns(bm,bm13),
+  merge_same_type_columns(env_data, env_data13),
+  merge_same_type_columns(phdata, phdata13),
+  merge_same_type_columns(vocd, vocd13),
+  merge_same_type_columns(cu, cu13),
+  merge_same_type_columns(ig, ig13),
+  merge_same_type_columns(uh, uh13),
+  mm,
+#  merge_same_type_columns(pst, pst13) )
+#  merge_same_type_columns(pfc, pfc13) ,
+  merge_same_type_columns(hvmt, hvmt13))
+
+table(merged_data$RIAGENDR)
+
+
+
+
+
+idata = impute_data(merged_data)
+idata = idata[ idata$BPXDI1 > 20 & idata$BPXDI2 > 20 & idata$BPXDI3 > 20 & idata$BPXDI4 > 20,  ]
+fdata <- filter_na_columns(merged_data, max_na_percent = 0.5)  # Removes columns with >10% NAs
+fdata = fdata[ na2f(fdata$BPXDI1 > 20 & fdata$BPXDI2 > 20 & fdata$BPXDI3 > 20 ),  ]
+
+myform =  create_formula( fdata, 'CFDDS', c('SEQN', 'RIDAGEMN','RIDRETH3', 'CFASTAT', 'CFDCRNC', 'CFDCIT', 'CFDCST', 'CFDAPP', 'CFDAST', 'CFALANG', 'BPAARM', 'CFDCCS', 'CFDCST', 'CFDCIT', 'CFDCSR', 'CFDCIR', 'CFDCST', 'CFDCIT', 'CFDARNC',
+'INDHHIN2','DMDHRBR4','INDFMIN2','PEASCST1','PEASCCT1','PEASCTM1','BPACSZ','BPXML1','URXMBP','URXMC1','URDUMMAL','SLD010H','LBXBMN','URXCNP','URXECP','URXMHH','URXMHP','URXMHNC','LBXV06','LBXV2A','LBXV3B','LBXV4C','LBXVCB','LBXVEB','LBXVCB','LBXVIPB','LBXVMC','LBXVOX','LBXVTC','LBXVTE','LBXVXY','URXUAS5','URXUAB','URXUAC','URXUMMA','URXUAS3','LBXBSE',
+# getNamesFromDataframe( 'DPQ',depression_data, exclusions=c('DPQ080','DPQ030''DPQ080',)),
+getNamesFromDataframe( 'DPQ',depression_data, exclusions=c('DPQ100')),
+getNamesFromDataframe( 'URXUCR',fdata ),
+getNamesFromDataframe( 'BMXSAD',fdata ),
+getNamesFromDataframe( 'BPAEN',fdata ),
+getNamesFromDataframe( 'BPXP',fdata ),
+getNamesFromDataframe( 'DMD',fdata ),
+getNamesFromDataframe( 'DMDHHSZ',fdata ),
+getNamesFromDataframe( 'WT',fdata ),
+getNamesFromDataframe( 'SDM',fdata ),
+getNamesFromDataframe( 'DMQ',fdata ),
+getNamesFromDataframe( 'FIA',fdata ),
+getNamesFromDataframe( 'MIA',fdata ),
+getNamesFromDataframe( 'AIA',fdata ),
+getNamesFromDataframe( 'DMDCIT',fdata ),
+getNamesFromDataframe( 'DMDYRS',fdata ),
+getNamesFromDataframe( 'RIDE',fdata ),
+getNamesFromDataframe( 'CFDCST',fdata ),
+getNamesFromDataframe( 'SDDSRVY', fdata ),
+getNamesFromDataframe( 'CFDCIT',fdata ), getNamesFromDataframe( 'LC',fdata ), getNamesFromDataframe( 'SI',fdata ) ) )
+problematic_factors <- check_formula_factors(myform, df)
+print(problematic_factors)
+idata2=impute_data(fdata )
+mdl = lm( myform, data=idata2)
+summary( mdl )
+
+```
+
+
+
+```{r nhanessimlr}
+regs <- regularizeSimlr(nh_list,fraction=0.15,sigma=rep(1.0,length(nh_list)))
+regs <- regularizeSimlr(nh_list)
+regs[[2]]=diag(2)
+initu=initializeSimlr( nh_list, k=40, jointReduction=TRUE )
+resultNH <- simlr(nh_list, iterations=100, 
+        sparsenessQuantiles=rep(0.5,length(nh_list)),
+        positivities=rep("positive",length(nh_list)), 
+        energyType='regression', mixAlg='ica',
+#        energyType='cca', mixAlg='pca',
+#        scale=c("centerAndScale", "np"),
+        scale=c( "robust", "centerAndScale", "np" ),
+        constraint="Stiefelx1000x1000",
+        initialUMatrix=initu, verbose=T)
+###############
+projlist=list()
+mysimk=2
+for ( k in 1:length(nh_list)) {
+    rownames(resultNH$v[[k]])=colnames( nh_list[[k]])
+    ux=data.frame(nh_list[[k]] %*% abs(resultNH$v[[k]][,1:mysimk]))
+    colnames(ux)=paste0(names(nh_list)[k],1:ncol(ux))
+    projlist[[length(projlist)+1]]=ux
+}
+simdf=simdf2=dplyr::bind_cols(projlist)
+simdf2$CFDDS=nhan$CFDDS
+simdf2$CFDAST=nhan$CFDAST
+myform = paste0( "CFDDS ~ ",paste0( colnames(simdf), collapse='+'))
+mdl = lm( myform, data=simdf2 )
+print( summary( mdl ) )
+#######################
+interpret_simlr_vector2( resultNH$v[['exposures']], 1, n2show=5, shortnames=F )
+interpret_simlr_vector2( resultNH$v[['exposures']], 2, n2show=5, shortnames=F )
+# https://wwwn.cdc.gov/nchs/nhanes/search/default.aspx
+# > interpret_simlr_vector2( resultNH$v[['exposures']], 1, n2show=5, shortnames=F )
+#   LBXVBZ    LBXVOX    LBXVFN    LBX2DF 
+# benzene, Xylene, furan, Dimethylfuran
+# 1.0000000 0.3346728 0.1868323 0.0586727 
+#######################
+###
+```

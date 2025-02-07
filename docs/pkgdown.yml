@@ -2,7 +2,6 @@ pandoc: 3.2.1
 pkgdown: 2.1.1
 pkgdown_sha: ~
 articles:
-  nalls_pd_genetics: nalls_pd_genetics.html
-  pd_imaging_genetics: pd_imaging_genetics.html
-  subtyper: subtyper.html
-last_built: 2024-10-12T16:13Z
+  simlr_nhanes: simlr_nhanes.html
+  toxicology_simlr_presentation: toxicology_simlr_presentation.html
+last_built: 2025-02-07T13:59Z
