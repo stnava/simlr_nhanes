@@ -1,0 +1,85 @@
+Package: subtyper
+Type: Package
+Title: Subtyping, Filtering and Visualization for Longitudinal Population Data
+Description: We ingest dataframes describing populations that are followed
+    longitudinally, potentially with repeat measurements at each visit/timepoint.
+    Subtypes are identified after filtering the data frame for good quality.
+    Training the subtyping method can be performed after covariates adjustment.
+    Training is made explicit and its results are captured in an intuitive data
+    frame detailing results.  Inference or prediction of subtypes in new data
+    is facilitated by a single function call. The package provides intuitive
+    visualization that show how subtyped data varies by group over time.
+Version: 1.0.0
+Author: c( person(c("Brian", "B."), "Avants", role=c("aut", "cre"), email="stnava@gmail.com") )
+Maintainer: Brian Avants <stnava@debian.org>
+URL: https://github.com/stnava/subtyper
+BugReports: https://github.com/stnava/subtyper/issues
+License: GPL-3
+Depends:
+    R (>= 3.0.0)
+Imports:
+  ggplot2,
+  caret,
+  ciTools,
+  ClusterR,
+  cluster,
+  coca,
+  dCUR,
+  dplyr,
+  effectsize,
+  Evacluster,
+  flexclust,
+  fmsb,
+  FNN,
+  fpc,
+  gaston,
+  ggpubr,
+  ggthemes,
+  ggstatsplot,
+  ggbeeswarm,
+  glasso,
+  globaltest,
+  gridExtra,
+  gt, 
+  gtsummary,
+  igraph,
+  imbalance,
+  kableExtra,
+  lmerTest,
+  lme4,
+  MASS,
+  methods,
+  mlr3,
+  mlr3cluster,
+  mlr3pipelines,
+  wesanderson,
+  Hmisc,
+  plyr,
+  proxy,
+  rlang,
+  DDoutlier,
+  data.table,
+  stringr,
+  mclust,
+  NMF,
+  nmfbin,
+  optmatch,
+  pheatmap,
+  gprofiler2,
+  magrittr,
+  fastICA,
+  pgenlibr,
+  grDevices,
+  VarSelLCM,
+  visreg
+Suggests:
+    covr,
+    knitr,
+    testthat,
+    spelling,
+    rmarkdown
+RoxygenNote: 7.3.2
+Roxygen: list(markdown = TRUE)
+VignetteBuilder: knitr
+Language: en-US
+Encoding: UTF-8

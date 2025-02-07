@@ -1,0 +1,17 @@
+*.pyc
+*.Rcheck/
+*.orig
+vignettes/figure/*
+subtyper*.tar.gz
+.DS_Store
+Rd2.pdf
+assets/
+inst/doc/*.html
+*.log
+.Rproj.user
+*.Rproj
+inst/doc
+docs/articles/pd_imaging_genetics_files
+docs/articles/pd_imaging_genetics.html
+/doc/
+/Meta/
