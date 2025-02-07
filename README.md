@@ -4,6 +4,7 @@
 
 ![simlr cartoon](https://i.imgur.com/gXpTokB.jpeg)
 
+![simlr nhanes](https://i.imgur.com/U9voKfC.png)
 
 documentation page [should be here](https://stnava.github.io/simlr_nhanes/)
 
