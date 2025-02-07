@@ -2,7 +2,7 @@
 
 [![CircleCI](https://circleci.com/gh/stnava/simlr_nhanes/tree/master.svg?style=svg)](https://circleci.com/gh/stnava/simlr_nhanes/tree/master)
 
-![simlr cartoon](https://i.imgur.com/gXpTokB.jpeg)
+![simlr cartoon](https://i.imgur.com/xqeaYqE.jpeg)
 
 ![simlr nhanes](https://i.imgur.com/U9voKfC.png)
 

@@ -130,12 +130,12 @@ fdata = fdata[ na2f(fdata$BPXDI1 > 20 & fdata$BPXDI2 > 20 & fdata$BPXDI3 > 20 ),
 fdata$race = factor( fdata$race )
 fdata$riagendr = factor( fdata$riagendr )
 
-myform =  create_formula( fdata, 'z_digit_re', c('SEQN', 'RIDAGEMN','RIDRETH3', 'CFASTAT', 'CFDCRNC', 'CFDCIT', 'CFDCST', 'CFDAPP', 'CFDAST', 'CFALANG', 'BPAARM', 'CFDCCS', 'CFDCST', 'CFDCIT', 'CFDCSR', 'CFDCIR', 'CFDCST', 'CFDCIT', 'CFDARNC', 'CFDDS',
+myformR =  create_formula( fdata, 'z_digit_re', c('SEQN', 'RIDAGEMN','RIDRETH3', 'CFASTAT', 'CFDCRNC', 'CFDCIT', 'CFDCST', 'CFDAPP', 'CFDAST', 'CFALANG', 'BPAARM', 'CFDCCS', 'CFDCST', 'CFDCIT', 'CFDCSR', 'CFDCIR', 'CFDCST', 'CFDCIT', 'CFDARNC', 'CFDDS',
 'INDHHIN2','DMDHRBR4','INDFMIN2','PEASCST1','PEASCCT1','PEASCTM1','BPACSZ','BPXML1','URXMBP','URXMC1','URDUMMAL','SLD010H','LBXBMN','URXCNP','URXECP','URXMHH','URXMHP','URXMHNC','LBXV06','LBXV2A','LBXV3B','LBXV4C','LBXVCB','LBXVEB','LBXVCB','LBXVIPB','LBXVMC','LBXVOX','LBXVTC','LBXVTE','LBXVXY','URXUAS5','URXUAB','URXUAC','URXUMMA','URXUAS3','LBXBSE', 'RIAGENDR', 'RIDAGEYR', 'RIDRETH1', 'seqn',
 'age_cat','ridreth1','ridreth3','edu_cat','cfastat','year','female','cerad_sum',
 # 'wtint2yr','wtmec2yr',
 'BMXARML','BMXARMC','BMXHT','BMXLEG','BMXWAIST',
-'INDFMPIR',
+'INDFMPIR', 'DRABF',
 getNamesFromDataframe( 'DRQS',fdata),
 getNamesFromDataframe( 'DPD',fdata),
 getNamesFromDataframe( 'cfd',fdata),
@@ -151,6 +151,8 @@ getNamesFromDataframe( 'BPXP',fdata ),
 getNamesFromDataframe( 'DMD',fdata ),
 getNamesFromDataframe( 'DMDHHSZ',fdata ),
 getNamesFromDataframe( 'DRD',fdata ),
+getNamesFromDataframe( 'DBD',fdata ),
+getNamesFromDataframe( 'DR1',fdata ),
 getNamesFromDataframe( 'WT',fdata ),
 getNamesFromDataframe( 'SDM',fdata ),
 getNamesFromDataframe( 'DMQ',fdata ),
@@ -166,9 +168,9 @@ getNamesFromDataframe( 'CFDCIT',fdata ), getNamesFromDataframe( 'LC',fdata ), ge
 problematic_factors <- check_formula_factors(myform, df)
 print(problematic_factors)
 idata2=impute_data(fdata )
-mdl = lm( myform, data=idata2)
-summary( mdl )
-mdl0 = lm( myform, data=fdata)
+# mdl = lm( myformR, data=idata2)
+# summary( mdl )
+mdl0 = lm( myformR, data=fdata)
 summary( mdl0 )
 ##############
 ####
@@ -237,7 +239,11 @@ for ( k in 1:length(nh_list)) {
 }
 simdf=simdf2=dplyr::bind_cols(projlist)
 cognames=c("cerad_sum","cfdast","cfdds")
-cognames = c("z_cerad_re", "z_animal_re",     "z_digit_re",      "z_delayed_re",    "z_global_re"  )
+cognames = c(
+  "z_cerad_re", "z_animal_re",     "z_digit_re",      "z_delayed_re",    "z_global_re"
+#  "z_cerad_age", "z_animal_age",     "z_digit_age",      "z_delayed_age",    "z_global_age",
+#  "z_cerad_edu", "z_animal_edu",     "z_digit_edu",      "z_delayed_edu",    "z_global_edu"
+)
 simdf2[,cognames]=fdata[mycc,cognames]
 for ( kk in 1:length(cognames)) {
   myform = paste0( cognames[kk]," ~ ",paste0( colnames(simdf), collapse='+'))
