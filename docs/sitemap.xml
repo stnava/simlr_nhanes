@@ -2,10 +2,8 @@
 <url><loc>https://github.com/stnava/simlr_nhanes/404.html</loc></url>
 <url><loc>https://github.com/stnava/simlr_nhanes/LICENSE-text.html</loc></url>
 <url><loc>https://github.com/stnava/simlr_nhanes/articles/index.html</loc></url>
-<url><loc>https://github.com/stnava/simlr_nhanes/articles/nalls_pd_genetics.html</loc></url>
 <url><loc>https://github.com/stnava/simlr_nhanes/articles/pca_cca_simlr.html</loc></url>
 <url><loc>https://github.com/stnava/simlr_nhanes/articles/simlr_nhanes.html</loc></url>
-<url><loc>https://github.com/stnava/simlr_nhanes/articles/subtyper.html</loc></url>
 <url><loc>https://github.com/stnava/simlr_nhanes/authors.html</loc></url>
 <url><loc>https://github.com/stnava/simlr_nhanes/index.html</loc></url>
 <url><loc>https://github.com/stnava/simlr_nhanes/news/index.html</loc></url>
@@ -30,7 +28,6 @@
 <url><loc>https://github.com/stnava/simlr_nhanes/reference/balanceDataMultiClass.html</loc></url>
 <url><loc>https://github.com/stnava/simlr_nhanes/reference/balancedDataframe.html</loc></url>
 <url><loc>https://github.com/stnava/simlr_nhanes/reference/biclusterMatrixFactorization.html</loc></url>
-<url><loc>https://github.com/stnava/simlr_nhanes/reference/bipartite_variable_match.html</loc></url>
 <url><loc>https://github.com/stnava/simlr_nhanes/reference/check_formula_factors.html</loc></url>
 <url><loc>https://github.com/stnava/simlr_nhanes/reference/clearcolname.html</loc></url>
 <url><loc>https://github.com/stnava/simlr_nhanes/reference/collect_and_zip_images.html</loc></url>
@@ -49,7 +46,6 @@
 <url><loc>https://github.com/stnava/simlr_nhanes/reference/create_formula.html</loc></url>
 <url><loc>https://github.com/stnava/simlr_nhanes/reference/create_radar_chart.html</loc></url>
 <url><loc>https://github.com/stnava/simlr_nhanes/reference/create_table1.html</loc></url>
-<url><loc>https://github.com/stnava/simlr_nhanes/reference/dataPartition.html</loc></url>
 <url><loc>https://github.com/stnava/simlr_nhanes/reference/dcurvarsel.html</loc></url>
 <url><loc>https://github.com/stnava/simlr_nhanes/reference/eliminateNonUniqueColumns.html</loc></url>
 <url><loc>https://github.com/stnava/simlr_nhanes/reference/exploratory_visualization.html</loc></url>
@@ -90,6 +86,7 @@
 <url><loc>https://github.com/stnava/simlr_nhanes/reference/merge_ADNI_antspymm_by_closest_date.html</loc></url>
 <url><loc>https://github.com/stnava/simlr_nhanes/reference/merge_ppmi_imaging_clinical_demographic_data.html</loc></url>
 <url><loc>https://github.com/stnava/simlr_nhanes/reference/merge_same_type_columns.html</loc></url>
+<url><loc>https://github.com/stnava/simlr_nhanes/reference/min_columns_list.html</loc></url>
 <url><loc>https://github.com/stnava/simlr_nhanes/reference/mlr3classification.html</loc></url>
 <url><loc>https://github.com/stnava/simlr_nhanes/reference/mlr3classifiercv.html</loc></url>
 <url><loc>https://github.com/stnava/simlr_nhanes/reference/mlr3classifiers.html</loc></url>

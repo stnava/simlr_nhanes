@@ -190,6 +190,9 @@ years). • OCD390G: Employment Status (in occupation questionnaire).</p>
 <span><span class="va">uh</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/nhanesA/man/nhanes.html" class="external-link">nhanes</a></span><span class="op">(</span><span class="st">'UHG_G'</span><span class="op">)</span>  <span class="co"># Example for phthalates and blood metals</span></span>
 <span><span class="va">uh13</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/nhanesA/man/nhanes.html" class="external-link">nhanes</a></span><span class="op">(</span><span class="st">'UHG_H'</span><span class="op">)</span>  <span class="co"># Example for phthalates and blood metals</span></span>
 <span></span>
+<span><span class="va">di</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/nhanesA/man/nhanes.html" class="external-link">nhanes</a></span><span class="op">(</span><span class="st">'DR1TOT_G'</span><span class="op">)</span>  <span class="co"># Example for phthalates and blood metals</span></span>
+<span><span class="va">di13</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/nhanesA/man/nhanes.html" class="external-link">nhanes</a></span><span class="op">(</span><span class="st">'DR1TOT_H'</span><span class="op">)</span>  <span class="co"># Example for phthalates and blood metals</span></span>
+<span></span>
 <span></span>
 <span><span class="va">merge_nhanes_data</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span> <span class="va">joinid</span>, <span class="va">nacol</span>,  <span class="va">...</span><span class="op">)</span> <span class="op">{</span></span>
 <span>  <span class="va">datasets</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="va">...</span><span class="op">)</span></span>
@@ -203,6 +206,7 @@ years). • OCD390G: Employment Status (in occupation questionnaire).</p>
 <span><span class="va">merged_data</span> <span class="op">&lt;-</span> <span class="fu">merge_nhanes_data</span><span class="op">(</span> <span class="st">'SEQN'</span>, <span class="st">'CFDDS'</span>,</span>
 <span>  <span class="fu"><a href="../reference/merge_same_type_columns.html">merge_same_type_columns</a></span><span class="op">(</span><span class="va">cog_data</span>, <span class="va">cog_data13</span><span class="op">)</span>,</span>
 <span>  <span class="fu"><a href="../reference/merge_same_type_columns.html">merge_same_type_columns</a></span><span class="op">(</span><span class="va">demo_data</span>,<span class="va">demo_data13</span><span class="op">)</span>,</span>
+<span>  <span class="fu"><a href="../reference/merge_same_type_columns.html">merge_same_type_columns</a></span><span class="op">(</span><span class="va">di</span>,<span class="va">di13</span><span class="op">)</span>,</span>
 <span>  <span class="fu"><a href="../reference/merge_same_type_columns.html">merge_same_type_columns</a></span><span class="op">(</span><span class="va">depression_data</span>,<span class="va">depression_data13</span><span class="op">)</span>,</span>
 <span>  <span class="fu"><a href="../reference/merge_same_type_columns.html">merge_same_type_columns</a></span><span class="op">(</span><span class="va">sleep_data</span>,<span class="va">sleep_data13</span><span class="op">)</span>,</span>
 <span>  <span class="fu"><a href="../reference/merge_same_type_columns.html">merge_same_type_columns</a></span><span class="op">(</span><span class="va">bp</span>,<span class="va">bp13</span><span class="op">)</span>,</span>
@@ -228,7 +232,7 @@ years). • OCD390G: Employment Status (in occupation questionnaire).</p>
 <span></span>
 <span></span>
 <span><span class="va">depnames</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span> </span>
-<span><span class="co">#  getNamesFromDataframe( "SLQ", merged_data ),</span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/pkg/subtyper/man/getNamesFromDataframe.html" class="external-link">getNamesFromDataframe</a></span><span class="op">(</span> <span class="st">"SLQ"</span>, <span class="va">merged_data</span> <span class="op">)</span>,</span>
 <span><span class="co">#  getNamesFromDataframe( "DPQ", merged_data, exclusions='DPQ100' )</span></span>
 <span>  <span class="fu"><a href="https://rdrr.io/pkg/subtyper/man/getNamesFromDataframe.html" class="external-link">getNamesFromDataframe</a></span><span class="op">(</span> <span class="st">"DPQ"</span>, <span class="va">merged_data</span> <span class="op">)</span></span>
 <span><span class="op">)</span></span>
@@ -241,13 +245,17 @@ years). • OCD390G: Employment Status (in occupation questionnaire).</p>
 <span><span class="va">idata</span> <span class="op">=</span> <span class="va">idata</span><span class="op">[</span> <span class="va">idata</span><span class="op">$</span><span class="va">BPXDI1</span> <span class="op">&gt;</span> <span class="fl">20</span> <span class="op">&amp;</span> <span class="va">idata</span><span class="op">$</span><span class="va">BPXDI2</span> <span class="op">&gt;</span> <span class="fl">20</span> <span class="op">&amp;</span> <span class="va">idata</span><span class="op">$</span><span class="va">BPXDI3</span> <span class="op">&gt;</span> <span class="fl">20</span> <span class="op">&amp;</span> <span class="va">idata</span><span class="op">$</span><span class="va">BPXDI4</span> <span class="op">&gt;</span> <span class="fl">20</span>,  <span class="op">]</span></span>
 <span><span class="va">fdata</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/filter_na_columns.html">filter_na_columns</a></span><span class="op">(</span><span class="va">merged_data</span>, max_na_percent <span class="op">=</span> <span class="fl">0.5</span><span class="op">)</span>  <span class="co"># Removes columns with &gt;10% NAs</span></span>
 <span><span class="va">fdata</span> <span class="op">=</span> <span class="va">fdata</span><span class="op">[</span> <span class="fu"><a href="https://rdrr.io/pkg/subtyper/man/na2f.html" class="external-link">na2f</a></span><span class="op">(</span><span class="va">fdata</span><span class="op">$</span><span class="va">BPXDI1</span> <span class="op">&gt;</span> <span class="fl">20</span> <span class="op">&amp;</span> <span class="va">fdata</span><span class="op">$</span><span class="va">BPXDI2</span> <span class="op">&gt;</span> <span class="fl">20</span> <span class="op">&amp;</span> <span class="va">fdata</span><span class="op">$</span><span class="va">BPXDI3</span> <span class="op">&gt;</span> <span class="fl">20</span> <span class="op">)</span>,  <span class="op">]</span></span>
+<span><span class="va">fdata</span><span class="op">$</span><span class="va">race</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/factor.html" class="external-link">factor</a></span><span class="op">(</span> <span class="va">fdata</span><span class="op">$</span><span class="va">race</span> <span class="op">)</span></span>
+<span><span class="va">fdata</span><span class="op">$</span><span class="va">riagendr</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/factor.html" class="external-link">factor</a></span><span class="op">(</span> <span class="va">fdata</span><span class="op">$</span><span class="va">riagendr</span> <span class="op">)</span></span>
 <span></span>
-<span><span class="va">myform</span> <span class="op">=</span>  <span class="fu"><a href="../reference/create_formula.html">create_formula</a></span><span class="op">(</span> <span class="va">fdata</span>, <span class="st">'z_digit_re'</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">'SEQN'</span>, <span class="st">'RIDAGEMN'</span>,<span class="st">'RIDRETH3'</span>, <span class="st">'CFASTAT'</span>, <span class="st">'CFDCRNC'</span>, <span class="st">'CFDCIT'</span>, <span class="st">'CFDCST'</span>, <span class="st">'CFDAPP'</span>, <span class="st">'CFDAST'</span>, <span class="st">'CFALANG'</span>, <span class="st">'BPAARM'</span>, <span class="st">'CFDCCS'</span>, <span class="st">'CFDCST'</span>, <span class="st">'CFDCIT'</span>, <span class="st">'CFDCSR'</span>, <span class="st">'CFDCIR'</span>, <span class="st">'CFDCST'</span>, <span class="st">'CFDCIT'</span>, <span class="st">'CFDARNC'</span>, <span class="st">'CFDDS'</span>,</span>
+<span><span class="va">myformR</span> <span class="op">=</span>  <span class="fu"><a href="../reference/create_formula.html">create_formula</a></span><span class="op">(</span> <span class="va">fdata</span>, <span class="st">'z_digit_re'</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">'SEQN'</span>, <span class="st">'RIDAGEMN'</span>,<span class="st">'RIDRETH3'</span>, <span class="st">'CFASTAT'</span>, <span class="st">'CFDCRNC'</span>, <span class="st">'CFDCIT'</span>, <span class="st">'CFDCST'</span>, <span class="st">'CFDAPP'</span>, <span class="st">'CFDAST'</span>, <span class="st">'CFALANG'</span>, <span class="st">'BPAARM'</span>, <span class="st">'CFDCCS'</span>, <span class="st">'CFDCST'</span>, <span class="st">'CFDCIT'</span>, <span class="st">'CFDCSR'</span>, <span class="st">'CFDCIR'</span>, <span class="st">'CFDCST'</span>, <span class="st">'CFDCIT'</span>, <span class="st">'CFDARNC'</span>, <span class="st">'CFDDS'</span>,</span>
 <span><span class="st">'INDHHIN2'</span>,<span class="st">'DMDHRBR4'</span>,<span class="st">'INDFMIN2'</span>,<span class="st">'PEASCST1'</span>,<span class="st">'PEASCCT1'</span>,<span class="st">'PEASCTM1'</span>,<span class="st">'BPACSZ'</span>,<span class="st">'BPXML1'</span>,<span class="st">'URXMBP'</span>,<span class="st">'URXMC1'</span>,<span class="st">'URDUMMAL'</span>,<span class="st">'SLD010H'</span>,<span class="st">'LBXBMN'</span>,<span class="st">'URXCNP'</span>,<span class="st">'URXECP'</span>,<span class="st">'URXMHH'</span>,<span class="st">'URXMHP'</span>,<span class="st">'URXMHNC'</span>,<span class="st">'LBXV06'</span>,<span class="st">'LBXV2A'</span>,<span class="st">'LBXV3B'</span>,<span class="st">'LBXV4C'</span>,<span class="st">'LBXVCB'</span>,<span class="st">'LBXVEB'</span>,<span class="st">'LBXVCB'</span>,<span class="st">'LBXVIPB'</span>,<span class="st">'LBXVMC'</span>,<span class="st">'LBXVOX'</span>,<span class="st">'LBXVTC'</span>,<span class="st">'LBXVTE'</span>,<span class="st">'LBXVXY'</span>,<span class="st">'URXUAS5'</span>,<span class="st">'URXUAB'</span>,<span class="st">'URXUAC'</span>,<span class="st">'URXUMMA'</span>,<span class="st">'URXUAS3'</span>,<span class="st">'LBXBSE'</span>, <span class="st">'RIAGENDR'</span>, <span class="st">'RIDAGEYR'</span>, <span class="st">'RIDRETH1'</span>, <span class="st">'seqn'</span>,</span>
-<span><span class="st">'age_cat'</span>,<span class="st">'ridreth1'</span>,<span class="st">'ridreth3'</span>,<span class="st">'edu_cat'</span>,<span class="st">'cfastat'</span>,<span class="st">'year'</span>,<span class="st">'riagendr'</span>,<span class="st">'cerad_sum'</span>,</span>
+<span><span class="st">'age_cat'</span>,<span class="st">'ridreth1'</span>,<span class="st">'ridreth3'</span>,<span class="st">'edu_cat'</span>,<span class="st">'cfastat'</span>,<span class="st">'year'</span>,<span class="st">'female'</span>,<span class="st">'cerad_sum'</span>,</span>
 <span><span class="co"># 'wtint2yr','wtmec2yr',</span></span>
 <span><span class="st">'BMXARML'</span>,<span class="st">'BMXARMC'</span>,<span class="st">'BMXHT'</span>,<span class="st">'BMXLEG'</span>,<span class="st">'BMXWAIST'</span>,</span>
-<span><span class="st">'INDFMPIR'</span>,</span>
+<span><span class="st">'INDFMPIR'</span>, <span class="st">'DRABF'</span>,</span>
+<span><span class="fu"><a href="https://rdrr.io/pkg/subtyper/man/getNamesFromDataframe.html" class="external-link">getNamesFromDataframe</a></span><span class="op">(</span> <span class="st">'DRQS'</span>,<span class="va">fdata</span><span class="op">)</span>,</span>
+<span><span class="fu"><a href="https://rdrr.io/pkg/subtyper/man/getNamesFromDataframe.html" class="external-link">getNamesFromDataframe</a></span><span class="op">(</span> <span class="st">'DPD'</span>,<span class="va">fdata</span><span class="op">)</span>,</span>
 <span><span class="fu"><a href="https://rdrr.io/pkg/subtyper/man/getNamesFromDataframe.html" class="external-link">getNamesFromDataframe</a></span><span class="op">(</span> <span class="st">'cfd'</span>,<span class="va">fdata</span><span class="op">)</span>,</span>
 <span><span class="fu"><a href="https://rdrr.io/pkg/subtyper/man/getNamesFromDataframe.html" class="external-link">getNamesFromDataframe</a></span><span class="op">(</span> <span class="st">'z_'</span>,<span class="va">fdata</span><span class="op">)</span>,</span>
 <span><span class="fu"><a href="https://rdrr.io/pkg/subtyper/man/getNamesFromDataframe.html" class="external-link">getNamesFromDataframe</a></span><span class="op">(</span> <span class="st">'low_'</span>,<span class="va">fdata</span><span class="op">)</span>,</span>
@@ -260,6 +268,9 @@ years). • OCD390G: Employment Status (in occupation questionnaire).</p>
 <span><span class="fu"><a href="https://rdrr.io/pkg/subtyper/man/getNamesFromDataframe.html" class="external-link">getNamesFromDataframe</a></span><span class="op">(</span> <span class="st">'BPXP'</span>,<span class="va">fdata</span> <span class="op">)</span>,</span>
 <span><span class="fu"><a href="https://rdrr.io/pkg/subtyper/man/getNamesFromDataframe.html" class="external-link">getNamesFromDataframe</a></span><span class="op">(</span> <span class="st">'DMD'</span>,<span class="va">fdata</span> <span class="op">)</span>,</span>
 <span><span class="fu"><a href="https://rdrr.io/pkg/subtyper/man/getNamesFromDataframe.html" class="external-link">getNamesFromDataframe</a></span><span class="op">(</span> <span class="st">'DMDHHSZ'</span>,<span class="va">fdata</span> <span class="op">)</span>,</span>
+<span><span class="fu"><a href="https://rdrr.io/pkg/subtyper/man/getNamesFromDataframe.html" class="external-link">getNamesFromDataframe</a></span><span class="op">(</span> <span class="st">'DRD'</span>,<span class="va">fdata</span> <span class="op">)</span>,</span>
+<span><span class="fu"><a href="https://rdrr.io/pkg/subtyper/man/getNamesFromDataframe.html" class="external-link">getNamesFromDataframe</a></span><span class="op">(</span> <span class="st">'DBD'</span>,<span class="va">fdata</span> <span class="op">)</span>,</span>
+<span><span class="co">#getNamesFromDataframe( 'DR1',fdata ),</span></span>
 <span><span class="fu"><a href="https://rdrr.io/pkg/subtyper/man/getNamesFromDataframe.html" class="external-link">getNamesFromDataframe</a></span><span class="op">(</span> <span class="st">'WT'</span>,<span class="va">fdata</span> <span class="op">)</span>,</span>
 <span><span class="fu"><a href="https://rdrr.io/pkg/subtyper/man/getNamesFromDataframe.html" class="external-link">getNamesFromDataframe</a></span><span class="op">(</span> <span class="st">'SDM'</span>,<span class="va">fdata</span> <span class="op">)</span>,</span>
 <span><span class="fu"><a href="https://rdrr.io/pkg/subtyper/man/getNamesFromDataframe.html" class="external-link">getNamesFromDataframe</a></span><span class="op">(</span> <span class="st">'DMQ'</span>,<span class="va">fdata</span> <span class="op">)</span>,</span>
@@ -272,81 +283,97 @@ years). • OCD390G: Employment Status (in occupation questionnaire).</p>
 <span><span class="fu"><a href="https://rdrr.io/pkg/subtyper/man/getNamesFromDataframe.html" class="external-link">getNamesFromDataframe</a></span><span class="op">(</span> <span class="st">'CFDCST'</span>,<span class="va">fdata</span> <span class="op">)</span>,</span>
 <span><span class="fu"><a href="https://rdrr.io/pkg/subtyper/man/getNamesFromDataframe.html" class="external-link">getNamesFromDataframe</a></span><span class="op">(</span> <span class="st">'SDDSRVY'</span>, <span class="va">fdata</span> <span class="op">)</span>,</span>
 <span><span class="fu"><a href="https://rdrr.io/pkg/subtyper/man/getNamesFromDataframe.html" class="external-link">getNamesFromDataframe</a></span><span class="op">(</span> <span class="st">'CFDCIT'</span>,<span class="va">fdata</span> <span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/pkg/subtyper/man/getNamesFromDataframe.html" class="external-link">getNamesFromDataframe</a></span><span class="op">(</span> <span class="st">'LC'</span>,<span class="va">fdata</span> <span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/pkg/subtyper/man/getNamesFromDataframe.html" class="external-link">getNamesFromDataframe</a></span><span class="op">(</span> <span class="st">'SI'</span>,<span class="va">fdata</span> <span class="op">)</span> <span class="op">)</span> <span class="op">)</span></span>
-<span><span class="va">problematic_factors</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/check_formula_factors.html">check_formula_factors</a></span><span class="op">(</span><span class="va">myform</span>, <span class="va">df</span><span class="op">)</span></span>
+<span><span class="va">problematic_factors</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/check_formula_factors.html">check_formula_factors</a></span><span class="op">(</span><span class="va">myformR</span>, <span class="va">df</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">problematic_factors</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## character(0)</span></span></code></pre>
 <div class="sourceCode" id="cb34"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">idata2</span><span class="op">=</span><span class="fu"><a href="../reference/impute_data.html">impute_data</a></span><span class="op">(</span><span class="va">fdata</span> <span class="op">)</span></span>
-<span><span class="va">mdl</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/lm.html" class="external-link">lm</a></span><span class="op">(</span> <span class="va">myform</span>, data<span class="op">=</span><span class="va">idata2</span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span> <span class="va">mdl</span> <span class="op">)</span></span></code></pre></div>
-<pre><code><span><span class="co">## </span></span>
-<span><span class="co">## Call:</span></span>
-<span><span class="co">## lm(formula = myform, data = idata2)</span></span>
-<span><span class="co">## </span></span>
-<span><span class="co">## Residuals:</span></span>
-<span><span class="co">##     Min      1Q  Median      3Q     Max </span></span>
-<span><span class="co">## -3.3508 -0.4932  0.0124  0.4939  2.5832 </span></span>
-<span><span class="co">## </span></span>
-<span><span class="co">## Coefficients:</span></span>
-<span><span class="co">##                    Estimate Std. Error t value Pr(&gt;|t|)    </span></span>
-<span><span class="co">## (Intercept)       2.646e+00  2.902e-01   9.117  &lt; 2e-16 ***</span></span>
-<span><span class="co">## female            2.684e-01  3.392e-02   7.913 3.71e-15 ***</span></span>
-<span><span class="co">## ridageyr         -5.133e-02  2.669e-03 -19.228  &lt; 2e-16 ***</span></span>
-<span><span class="co">## race              3.291e-02  1.928e-02   1.707  0.08798 .  </span></span>
-<span><span class="co">## dmdeduc2          3.060e-01  1.246e-02  24.555  &lt; 2e-16 ***</span></span>
-<span><span class="co">## wtint2yr          2.947e-05  1.916e-05   1.538  0.12410    </span></span>
-<span><span class="co">## wtmec2yr         -2.480e-05  1.881e-05  -1.318  0.18746    </span></span>
-<span><span class="co">## DPQ010           -4.927e-02  2.433e-02  -2.025  0.04295 *  </span></span>
-<span><span class="co">## DPQ020            1.075e-02  2.861e-02   0.376  0.70708    </span></span>
-<span><span class="co">## DPQ030            4.499e-02  1.887e-02   2.385  0.01716 *  </span></span>
-<span><span class="co">## DPQ040            9.192e-03  2.001e-02   0.459  0.64597    </span></span>
-<span><span class="co">## DPQ050           -3.701e-02  2.400e-02  -1.542  0.12320    </span></span>
-<span><span class="co">## DPQ060            3.667e-03  3.059e-02   0.120  0.90459    </span></span>
-<span><span class="co">## DPQ070           -7.271e-02  2.757e-02  -2.637  0.00840 ** </span></span>
-<span><span class="co">## DPQ080           -1.344e-01  3.002e-02  -4.477 7.88e-06 ***</span></span>
-<span><span class="co">## DPQ090           -8.698e-02  5.207e-02  -1.670  0.09498 .  </span></span>
-<span><span class="co">## DPQ100           -4.770e-02  3.182e-02  -1.499  0.13392    </span></span>
-<span><span class="co">## SLQ050No          2.276e-02  3.725e-02   0.611  0.54122    </span></span>
-<span><span class="co">## SLQ060No         -8.927e-03  5.133e-02  -0.174  0.86195    </span></span>
-<span><span class="co">## SLQ060Don't know -8.530e-01  3.445e-01  -2.476  0.01336 *  </span></span>
-<span><span class="co">## BPXSY1           -6.343e-03  2.540e-03  -2.497  0.01260 *  </span></span>
-<span><span class="co">## BPXDI1           -3.162e-03  3.011e-03  -1.050  0.29369    </span></span>
-<span><span class="co">## BPXSY2            6.077e-03  2.991e-03   2.031  0.04232 *  </span></span>
-<span><span class="co">## BPXDI2            4.427e-03  3.372e-03   1.313  0.18931    </span></span>
-<span><span class="co">## BPXSY3           -3.114e-03  2.719e-03  -1.145  0.25219    </span></span>
-<span><span class="co">## BPXDI3            2.595e-03  3.140e-03   0.826  0.40871    </span></span>
-<span><span class="co">## BMXBMI            1.412e-02  4.411e-03   3.201  0.00139 ** </span></span>
-<span><span class="co">## BMDAVSAD         -1.925e-02  6.918e-03  -2.782  0.00543 ** </span></span>
-<span><span class="co">## LBXBPB           -1.700e-02  1.138e-02  -1.493  0.13558    </span></span>
-<span><span class="co">## LBXBCD           -1.849e-01  4.114e-02  -4.494 7.29e-06 ***</span></span>
-<span><span class="co">## LBXTHG            5.532e-02  5.391e-02   1.026  0.30492    </span></span>
-<span><span class="co">## LBXIHG           -1.748e-02  9.537e-02  -0.183  0.85459    </span></span>
-<span><span class="co">## LBXBGE            2.829e-01  5.512e-01   0.513  0.60787    </span></span>
-<span><span class="co">## LBXBGM           -6.077e-02  5.070e-02  -1.199  0.23079    </span></span>
-<span><span class="co">## ---</span></span>
-<span><span class="co">## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</span></span>
-<span><span class="co">## </span></span>
-<span><span class="co">## Residual standard error: 0.7582 on 2563 degrees of freedom</span></span>
-<span><span class="co">## Multiple R-squared:  0.4236, Adjusted R-squared:  0.4162 </span></span>
-<span><span class="co">## F-statistic: 57.08 on 33 and 2563 DF,  p-value: &lt; 2.2e-16</span></span></code></pre>
-<div class="sourceCode" id="cb36"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co">##############</span></span>
+<span><span class="co"># mdl = lm( myformR, data=idata2)</span></span>
+<span><span class="co"># summary( mdl )</span></span>
+<span><span class="co"># mdl0 = lm( myformR, data=fdata)</span></span>
+<span><span class="co"># summary( mdl0 )</span></span>
+<span><span class="co">##############</span></span>
 <span><span class="co">####</span></span></code></pre></div>
-<div class="sourceCode" id="cb37"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">regs</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/ANTsR/man/regularizeSimlr.html" class="external-link">regularizeSimlr</a></span><span class="op">(</span><span class="va">nh_list</span>,fraction<span class="op">=</span><span class="fl">0.15</span>,sigma<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fl">1.0</span>,<span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">nh_list</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
+<div class="sourceCode" id="cb35"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">colcats</span><span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="st">"Basic"</span>,<span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">ncol</a></span><span class="op">(</span><span class="va">fdata</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="va">colcats</span><span class="op">[</span> <span class="fu"><a href="https://rdrr.io/r/base/colnames.html" class="external-link">colnames</a></span><span class="op">(</span><span class="va">fdata</span><span class="op">)</span> <span class="op"><a href="https://rdrr.io/r/base/match.html" class="external-link">%in%</a></span>  <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"ridageyr"</span>,<span class="st">"riagendr"</span>,<span class="st">"race"</span>,<span class="st">"dmdeduc2"</span>,<span class="st">"INDFMPIR"</span><span class="op">)</span> <span class="op">]</span><span class="op">=</span><span class="st">'demog'</span></span>
+<span><span class="va">bpname</span><span class="op">=</span><span class="fu"><a href="https://rdrr.io/pkg/subtyper/man/getNamesFromDataframe.html" class="external-link">getNamesFromDataframe</a></span><span class="op">(</span> <span class="st">"BPX"</span>,<span class="va">fdata</span><span class="op">)</span></span>
+<span><span class="va">bmname</span><span class="op">=</span><span class="fu"><a href="https://rdrr.io/pkg/subtyper/man/getNamesFromDataframe.html" class="external-link">getNamesFromDataframe</a></span><span class="op">(</span> <span class="st">"BMX"</span>,<span class="va">fdata</span><span class="op">)</span></span>
+<span><span class="va">colcats</span><span class="op">[</span> <span class="fu"><a href="https://rdrr.io/r/base/colnames.html" class="external-link">colnames</a></span><span class="op">(</span><span class="va">fdata</span><span class="op">)</span> <span class="op"><a href="https://rdrr.io/r/base/match.html" class="external-link">%in%</a></span>  <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">bmname</span>,<span class="va">bpname</span>,<span class="st">"Testosterone"</span>,<span class="st">"TotChol"</span>,<span class="st">"Diabetes"</span> <span class="op">)</span> <span class="op">]</span><span class="op">=</span><span class="st">'physical'</span></span>
+<span><span class="va">colcats</span><span class="op">[</span> <span class="fu"><a href="https://rdrr.io/r/base/colnames.html" class="external-link">colnames</a></span><span class="op">(</span><span class="va">fdata</span><span class="op">)</span> <span class="op"><a href="https://rdrr.io/r/base/match.html" class="external-link">%in%</a></span>   <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/pkg/subtyper/man/getNamesFromDataframe.html" class="external-link">getNamesFromDataframe</a></span><span class="op">(</span> <span class="st">"DPQ"</span>, <span class="va">fdata</span> <span class="op">)</span>, </span>
+<span>  <span class="fu"><a href="https://rdrr.io/pkg/subtyper/man/getNamesFromDataframe.html" class="external-link">getNamesFromDataframe</a></span><span class="op">(</span> <span class="st">"SLQ"</span>, <span class="va">fdata</span> <span class="op">)</span> <span class="op">)</span>  <span class="op">]</span><span class="op">=</span><span class="st">'mentalhealth'</span></span>
+<span><span class="va">colcats</span><span class="op">[</span> <span class="fu"><a href="https://rdrr.io/r/base/colnames.html" class="external-link">colnames</a></span><span class="op">(</span><span class="va">fdata</span><span class="op">)</span> <span class="op"><a href="https://rdrr.io/r/base/match.html" class="external-link">%in%</a></span>  <span class="fu"><a href="https://rdrr.io/pkg/subtyper/man/getNamesFromDataframe.html" class="external-link">getNamesFromDataframe</a></span><span class="op">(</span> <span class="st">"LBX"</span>, <span class="va">fdata</span> <span class="op">)</span> <span class="op">]</span><span class="op">=</span><span class="st">'exposures'</span></span>
+<span><span class="va">colcats</span><span class="op">[</span> <span class="fu"><a href="https://rdrr.io/r/base/colnames.html" class="external-link">colnames</a></span><span class="op">(</span><span class="va">fdata</span><span class="op">)</span> <span class="op"><a href="https://rdrr.io/r/base/match.html" class="external-link">%in%</a></span>  <span class="fu"><a href="https://rdrr.io/pkg/subtyper/man/getNamesFromDataframe.html" class="external-link">getNamesFromDataframe</a></span><span class="op">(</span> <span class="st">"DR1T"</span>, <span class="va">fdata</span> <span class="op">)</span> <span class="op">]</span><span class="op">=</span><span class="st">'diet'</span></span>
+<span><span class="co"># colcats[ colnames(fdata) %in%  getNamesFromDataframe( "cfd", fdata )[-1] ]='digitspan'</span></span>
+<span><span class="va">tbl</span><span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/table.html" class="external-link">table</a></span><span class="op">(</span><span class="va">colcats</span><span class="op">)</span></span>
+<span><span class="co">##############</span></span>
+<span><span class="va">nh_list</span><span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="va">knm</span><span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">tbl</span><span class="op">)</span><span class="op">[</span><span class="op">-</span><span class="fl">1</span><span class="op">]</span></span>
+<span><span class="va">mycc</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/complete.cases.html" class="external-link">complete.cases</a></span><span class="op">(</span> <span class="va">fdata</span><span class="op">[</span> , <span class="va">colcats</span> <span class="op"><a href="https://rdrr.io/r/base/match.html" class="external-link">%in%</a></span> <span class="va">knm</span> <span class="op">]</span><span class="op">)</span></span>
+<span><span class="kw">for</span> <span class="op">(</span> <span class="va">k</span> <span class="kw">in</span> <span class="va">knm</span> <span class="op">)</span> <span class="op">{</span></span>
+<span>    <span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">k</span><span class="op">)</span></span>
+<span>    <span class="va">temp0</span><span class="op">=</span><span class="op">(</span><span class="va">fdata</span><span class="op">[</span><span class="va">mycc</span>,<span class="va">colcats</span><span class="op">==</span><span class="va">k</span><span class="op">]</span><span class="op">)</span></span>
+<span>    <span class="va">temp</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span><span class="fu"><a href="../reference/convert_to_numeric_matrix.html">convert_to_numeric_matrix</a></span><span class="op">(</span> <span class="va">temp0</span> <span class="op">)</span><span class="op">)</span></span>
+<span>    <span class="kw">for</span> <span class="op">(</span> <span class="va">j</span> <span class="kw">in</span> <span class="fl">1</span><span class="op">:</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">ncol</a></span><span class="op">(</span><span class="va">temp</span><span class="op">)</span> <span class="op">)</span> <span class="op">{</span></span>
+<span>        <span class="fu"><a href="https://rdrr.io/r/graphics/hist.html" class="external-link">hist</a></span><span class="op">(</span> <span class="va">temp</span><span class="op">[</span>,<span class="va">j</span><span class="op">]</span>, main<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/colnames.html" class="external-link">colnames</a></span><span class="op">(</span><span class="va">temp</span><span class="op">)</span><span class="op">[</span><span class="va">j</span><span class="op">]</span><span class="op">)</span></span>
+<span><span class="co">#        Sys.sleep(1)</span></span>
+<span>        <span class="op">}</span></span>
+<span>    <span class="va">nh_list</span><span class="op">[[</span><span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">nh_list</span><span class="op">)</span><span class="op">+</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span><span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/data.matrix.html" class="external-link">data.matrix</a></span><span class="op">(</span> <span class="op">(</span> <span class="va">temp</span> <span class="op">)</span> <span class="op">)</span></span>
+<span><span class="co">#    nh_list[[length(nh_list)]]=impute_and_report_na(nh_list[[length(nh_list)]] )</span></span>
+<span>    <span class="op">}</span></span></code></pre></div>
+<pre><code><span><span class="co">## [1] "demog"</span></span></code></pre>
+<p><img src="simlr_nhanes_files/figure-html/simlrcats-1.png" width="700"><img src="simlr_nhanes_files/figure-html/simlrcats-2.png" width="700"><img src="simlr_nhanes_files/figure-html/simlrcats-3.png" width="700"><img src="simlr_nhanes_files/figure-html/simlrcats-4.png" width="700"><img src="simlr_nhanes_files/figure-html/simlrcats-5.png" width="700"><img src="simlr_nhanes_files/figure-html/simlrcats-6.png" width="700"><img src="simlr_nhanes_files/figure-html/simlrcats-7.png" width="700"><img src="simlr_nhanes_files/figure-html/simlrcats-8.png" width="700"><img src="simlr_nhanes_files/figure-html/simlrcats-9.png" width="700"></p>
+<pre><code><span><span class="co">## [1] "diet"</span></span></code></pre>
+<p><img src="simlr_nhanes_files/figure-html/simlrcats-10.png" width="700"><img src="simlr_nhanes_files/figure-html/simlrcats-11.png" width="700"><img src="simlr_nhanes_files/figure-html/simlrcats-12.png" width="700"><img src="simlr_nhanes_files/figure-html/simlrcats-13.png" width="700"><img src="simlr_nhanes_files/figure-html/simlrcats-14.png" width="700"><img src="simlr_nhanes_files/figure-html/simlrcats-15.png" width="700"><img src="simlr_nhanes_files/figure-html/simlrcats-16.png" width="700"><img src="simlr_nhanes_files/figure-html/simlrcats-17.png" width="700"><img src="simlr_nhanes_files/figure-html/simlrcats-18.png" width="700"><img src="simlr_nhanes_files/figure-html/simlrcats-19.png" width="700"><img src="simlr_nhanes_files/figure-html/simlrcats-20.png" width="700"><img src="simlr_nhanes_files/figure-html/simlrcats-21.png" width="700"><img src="simlr_nhanes_files/figure-html/simlrcats-22.png" width="700"><img src="simlr_nhanes_files/figure-html/simlrcats-23.png" width="700"><img src="simlr_nhanes_files/figure-html/simlrcats-24.png" width="700"><img src="simlr_nhanes_files/figure-html/simlrcats-25.png" width="700"><img src="simlr_nhanes_files/figure-html/simlrcats-26.png" width="700"><img src="simlr_nhanes_files/figure-html/simlrcats-27.png" width="700"><img src="simlr_nhanes_files/figure-html/simlrcats-28.png" width="700"><img src="simlr_nhanes_files/figure-html/simlrcats-29.png" width="700"><img src="simlr_nhanes_files/figure-html/simlrcats-30.png" width="700"><img src="simlr_nhanes_files/figure-html/simlrcats-31.png" width="700"><img src="simlr_nhanes_files/figure-html/simlrcats-32.png" width="700"><img src="simlr_nhanes_files/figure-html/simlrcats-33.png" width="700"><img src="simlr_nhanes_files/figure-html/simlrcats-34.png" width="700"><img src="simlr_nhanes_files/figure-html/simlrcats-35.png" width="700"><img src="simlr_nhanes_files/figure-html/simlrcats-36.png" width="700"><img src="simlr_nhanes_files/figure-html/simlrcats-37.png" width="700"><img src="simlr_nhanes_files/figure-html/simlrcats-38.png" width="700"><img src="simlr_nhanes_files/figure-html/simlrcats-39.png" width="700"><img src="simlr_nhanes_files/figure-html/simlrcats-40.png" width="700"><img src="simlr_nhanes_files/figure-html/simlrcats-41.png" width="700"><img src="simlr_nhanes_files/figure-html/simlrcats-42.png" width="700"><img src="simlr_nhanes_files/figure-html/simlrcats-43.png" width="700"><img src="simlr_nhanes_files/figure-html/simlrcats-44.png" width="700"><img src="simlr_nhanes_files/figure-html/simlrcats-45.png" width="700"><img src="simlr_nhanes_files/figure-html/simlrcats-46.png" width="700"><img src="simlr_nhanes_files/figure-html/simlrcats-47.png" width="700"><img src="simlr_nhanes_files/figure-html/simlrcats-48.png" width="700"><img src="simlr_nhanes_files/figure-html/simlrcats-49.png" width="700"><img src="simlr_nhanes_files/figure-html/simlrcats-50.png" width="700"><img src="simlr_nhanes_files/figure-html/simlrcats-51.png" width="700"><img src="simlr_nhanes_files/figure-html/simlrcats-52.png" width="700"><img src="simlr_nhanes_files/figure-html/simlrcats-53.png" width="700"><img src="simlr_nhanes_files/figure-html/simlrcats-54.png" width="700"><img src="simlr_nhanes_files/figure-html/simlrcats-55.png" width="700"><img src="simlr_nhanes_files/figure-html/simlrcats-56.png" width="700"><img src="simlr_nhanes_files/figure-html/simlrcats-57.png" width="700"><img src="simlr_nhanes_files/figure-html/simlrcats-58.png" width="700"><img src="simlr_nhanes_files/figure-html/simlrcats-59.png" width="700"><img src="simlr_nhanes_files/figure-html/simlrcats-60.png" width="700"><img src="simlr_nhanes_files/figure-html/simlrcats-61.png" width="700"><img src="simlr_nhanes_files/figure-html/simlrcats-62.png" width="700"><img src="simlr_nhanes_files/figure-html/simlrcats-63.png" width="700"><img src="simlr_nhanes_files/figure-html/simlrcats-64.png" width="700"><img src="simlr_nhanes_files/figure-html/simlrcats-65.png" width="700"><img src="simlr_nhanes_files/figure-html/simlrcats-66.png" width="700"><img src="simlr_nhanes_files/figure-html/simlrcats-67.png" width="700"><img src="simlr_nhanes_files/figure-html/simlrcats-68.png" width="700"><img src="simlr_nhanes_files/figure-html/simlrcats-69.png" width="700"><img src="simlr_nhanes_files/figure-html/simlrcats-70.png" width="700"><img src="simlr_nhanes_files/figure-html/simlrcats-71.png" width="700"><img src="simlr_nhanes_files/figure-html/simlrcats-72.png" width="700"><img src="simlr_nhanes_files/figure-html/simlrcats-73.png" width="700"><img src="simlr_nhanes_files/figure-html/simlrcats-74.png" width="700"><img src="simlr_nhanes_files/figure-html/simlrcats-75.png" width="700"><img src="simlr_nhanes_files/figure-html/simlrcats-76.png" width="700"><img src="simlr_nhanes_files/figure-html/simlrcats-77.png" width="700"><img src="simlr_nhanes_files/figure-html/simlrcats-78.png" width="700"><img src="simlr_nhanes_files/figure-html/simlrcats-79.png" width="700"><img src="simlr_nhanes_files/figure-html/simlrcats-80.png" width="700"></p>
+<pre><code><span><span class="co">## [1] "exposures"</span></span></code></pre>
+<p><img src="simlr_nhanes_files/figure-html/simlrcats-81.png" width="700"><img src="simlr_nhanes_files/figure-html/simlrcats-82.png" width="700"><img src="simlr_nhanes_files/figure-html/simlrcats-83.png" width="700"><img src="simlr_nhanes_files/figure-html/simlrcats-84.png" width="700"><img src="simlr_nhanes_files/figure-html/simlrcats-85.png" width="700"><img src="simlr_nhanes_files/figure-html/simlrcats-86.png" width="700"><img src="simlr_nhanes_files/figure-html/simlrcats-87.png" width="700"><img src="simlr_nhanes_files/figure-html/simlrcats-88.png" width="700"></p>
+<pre><code><span><span class="co">## [1] "mentalhealth"</span></span></code></pre>
+<p><img src="simlr_nhanes_files/figure-html/simlrcats-89.png" width="700"><img src="simlr_nhanes_files/figure-html/simlrcats-90.png" width="700"><img src="simlr_nhanes_files/figure-html/simlrcats-91.png" width="700"><img src="simlr_nhanes_files/figure-html/simlrcats-92.png" width="700"><img src="simlr_nhanes_files/figure-html/simlrcats-93.png" width="700"><img src="simlr_nhanes_files/figure-html/simlrcats-94.png" width="700"><img src="simlr_nhanes_files/figure-html/simlrcats-95.png" width="700"><img src="simlr_nhanes_files/figure-html/simlrcats-96.png" width="700"><img src="simlr_nhanes_files/figure-html/simlrcats-97.png" width="700"><img src="simlr_nhanes_files/figure-html/simlrcats-98.png" width="700"><img src="simlr_nhanes_files/figure-html/simlrcats-99.png" width="700"><img src="simlr_nhanes_files/figure-html/simlrcats-100.png" width="700"></p>
+<pre><code><span><span class="co">## [1] "physical"</span></span></code></pre>
+<p><img src="simlr_nhanes_files/figure-html/simlrcats-101.png" width="700"><img src="simlr_nhanes_files/figure-html/simlrcats-102.png" width="700"><img src="simlr_nhanes_files/figure-html/simlrcats-103.png" width="700"><img src="simlr_nhanes_files/figure-html/simlrcats-104.png" width="700"><img src="simlr_nhanes_files/figure-html/simlrcats-105.png" width="700"><img src="simlr_nhanes_files/figure-html/simlrcats-106.png" width="700"><img src="simlr_nhanes_files/figure-html/simlrcats-107.png" width="700"><img src="simlr_nhanes_files/figure-html/simlrcats-108.png" width="700"><img src="simlr_nhanes_files/figure-html/simlrcats-109.png" width="700"><img src="simlr_nhanes_files/figure-html/simlrcats-110.png" width="700"><img src="simlr_nhanes_files/figure-html/simlrcats-111.png" width="700"><img src="simlr_nhanes_files/figure-html/simlrcats-112.png" width="700"><img src="simlr_nhanes_files/figure-html/simlrcats-113.png" width="700"><img src="simlr_nhanes_files/figure-html/simlrcats-114.png" width="700"><img src="simlr_nhanes_files/figure-html/simlrcats-115.png" width="700"><img src="simlr_nhanes_files/figure-html/simlrcats-116.png" width="700"><img src="simlr_nhanes_files/figure-html/simlrcats-117.png" width="700"><img src="simlr_nhanes_files/figure-html/simlrcats-118.png" width="700"><img src="simlr_nhanes_files/figure-html/simlrcats-119.png" width="700"><img src="simlr_nhanes_files/figure-html/simlrcats-120.png" width="700"><img src="simlr_nhanes_files/figure-html/simlrcats-121.png" width="700"></p>
+<div class="sourceCode" id="cb41"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">nh_list</span><span class="op">)</span><span class="op">=</span><span class="va">knm</span></span>
+<span><span class="co">#####</span></span></code></pre></div>
+<div class="sourceCode" id="cb42"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co">################################################################################</span></span>
+<span><span class="va">regs</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/ANTsR/man/regularizeSimlr.html" class="external-link">regularizeSimlr</a></span><span class="op">(</span><span class="va">nh_list</span>,fraction<span class="op">=</span><span class="fl">0.15</span>,sigma<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fl">1.0</span>,<span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">nh_list</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="va">regs</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/ANTsR/man/regularizeSimlr.html" class="external-link">regularizeSimlr</a></span><span class="op">(</span><span class="va">nh_list</span><span class="op">)</span></span>
-<span><span class="va">regs</span><span class="op">[[</span><span class="fl">2</span><span class="op">]</span><span class="op">]</span><span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/diag.html" class="external-link">diag</a></span><span class="op">(</span><span class="fl">2</span><span class="op">)</span></span>
-<span><span class="va">initu</span><span class="op">=</span><span class="fu"><a href="https://rdrr.io/pkg/ANTsR/man/initializeSimlr.html" class="external-link">initializeSimlr</a></span><span class="op">(</span> <span class="va">nh_list</span>, k<span class="op">=</span><span class="fl">40</span>, jointReduction<span class="op">=</span><span class="cn">TRUE</span> <span class="op">)</span></span>
-<span><span class="va">resultNH</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/ANTsR/man/simlr.html" class="external-link">simlr</a></span><span class="op">(</span><span class="va">nh_list</span>, iterations<span class="op">=</span><span class="fl">100</span>, </span>
+<span><span class="va">wdemog</span><span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/which.html" class="external-link">which</a></span><span class="op">(</span> <span class="va">knm</span> <span class="op">==</span> <span class="st">'demog'</span><span class="op">)</span></span>
+<span><span class="va">regs</span><span class="op">[[</span> <span class="va">wdemog</span><span class="op">]</span><span class="op">]</span><span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/diag.html" class="external-link">diag</a></span><span class="op">(</span> <span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">ncol</a></span><span class="op">(</span><span class="va">nh_list</span><span class="op">[[</span><span class="va">wdemog</span><span class="op">]</span><span class="op">]</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="va">initu</span><span class="op">=</span><span class="fu"><a href="https://rdrr.io/pkg/ANTsR/man/initializeSimlr.html" class="external-link">initializeSimlr</a></span><span class="op">(</span> <span class="va">nh_list</span>, k<span class="op">=</span><span class="fu"><a href="../reference/min_columns_list.html">min_columns_list</a></span><span class="op">(</span><span class="va">nh_list</span><span class="op">)</span>, jointReduction<span class="op">=</span><span class="cn">TRUE</span> <span class="op">)</span></span>
+<span><span class="va">resultNH</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/ANTsR/man/simlr.html" class="external-link">simlr</a></span><span class="op">(</span> <span class="va">nh_list</span>, </span>
+<span>        iterations<span class="op">=</span><span class="fl">300</span>,</span>
 <span>        sparsenessQuantiles<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fl">0.5</span>,<span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">nh_list</span><span class="op">)</span><span class="op">)</span>,</span>
 <span>        positivities<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="st">"positive"</span>,<span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">nh_list</span><span class="op">)</span><span class="op">)</span>, </span>
-<span>        energyType<span class="op">=</span><span class="st">'regression'</span>, mixAlg<span class="op">=</span><span class="st">'ica'</span>,</span>
-<span><span class="co">#        energyType='cca', mixAlg='pca',</span></span>
-<span><span class="co">#        scale=c("centerAndScale", "np"),</span></span>
-<span>        scale<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span> <span class="st">"robust"</span>, <span class="st">"centerAndScale"</span>, <span class="st">"np"</span> <span class="op">)</span>,</span>
-<span>        constraint<span class="op">=</span><span class="st">"Stiefelx1000x1000"</span>,</span>
-<span>        initialUMatrix<span class="op">=</span><span class="va">initu</span>, verbose<span class="op">=</span><span class="cn">T</span><span class="op">)</span></span>
-<span><span class="co">###############</span></span>
+<span><span class="co">#        energyType='regression', mixAlg='ica',</span></span>
+<span>        energyType<span class="op">=</span><span class="st">'cca'</span>, mixAlg<span class="op">=</span><span class="st">'pca'</span>,</span>
+<span>        scale<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"centerAndScale"</span>, <span class="st">"np"</span><span class="op">)</span>,</span>
+<span><span class="co">#        scale=c( "robust",  "np" ),</span></span>
+<span>        constraint<span class="op">=</span><span class="st">"Grassmannx10x10"</span>,</span>
+<span>        initialUMatrix<span class="op">=</span><span class="va">initu</span>, verbose<span class="op">=</span><span class="cn">T</span> <span class="op">)</span></span></code></pre></div>
+<pre><code><span><span class="co">## [1] "Grassmann" "10"        "10"       </span></span>
+<span><span class="co">## [1] "     &lt;0&gt; BUILD-V &lt;0&gt; BUILD-V &lt;0&gt; BUILD-V &lt;0&gt; BUILD-V &lt;0&gt;    "</span></span>
+<span><span class="co">## [1] "initialDataTerm: 1.21946487899318  &lt;o&gt; mixer: pca  &lt;o&gt; E:  cca"</span></span>
+<span><span class="co">## [1] "Iteration: 1 bestEv: 0.61932734053793 bestIt: 1 CE: 0.61932734053793 featOrth: 0.0715750626425437"</span></span>
+<span><span class="co">## [1] "Iteration: 2 bestEv: 0.577544232613685 bestIt: 2 CE: 0.577544232613685 featOrth: 0.0669961577183825"</span></span>
+<span><span class="co">## [1] "Iteration: 3 bestEv: 0.535910687638303 bestIt: 3 CE: 0.535910687638303 featOrth: 0.062992404708655"</span></span>
+<span><span class="co">## [1] "Iteration: 4 bestEv: 0.421552500872032 bestIt: 4 CE: 0.421552500872032 featOrth: 0.050847382201307"</span></span>
+<span><span class="co">## [1] "Iteration: 5 bestEv: 0.382947025670519 bestIt: 5 CE: 0.382947025670519 featOrth: 0.0467064270190661"</span></span>
+<span><span class="co">## [1] "Iteration: 6 bestEv: 0.284493432058705 bestIt: 6 CE: 0.284493432058705 featOrth: 0.0359508062820522"</span></span>
+<span><span class="co">## [1] "Iteration: 7 bestEv: 0.155684357566727 bestIt: 7 CE: 0.155684357566727 featOrth: 0.0248506813685202"</span></span>
+<span><span class="co">## [1] "Iteration: 8 bestEv: 0.0829324949739227 bestIt: 8 CE: 0.0829324949739227 featOrth: 0.0191366886963609"</span></span>
+<span><span class="co">## [1] "Iteration: 9 bestEv: 0.0215930486755787 bestIt: 9 CE: 0.0215930486755787 featOrth: 0.0133772458052045"</span></span>
+<span><span class="co">## [1] "Iteration: 10 bestEv: -0.00606833727863338 bestIt: 10 CE: -0.00606833727863338 featOrth: 0.00935360378073757"</span></span>
+<span><span class="co">## [1] "Iteration: 11 bestEv: -0.00606833727863344 bestIt: 11 CE: -0.00606833727863345 featOrth: 0.00935360378073757"</span></span>
+<span><span class="co">## [1] "Iteration: 12 bestEv: -0.00606833727863344 bestIt: 11 CE: -0.00606833727863345 featOrth: 0.00935360378073757"</span></span>
+<span><span class="co">## [1] "Iteration: 13 bestEv: -0.00606833727863344 bestIt: 11 CE: -0.00606833727863345 featOrth: 0.00935360378073757"</span></span>
+<span><span class="co">## [1] "Iteration: 14 bestEv: -0.00606833727863344 bestIt: 11 CE: -0.00606833727863345 featOrth: 0.00935360378073757"</span></span>
+<span><span class="co">## [1] "Iteration: 15 bestEv: -0.00606833727863344 bestIt: 11 CE: -0.00606833727863345 featOrth: 0.00935360378073757"</span></span>
+<span><span class="co">## [1] "Iteration: 16 bestEv: -0.00606833727863344 bestIt: 11 CE: -0.00606833727863345 featOrth: 0.00935360378073757"</span></span>
+<span><span class="co">## [1] "Iteration: 17 bestEv: -0.00606833727863344 bestIt: 11 CE: -0.00606833727863345 featOrth: 0.00935360378073757"</span></span></code></pre>
+<div class="sourceCode" id="cb44"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co">#####################################################</span></span>
 <span><span class="va">projlist</span><span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="va">mysimk</span><span class="op">=</span><span class="fl">2</span></span>
 <span><span class="kw">for</span> <span class="op">(</span> <span class="va">k</span> <span class="kw">in</span> <span class="fl">1</span><span class="op">:</span><span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">nh_list</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span>
@@ -356,20 +383,209 @@ years). • OCD390G: Employment Status (in occupation questionnaire).</p>
 <span>    <span class="va">projlist</span><span class="op">[[</span><span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">projlist</span><span class="op">)</span><span class="op">+</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span><span class="op">=</span><span class="va">ux</span></span>
 <span><span class="op">}</span></span>
 <span><span class="va">simdf</span><span class="op">=</span><span class="va">simdf2</span><span class="op">=</span><span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/bind_cols.html" class="external-link">bind_cols</a></span><span class="op">(</span><span class="va">projlist</span><span class="op">)</span></span>
-<span><span class="va">simdf2</span><span class="op">$</span><span class="va">CFDDS</span><span class="op">=</span><span class="va">nhan</span><span class="op">$</span><span class="va">CFDDS</span></span>
-<span><span class="va">simdf2</span><span class="op">$</span><span class="va">CFDAST</span><span class="op">=</span><span class="va">nhan</span><span class="op">$</span><span class="va">CFDAST</span></span>
-<span><span class="va">myform</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span> <span class="st">"CFDDS ~ "</span>,<span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span> <span class="fu"><a href="https://rdrr.io/r/base/colnames.html" class="external-link">colnames</a></span><span class="op">(</span><span class="va">simdf</span><span class="op">)</span>, collapse<span class="op">=</span><span class="st">'+'</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="va">mdl</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/lm.html" class="external-link">lm</a></span><span class="op">(</span> <span class="va">myform</span>, data<span class="op">=</span><span class="va">simdf2</span> <span class="op">)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span> <span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span> <span class="va">mdl</span> <span class="op">)</span> <span class="op">)</span></span>
-<span><span class="co">#######################</span></span>
-<span><span class="fu"><a href="https://rdrr.io/pkg/ANTsR/man/interpret_simlr_vector2.html" class="external-link">interpret_simlr_vector2</a></span><span class="op">(</span> <span class="va">resultNH</span><span class="op">$</span><span class="va">v</span><span class="op">[[</span><span class="st">'exposures'</span><span class="op">]</span><span class="op">]</span>, <span class="fl">1</span>, n2show<span class="op">=</span><span class="fl">5</span>, shortnames<span class="op">=</span><span class="cn">F</span> <span class="op">)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/pkg/ANTsR/man/interpret_simlr_vector2.html" class="external-link">interpret_simlr_vector2</a></span><span class="op">(</span> <span class="va">resultNH</span><span class="op">$</span><span class="va">v</span><span class="op">[[</span><span class="st">'exposures'</span><span class="op">]</span><span class="op">]</span>, <span class="fl">2</span>, n2show<span class="op">=</span><span class="fl">5</span>, shortnames<span class="op">=</span><span class="cn">F</span> <span class="op">)</span></span>
+<span><span class="va">cognames</span><span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"cerad_sum"</span>,<span class="st">"cfdast"</span>,<span class="st">"cfdds"</span><span class="op">)</span></span>
+<span><span class="va">cognames</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span></span>
+<span>  <span class="st">"z_cerad_re"</span>, <span class="st">"z_animal_re"</span>,     <span class="st">"z_digit_re"</span>,      <span class="st">"z_delayed_re"</span>,    <span class="st">"z_global_re"</span></span>
+<span><span class="co">#  "z_cerad_age", "z_animal_age",     "z_digit_age",      "z_delayed_age",    "z_global_age",</span></span>
+<span><span class="co">#  "z_cerad_edu", "z_animal_edu",     "z_digit_edu",      "z_delayed_edu",    "z_global_edu"</span></span>
+<span><span class="op">)</span></span>
+<span><span class="va">simdf2</span><span class="op">[</span>,<span class="va">cognames</span><span class="op">]</span><span class="op">=</span><span class="va">fdata</span><span class="op">[</span><span class="va">mycc</span>,<span class="va">cognames</span><span class="op">]</span></span>
+<span><span class="kw">for</span> <span class="op">(</span> <span class="va">kk</span> <span class="kw">in</span> <span class="fl">1</span><span class="op">:</span><span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">cognames</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span>
+<span>  <span class="va">myform</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span> <span class="va">cognames</span><span class="op">[</span><span class="va">kk</span><span class="op">]</span>,<span class="st">" ~ "</span>,<span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span> <span class="fu"><a href="https://rdrr.io/r/base/colnames.html" class="external-link">colnames</a></span><span class="op">(</span><span class="va">simdf</span><span class="op">)</span>, collapse<span class="op">=</span><span class="st">'+'</span><span class="op">)</span><span class="op">)</span></span>
+<span>  <span class="va">mdl</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/lm.html" class="external-link">lm</a></span><span class="op">(</span> <span class="va">myform</span>, data<span class="op">=</span><span class="va">simdf2</span> <span class="op">)</span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span> <span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span> <span class="va">mdl</span> <span class="op">)</span> <span class="op">)</span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span> <span class="va">cognames</span><span class="op">[</span><span class="va">kk</span><span class="op">]</span><span class="op">)</span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/base/Sys.sleep.html" class="external-link">Sys.sleep</a></span><span class="op">(</span><span class="fl">3</span><span class="op">)</span></span>
+<span><span class="op">}</span></span></code></pre></div>
+<pre><code><span><span class="co">## </span></span>
+<span><span class="co">## Call:</span></span>
+<span><span class="co">## lm(formula = myform, data = simdf2)</span></span>
+<span><span class="co">## </span></span>
+<span><span class="co">## Residuals:</span></span>
+<span><span class="co">##      Min       1Q   Median       3Q      Max </span></span>
+<span><span class="co">## -2.97408 -0.60523  0.04132  0.63516  2.21646 </span></span>
+<span><span class="co">## </span></span>
+<span><span class="co">## Coefficients:</span></span>
+<span><span class="co">##                 Estimate Std. Error t value Pr(&gt;|t|)    </span></span>
+<span><span class="co">## (Intercept)   -1.392e+00  5.887e-01  -2.365 0.018253 *  </span></span>
+<span><span class="co">## demog1        -3.158e+00  6.678e-01  -4.729 2.64e-06 ***</span></span>
+<span><span class="co">## demog2         1.166e+01  6.175e+00   1.888 0.059406 .  </span></span>
+<span><span class="co">## diet1          4.152e-04  1.194e-04   3.477 0.000533 ***</span></span>
+<span><span class="co">## diet2         -1.047e-05  6.531e-06  -1.603 0.109196    </span></span>
+<span><span class="co">## exposures1     3.763e-03  1.588e-02   0.237 0.812742    </span></span>
+<span><span class="co">## exposures2     5.730e-02  1.926e-02   2.975 0.003009 ** </span></span>
+<span><span class="co">## mentalhealth1 -3.873e-01  2.107e-01  -1.838 0.066404 .  </span></span>
+<span><span class="co">## mentalhealth2 -5.555e-01  5.998e-01  -0.926 0.354621    </span></span>
+<span><span class="co">## physical1      6.022e-02  3.386e-02   1.778 0.075698 .  </span></span>
+<span><span class="co">## physical2      1.034e-02  2.999e-02   0.345 0.730317    </span></span>
+<span><span class="co">## ---</span></span>
+<span><span class="co">## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</span></span>
+<span><span class="co">## </span></span>
+<span><span class="co">## Residual standard error: 0.9023 on 858 degrees of freedom</span></span>
+<span><span class="co">##   (12 observations deleted due to missingness)</span></span>
+<span><span class="co">## Multiple R-squared:  0.06848,    Adjusted R-squared:  0.05762 </span></span>
+<span><span class="co">## F-statistic: 6.307 on 10 and 858 DF,  p-value: 2.2e-09</span></span>
+<span><span class="co">## </span></span>
+<span><span class="co">## [1] "z_cerad_re"</span></span>
+<span><span class="co">## </span></span>
+<span><span class="co">## Call:</span></span>
+<span><span class="co">## lm(formula = myform, data = simdf2)</span></span>
+<span><span class="co">## </span></span>
+<span><span class="co">## Residuals:</span></span>
+<span><span class="co">##     Min      1Q  Median      3Q     Max </span></span>
+<span><span class="co">## -2.5675 -0.6986 -0.0804  0.6356  3.6167 </span></span>
+<span><span class="co">## </span></span>
+<span><span class="co">## Coefficients:</span></span>
+<span><span class="co">##                 Estimate Std. Error t value Pr(&gt;|t|)    </span></span>
+<span><span class="co">## (Intercept)   -2.235e+00  6.503e-01  -3.437 0.000617 ***</span></span>
+<span><span class="co">## demog1        -2.718e-05  7.402e-01   0.000 0.999971    </span></span>
+<span><span class="co">## demog2        -3.042e+00  6.817e+00  -0.446 0.655530    </span></span>
+<span><span class="co">## diet1          3.561e-04  1.330e-04   2.678 0.007557 ** </span></span>
+<span><span class="co">## diet2         -6.351e-06  7.714e-06  -0.823 0.410544    </span></span>
+<span><span class="co">## exposures1    -8.728e-03  1.750e-02  -0.499 0.618197    </span></span>
+<span><span class="co">## exposures2     3.901e-02  2.123e-02   1.837 0.066507 .  </span></span>
+<span><span class="co">## mentalhealth1 -4.766e-01  2.324e-01  -2.051 0.040592 *  </span></span>
+<span><span class="co">## mentalhealth2 -8.675e-01  6.625e-01  -1.309 0.190726    </span></span>
+<span><span class="co">## physical1      9.117e-02  3.727e-02   2.446 0.014639 *  </span></span>
+<span><span class="co">## physical2      9.746e-03  3.296e-02   0.296 0.767530    </span></span>
+<span><span class="co">## ---</span></span>
+<span><span class="co">## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</span></span>
+<span><span class="co">## </span></span>
+<span><span class="co">## Residual standard error: 0.9912 on 850 degrees of freedom</span></span>
+<span><span class="co">##   (20 observations deleted due to missingness)</span></span>
+<span><span class="co">## Multiple R-squared:  0.05437,    Adjusted R-squared:  0.04324 </span></span>
+<span><span class="co">## F-statistic: 4.887 on 10 and 850 DF,  p-value: 6.932e-07</span></span>
+<span><span class="co">## </span></span>
+<span><span class="co">## [1] "z_animal_re"</span></span>
+<span><span class="co">## </span></span>
+<span><span class="co">## Call:</span></span>
+<span><span class="co">## lm(formula = myform, data = simdf2)</span></span>
+<span><span class="co">## </span></span>
+<span><span class="co">## Residuals:</span></span>
+<span><span class="co">##      Min       1Q   Median       3Q      Max </span></span>
+<span><span class="co">## -2.68666 -0.70897 -0.06095  0.66542  2.69719 </span></span>
+<span><span class="co">## </span></span>
+<span><span class="co">## Coefficients:</span></span>
+<span><span class="co">##                 Estimate Std. Error t value Pr(&gt;|t|)    </span></span>
+<span><span class="co">## (Intercept)   -2.757e+00  6.221e-01  -4.431 1.06e-05 ***</span></span>
+<span><span class="co">## demog1        -2.479e+00  7.068e-01  -3.508 0.000474 ***</span></span>
+<span><span class="co">## demog2         7.806e+00  6.552e+00   1.191 0.233867    </span></span>
+<span><span class="co">## diet1          2.990e-04  1.265e-04   2.364 0.018314 *  </span></span>
+<span><span class="co">## diet2          4.810e-06  6.949e-06   0.692 0.488964    </span></span>
+<span><span class="co">## exposures1     2.492e-02  1.684e-02   1.480 0.139260    </span></span>
+<span><span class="co">## exposures2     7.444e-02  2.053e-02   3.627 0.000304 ***</span></span>
+<span><span class="co">## mentalhealth1 -7.919e-01  2.234e-01  -3.544 0.000415 ***</span></span>
+<span><span class="co">## mentalhealth2 -5.098e-01  6.381e-01  -0.799 0.424500    </span></span>
+<span><span class="co">## physical1      1.285e-01  3.574e-02   3.597 0.000340 ***</span></span>
+<span><span class="co">## physical2     -4.170e-03  3.186e-02  -0.131 0.895919    </span></span>
+<span><span class="co">## ---</span></span>
+<span><span class="co">## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</span></span>
+<span><span class="co">## </span></span>
+<span><span class="co">## Residual standard error: 0.9639 on 870 degrees of freedom</span></span>
+<span><span class="co">## Multiple R-squared:  0.07519,    Adjusted R-squared:  0.06456 </span></span>
+<span><span class="co">## F-statistic: 7.073 on 10 and 870 DF,  p-value: 9.364e-11</span></span>
+<span><span class="co">## </span></span>
+<span><span class="co">## [1] "z_digit_re"</span></span>
+<span><span class="co">## </span></span>
+<span><span class="co">## Call:</span></span>
+<span><span class="co">## lm(formula = myform, data = simdf2)</span></span>
+<span><span class="co">## </span></span>
+<span><span class="co">## Residuals:</span></span>
+<span><span class="co">##     Min      1Q  Median      3Q     Max </span></span>
+<span><span class="co">## -2.7968 -0.6182  0.0582  0.6831  1.9001 </span></span>
+<span><span class="co">## </span></span>
+<span><span class="co">## Coefficients:</span></span>
+<span><span class="co">##                 Estimate Std. Error t value Pr(&gt;|t|)    </span></span>
+<span><span class="co">## (Intercept)   -2.163e+00  6.047e-01  -3.578 0.000366 ***</span></span>
+<span><span class="co">## demog1        -3.193e+00  6.853e-01  -4.659 3.68e-06 ***</span></span>
+<span><span class="co">## demog2         1.245e+01  6.334e+00   1.965 0.049742 *  </span></span>
+<span><span class="co">## diet1          2.929e-04  1.227e-04   2.388 0.017156 *  </span></span>
+<span><span class="co">## diet2         -8.077e-06  6.709e-06  -1.204 0.228929    </span></span>
+<span><span class="co">## exposures1     7.228e-03  1.631e-02   0.443 0.657778    </span></span>
+<span><span class="co">## exposures2     4.712e-02  1.978e-02   2.382 0.017423 *  </span></span>
+<span><span class="co">## mentalhealth1 -1.845e-01  2.156e-01  -0.856 0.392407    </span></span>
+<span><span class="co">## mentalhealth2 -4.877e-01  6.161e-01  -0.792 0.428744    </span></span>
+<span><span class="co">## physical1      7.797e-02  3.478e-02   2.242 0.025200 *  </span></span>
+<span><span class="co">## physical2      3.227e-02  3.080e-02   1.048 0.295143    </span></span>
+<span><span class="co">## ---</span></span>
+<span><span class="co">## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</span></span>
+<span><span class="co">## </span></span>
+<span><span class="co">## Residual standard error: 0.9268 on 859 degrees of freedom</span></span>
+<span><span class="co">##   (11 observations deleted due to missingness)</span></span>
+<span><span class="co">## Multiple R-squared:  0.05448,    Adjusted R-squared:  0.04347 </span></span>
+<span><span class="co">## F-statistic: 4.949 on 10 and 859 DF,  p-value: 5.378e-07</span></span>
+<span><span class="co">## </span></span>
+<span><span class="co">## [1] "z_delayed_re"</span></span>
+<span><span class="co">## </span></span>
+<span><span class="co">## Call:</span></span>
+<span><span class="co">## lm(formula = myform, data = simdf2)</span></span>
+<span><span class="co">## </span></span>
+<span><span class="co">## Residuals:</span></span>
+<span><span class="co">##    Min     1Q Median     3Q    Max </span></span>
+<span><span class="co">## -6.253 -1.619 -0.042  1.580  7.514 </span></span>
+<span><span class="co">## </span></span>
+<span><span class="co">## Coefficients:</span></span>
+<span><span class="co">##                 Estimate Std. Error t value Pr(&gt;|t|)    </span></span>
+<span><span class="co">## (Intercept)   -6.277e+00  1.491e+00  -4.210 2.83e-05 ***</span></span>
+<span><span class="co">## demog1        -5.341e+00  1.697e+00  -3.147 0.001708 ** </span></span>
+<span><span class="co">## demog2         1.509e+01  1.564e+01   0.965 0.334941    </span></span>
+<span><span class="co">## diet1          9.409e-04  3.049e-04   3.086 0.002095 ** </span></span>
+<span><span class="co">## diet2         -1.156e-06  1.767e-05  -0.065 0.947864    </span></span>
+<span><span class="co">## exposures1     2.311e-02  4.029e-02   0.574 0.566420    </span></span>
+<span><span class="co">## exposures2     1.709e-01  4.867e-02   3.511 0.000469 ***</span></span>
+<span><span class="co">## mentalhealth1 -1.574e+00  5.351e-01  -2.942 0.003346 ** </span></span>
+<span><span class="co">## mentalhealth2 -2.131e+00  1.519e+00  -1.403 0.160919    </span></span>
+<span><span class="co">## physical1      2.850e-01  8.568e-02   3.326 0.000918 ***</span></span>
+<span><span class="co">## physical2      6.375e-03  7.568e-02   0.084 0.932893    </span></span>
+<span><span class="co">## ---</span></span>
+<span><span class="co">## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</span></span>
+<span><span class="co">## </span></span>
+<span><span class="co">## Residual standard error: 2.27 on 846 degrees of freedom</span></span>
+<span><span class="co">##   (24 observations deleted due to missingness)</span></span>
+<span><span class="co">## Multiple R-squared:  0.0723, Adjusted R-squared:  0.06134 </span></span>
+<span><span class="co">## F-statistic: 6.594 on 10 and 846 DF,  p-value: 6.9e-10</span></span>
+<span><span class="co">## </span></span>
+<span><span class="co">## [1] "z_global_re"</span></span></code></pre>
+<div class="sourceCode" id="cb46"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co">#######################</span></span>
+<span><span class="kw">for</span> <span class="op">(</span> <span class="va">k</span> <span class="kw">in</span> <span class="va">knm</span> <span class="op">)</span> <span class="op">{</span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">k</span><span class="op">)</span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span> <span class="fu"><a href="https://rdrr.io/pkg/ANTsR/man/interpret_simlr_vector2.html" class="external-link">interpret_simlr_vector2</a></span><span class="op">(</span> <span class="va">resultNH</span><span class="op">$</span><span class="va">v</span><span class="op">[[</span><span class="va">k</span><span class="op">]</span><span class="op">]</span>, <span class="fl">1</span>, n2show<span class="op">=</span><span class="fl">3</span>, shortnames<span class="op">=</span><span class="cn">F</span> <span class="op">)</span> <span class="op">)</span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span> <span class="fu"><a href="https://rdrr.io/pkg/ANTsR/man/interpret_simlr_vector2.html" class="external-link">interpret_simlr_vector2</a></span><span class="op">(</span> <span class="va">resultNH</span><span class="op">$</span><span class="va">v</span><span class="op">[[</span><span class="va">k</span><span class="op">]</span><span class="op">]</span>, <span class="fl">2</span>, n2show<span class="op">=</span><span class="fl">3</span>, shortnames<span class="op">=</span><span class="cn">F</span> <span class="op">)</span> <span class="op">)</span></span>
+<span><span class="op">}</span></span></code></pre></div>
+<pre><code><span><span class="co">## [1] "demog"</span></span>
+<span><span class="co">## riagendr_1     race_2 riagendr_2 </span></span>
+<span><span class="co">## 1.00000000 0.29547397 0.08087938 </span></span>
+<span><span class="co">## riagendr_1     race_2     race_3 </span></span>
+<span><span class="co">##  1.0000000  0.8748512  0.1431901 </span></span>
+<span><span class="co">## [1] "diet"</span></span>
+<span><span class="co">##  DR1TM161  DR1TMFAT  DR1TM181 </span></span>
+<span><span class="co">## 1.0000000 0.8493282 0.8250955 </span></span>
+<span><span class="co">##  DR1TLYCO  DR1TSODI    DR1TVC </span></span>
+<span><span class="co">## 1.0000000 0.1927694 0.1603342 </span></span>
+<span><span class="co">## [1] "exposures"</span></span>
+<span><span class="co">##     LBXBMN     LBXIHG     LBXBCD </span></span>
+<span><span class="co">## 1.00000000 0.14145834 0.04121102 </span></span>
+<span><span class="co">##    LBXTHG    LBXBGM    LBXIHG </span></span>
+<span><span class="co">## 1.0000000 0.9415720 0.9369719 </span></span>
+<span><span class="co">## [1] "mentalhealth"</span></span>
+<span><span class="co">##    DPQ020    DPQ070    DPQ080 </span></span>
+<span><span class="co">## 1.0000000 0.8886414 0.3058964 </span></span>
+<span><span class="co">##    DPQ090    DPQ040    DPQ030 </span></span>
+<span><span class="co">## 1.0000000 0.7109818 0.3758003 </span></span>
+<span><span class="co">## [1] "physical"</span></span>
+<span><span class="co">##    BMXLEG     BMXHT   BMXARML </span></span>
+<span><span class="co">## 1.0000000 0.8440892 0.4431668 </span></span>
+<span><span class="co">##           BMXARML BPXPULS_Irregular            BPXDI1 </span></span>
+<span><span class="co">##         1.0000000         0.3520253         0.3507924</span></span></code></pre>
+<div class="sourceCode" id="cb48"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co">##########################################################################################</span></span>
 <span><span class="co"># https://wwwn.cdc.gov/nchs/nhanes/search/default.aspx</span></span>
 <span><span class="co"># &gt; interpret_simlr_vector2( resultNH$v[['exposures']], 1, n2show=5, shortnames=F )</span></span>
 <span><span class="co">#   LBXVBZ    LBXVOX    LBXVFN    LBX2DF </span></span>
 <span><span class="co"># benzene, Xylene, furan, Dimethylfuran</span></span>
 <span><span class="co"># 1.0000000 0.3346728 0.1868323 0.0586727 </span></span>
-<span><span class="co">#######################</span></span>
+<span><span class="co">##########################################################################################</span></span>
 <span><span class="co">###</span></span></code></pre></div>
 </div>
   </main>

@@ -165,13 +165,13 @@ getNamesFromDataframe( 'RIDE',fdata ),
 getNamesFromDataframe( 'CFDCST',fdata ),
 getNamesFromDataframe( 'SDDSRVY', fdata ),
 getNamesFromDataframe( 'CFDCIT',fdata ), getNamesFromDataframe( 'LC',fdata ), getNamesFromDataframe( 'SI',fdata ) ) )
-problematic_factors <- check_formula_factors(myform, df)
+problematic_factors <- check_formula_factors(myformR, df)
 print(problematic_factors)
 idata2=impute_data(fdata )
 # mdl = lm( myformR, data=idata2)
 # summary( mdl )
-mdl0 = lm( myformR, data=fdata)
-summary( mdl0 )
+# mdl0 = lm( myformR, data=fdata)
+# summary( mdl0 )
 ##############
 ####
 ```
@@ -222,8 +222,8 @@ resultNH <- simlr( nh_list,
         iterations=300,
         sparsenessQuantiles=rep(0.5,length(nh_list)),
         positivities=rep("positive",length(nh_list)), 
-        energyType='regression', mixAlg='ica',
-#        energyType='cca', mixAlg='pca',
+#        energyType='regression', mixAlg='ica',
+        energyType='cca', mixAlg='pca',
         scale=c("centerAndScale", "np"),
 #        scale=c( "robust",  "np" ),
         constraint="Grassmannx10x10",
