@@ -214,19 +214,20 @@ names(nh_list)=knm
 ```{r nhanessimlr,eval=TRUE}
 ################################################################################
 regs <- regularizeSimlr(nh_list,fraction=0.15,sigma=rep(1.0,length(nh_list)))
-regs <- regularizeSimlr(nh_list)
+# regs <- regularizeSimlr(nh_list)
 wdemog=which( knm == 'demog')
-regs[[ wdemog]]=diag( ncol(nh_list[[wdemog]]))
+for ( wdemog in 1:length(nh_list) ) regs[[ wdemog]]=diag( ncol(nh_list[[wdemog]]))
 initu=initializeSimlr( nh_list, k=min_columns_list(nh_list), jointReduction=TRUE )
 resultNH <- simlr( nh_list, 
         iterations=300,
-        sparsenessQuantiles=rep(0.5,length(nh_list)),
+        sparsenessQuantiles=rep(0.8,length(nh_list)),
         positivities=rep("positive",length(nh_list)), 
-#        energyType='regression', mixAlg='ica',
-        energyType='cca', mixAlg='pca',
+        energyType='regression', mixAlg='ica',
+#        energyType='cca', mixAlg='pca',
+#        scale=c( "whiten", "np"),
         scale=c("centerAndScale", "np"),
 #        scale=c( "robust",  "np" ),
-        constraint="Grassmannx10x10",
+        constraint="Stiefelx10x10",
         initialUMatrix=initu, verbose=T )
 #####################################################
 projlist=list()
