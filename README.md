@@ -2,6 +2,9 @@
 
 [![CircleCI](https://circleci.com/gh/stnava/simlr_nhanes/tree/master.svg?style=svg)](https://circleci.com/gh/stnava/simlr_nhanes/tree/master)
 
+![simlr cartoon](https://imgur.com/a/muOfU9Y)
+
+
 documentation page [should be here](https://stnava.github.io/simlr_nhanes/)
 
 ## SiMLR NHANES
