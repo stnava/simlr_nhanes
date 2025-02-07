@@ -151,7 +151,7 @@ map_freq_to_numeric <- function(df, colname) {
   }
   
   valid_categories <- c("Not at all", "Several days", "More than half the days", "Nearly every day", "Refused", "Don't know", "Not at all difficult,", "Somewhat difficult,",   "Very difficult,"  ,    
-  "Extremely difficult",   "Don't know"          ,  "Refused", "Yes", "No",              , NA )
+  "Extremely difficult",   "Don't know"          ,  "Refused", "Yes", "No",   NA )
   unique_values <- unique(df[[colname]])
   invalid_values <- setdiff(unique_values, valid_categories)
 

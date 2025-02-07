@@ -110,7 +110,7 @@ merged_data=merge(nhanescog, merged_data, by='SEQN')
 
 
 depnames = c( 
-#  getNamesFromDataframe( "SLQ", merged_data ),
+  getNamesFromDataframe( "SLQ", merged_data ),
 #  getNamesFromDataframe( "DPQ", merged_data, exclusions='DPQ100' )
   getNamesFromDataframe( "DPQ", merged_data )
 )
