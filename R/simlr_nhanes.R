@@ -293,10 +293,10 @@ matrix_from_latent <- function(latent_matrix, target_p, noise_sd = 0.3) {
 
 
 
-#'
+#' NHANES cognition data
 #' @format Curated nhanes cognition data from CERAD
 #' @examples
 #' \dontrun{
-#'  nhanescog
+#'  data("nhanescog_2011_2014")
 #' }
 "nhanescog"
