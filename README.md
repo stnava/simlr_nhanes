@@ -16,3 +16,7 @@ Data sources:
 
 * nhanesA [here](https://github.com/cjendres1/nhanes)
 
+Code sources:
+
+* haven [here](https://cran.r-project.org/web/packages/haven/index.html)
+

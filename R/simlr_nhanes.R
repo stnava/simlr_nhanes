@@ -254,3 +254,39 @@ filter_na_columns <- function(df, max_na_percent = 0.2) {
   filtered_df <- df[, names(na_percent[na_percent <= max_na_percent]), drop = FALSE]
   return(filtered_df)
 }
+
+
+
+
+#' Generate a Matrix from a Latent Matrix with Added Noise
+#'
+#' This function generates a new matrix by applying a random linear transformation
+#' to a given latent matrix and adding Gaussian noise.
+#'
+#' @param latent_matrix A numeric matrix representing the latent structure (n x k).
+#' @param target_p An integer specifying the number of columns in the output matrix.
+#' @param noise_sd A numeric value indicating the standard deviation of the Gaussian noise to be added. Default is 0.3.
+#'
+#' @return A numeric matrix of dimensions (n x target_p), generated from the latent matrix
+#' with a random linear transformation and added Gaussian noise.
+#'
+#' @examples
+#' latent <- matrix(rnorm(20), nrow = 5, ncol = 4)
+#' generated_matrix <- matrix_from_latent(latent, target_p = 3, noise_sd = 0.2)
+#' print(generated_matrix)
+#'
+#' @export
+matrix_from_latent <- function(latent_matrix, target_p, noise_sd = 0.3) {
+  # Get dimensions of latent matrix
+  n <- nrow(latent_matrix)
+  k <- ncol(latent_matrix)
+
+  # Generate a random transformation matrix (k x target_p)
+  transformation_matrix <- matrix(rnorm(k * target_p), nrow = k, ncol = target_p)
+
+  # Generate the new matrix by multiplying latent matrix with transformation and adding noise
+  new_matrix <- latent_matrix %*% transformation_matrix + 
+                matrix(rnorm(n * target_p, sd = noise_sd), nrow = n, ncol = target_p)
+
+  return(new_matrix)
+}
