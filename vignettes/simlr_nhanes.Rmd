@@ -214,22 +214,24 @@ names(nh_list)=knm
 ```{r nhanessimlr,eval=TRUE}
 ################################################################################
 regs <- regularizeSimlr(nh_list,fraction=0.15,sigma=rep(1.0,length(nh_list)))
-# regs <- regularizeSimlr(nh_list)
+regs <- regularizeSimlr(nh_list)
 wdemog=which( knm == 'demog')
-for ( wdemog in 1:length(nh_list) ) regs[[ wdemog]]=diag( ncol(nh_list[[wdemog]]))
+# for ( wdemog in 1:length(nh_list) ) regs[[ wdemog]]=diag( ncol(nh_list[[wdemog]]))
+initu=initializeSimlr( nh_list, k=round(min_columns_list(nh_list)*2), jointReduction=TRUE )
 initu=initializeSimlr( nh_list, k=min_columns_list(nh_list), jointReduction=TRUE )
-initu=initializeSimlr( nh_list, k=round(max_columns_list(nh_list)*0.8), jointReduction=TRUE )
+initu=initializeSimlr( nh_list, k=round(max_columns_list(nh_list)), jointReduction=TRUE )
 resultNH <- simlr( nh_list, 
         iterations=300,
-        sparsenessQuantiles=rep(0.5,length(nh_list)),
+        sparsenessQuantiles=rep(0.65,length(nh_list)),
         positivities=rep("positive",length(nh_list)), 
-        energyType='regression', mixAlg='ica',
-        scale=c("centerAndScale", "np"),
-        constraint="Grassmann10x10",
+#        energyType='regression', mixAlg='ica',
+        energyType='cca', mixAlg='svd',
+        scale=c("centerAndScale", "robust",  "np"),
+        constraint="Stiefelx10x10",
         initialUMatrix=initu, verbose=T )
 #####################################################
 projlist=list()
-mysimk=2
+mysimk=1
 for ( k in 2:length(nh_list)) {
     rownames(resultNH$v[[k]])=colnames( nh_list[[k]])
     ux=data.frame(nh_list[[k]] %*% abs(resultNH$v[[k]][,1:mysimk]))
