@@ -150,7 +150,8 @@ map_freq_to_numeric <- function(df, colname) {
     stop(paste("Column", colname, "does not exist in the dataframe"))
   }
   
-  valid_categories <- c("Not at all", "Several days", "More than half the days", "Nearly every day", "Refused", "Don't know", NA)
+  valid_categories <- c("Not at all", "Several days", "More than half the days", "Nearly every day", "Refused", "Don't know", "Not at all difficult,", "Somewhat difficult,",   "Very difficult,"  ,    
+  "Extremely difficult",   "Don't know"          ,  "Refused", "Yes", "No",              , NA )
   unique_values <- unique(df[[colname]])
   invalid_values <- setdiff(unique_values, valid_categories)
 
@@ -159,10 +160,16 @@ map_freq_to_numeric <- function(df, colname) {
   }
   
   mapped_values <- dplyr::recode(df[[colname]],
+                                 "Yes" = 1,
+                                 "No" = 0,
                                  "Not at all" = 0,
+                                 "Not at all difficult," = 0,
                                  "Several days" = 1,
+                                 "Somewhat difficult,"=1,
                                  "More than half the days" = 2,
+                                 "Very difficult,"=2,
                                  "Nearly every day" = 3,
+                                 "Extremely difficult"=4,
                                  "Refused" = NA_real_,
                                  "Don't know" = NA_real_)
   return(mapped_values)
@@ -294,7 +301,7 @@ matrix_from_latent <- function(latent_matrix, target_p, noise_sd = 0.3) {
 
 
 #' NHANES cognition data
-#' @format Curated nhanes cognition data from CERAD
+#' @format Curated nhanes cognition data from CAPRA
 #' @examples
 #' \dontrun{
 #'  data("nhanescog_2011_2014")

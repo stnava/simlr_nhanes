@@ -132,6 +132,8 @@
 <pre><code><span><span class="co">## The following objects are masked from 'package:base':</span></span>
 <span><span class="co">## </span></span>
 <span><span class="co">##     intersect, setdiff, setequal, union</span></span></code></pre>
+<div class="sourceCode" id="cb25"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="st">"nhanescog_2011_2014"</span><span class="op">)</span></span></code></pre></div>
 <div class="section level2">
 <h2 id="nhanes-example">NHANES example<a class="anchor" aria-label="anchor" href="#nhanes-example"></a>
 </h2>
@@ -143,7 +145,7 @@ substituted for the long form in nhanesA commands.</p>
 income relative to poverty threshold). • INDHHIN2: Annual Household
 Income (categorized ranges). • DMDEDUC2: Education Level (for adults 20+
 years). • OCD390G: Employment Status (in occupation questionnaire).</p>
-<div class="sourceCode" id="cb25"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb26"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Demographic data (e.g., 2011-2012 cycle)</span></span>
 <span><span class="va">demo_data</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/nhanesA/man/nhanes.html" class="external-link">nhanes</a></span><span class="op">(</span><span class="st">'DEMO_G'</span><span class="op">)</span></span>
 <span><span class="va">cog_data</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/nhanesA/man/nhanes.html" class="external-link">nhanes</a></span><span class="op">(</span><span class="st">'CFQ_G'</span><span class="op">)</span></span>
@@ -176,11 +178,11 @@ years). • OCD390G: Employment Status (in occupation questionnaire).</p>
 <span><span class="va">pfc</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/nhanesA/man/nhanes.html" class="external-link">nhanes</a></span><span class="op">(</span><span class="st">'PFC_G'</span><span class="op">)</span>  <span class="co"># Example for phthalates and blood metals</span></span>
 <span><span class="va">pfc13</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/nhanesA/man/nhanes.html" class="external-link">nhanes</a></span><span class="op">(</span><span class="st">'PFC_H'</span><span class="op">)</span>  <span class="co"># Example for phthalates and blood metals</span></span></code></pre></div>
 <pre><code><span><span class="co">## simpleWarning in download.file(url, tf, mode = "wb", quiet = TRUE): downloaded length 0 != reported length 1245</span></span></code></pre>
-<div class="sourceCode" id="cb27"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb28"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">mm</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/nhanesA/man/nhanes.html" class="external-link">nhanes</a></span><span class="op">(</span><span class="st">'UHM_G'</span><span class="op">)</span>  <span class="co"># Example for phthalates and blood metals</span></span>
 <span><span class="va">mm13</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/nhanesA/man/nhanes.html" class="external-link">nhanes</a></span><span class="op">(</span><span class="st">'UHM_H'</span><span class="op">)</span>  <span class="co"># Example for phthalates and blood metals</span></span></code></pre></div>
 <pre><code><span><span class="co">## simpleWarning in download.file(url, tf, mode = "wb", quiet = TRUE): downloaded length 0 != reported length 1245</span></span></code></pre>
-<div class="sourceCode" id="cb29"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb30"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">cu</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/nhanesA/man/nhanes.html" class="external-link">nhanes</a></span><span class="op">(</span><span class="st">'CUSEZN_G'</span><span class="op">)</span>  <span class="co"># Example for phthalates and blood metals</span></span>
 <span><span class="va">cu13</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/nhanesA/man/nhanes.html" class="external-link">nhanes</a></span><span class="op">(</span><span class="st">'CUSEZN_H'</span><span class="op">)</span>  <span class="co"># Example for phthalates and blood metals</span></span>
 <span><span class="va">ig</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/nhanesA/man/nhanes.html" class="external-link">nhanes</a></span><span class="op">(</span><span class="st">'IHgEM_G'</span><span class="op">)</span>  <span class="co"># Example for phthalates and blood metals</span></span>
@@ -220,16 +222,38 @@ years). • OCD390G: Employment Status (in occupation questionnaire).</p>
 <pre><code><span><span class="co">## </span></span>
 <span><span class="co">##   Male Female </span></span>
 <span><span class="co">##   1469   1545</span></span></code></pre>
-<div class="sourceCode" id="cb31"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">idata</span> <span class="op">=</span> <span class="fu"><a href="../reference/impute_data.html">impute_data</a></span><span class="op">(</span><span class="va">merged_data</span><span class="op">)</span></span>
+<div class="sourceCode" id="cb32"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">nhanescog</span><span class="op">$</span><span class="va">SEQN</span> <span class="op">=</span> <span class="va">nhanescog</span><span class="op">$</span><span class="va">seqn</span></span>
+<span><span class="va">merged_data</span><span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/merge.html" class="external-link">merge</a></span><span class="op">(</span><span class="va">nhanescog</span>, <span class="va">merged_data</span>, by<span class="op">=</span><span class="st">'SEQN'</span><span class="op">)</span></span>
+<span></span>
+<span></span>
+<span><span class="va">depnames</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span> </span>
+<span><span class="co">#  getNamesFromDataframe( "SLQ", merged_data ),</span></span>
+<span><span class="co">#  getNamesFromDataframe( "DPQ", merged_data, exclusions='DPQ100' )</span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/pkg/subtyper/man/getNamesFromDataframe.html" class="external-link">getNamesFromDataframe</a></span><span class="op">(</span> <span class="st">"DPQ"</span>, <span class="va">merged_data</span> <span class="op">)</span></span>
+<span><span class="op">)</span></span>
+<span><span class="kw">for</span> <span class="op">(</span> <span class="va">x</span> <span class="kw">in</span> <span class="va">depnames</span> <span class="op">)</span> <span class="va">merged_data</span><span class="op">[</span>,<span class="va">x</span><span class="op">]</span><span class="op">=</span><span class="fu"><a href="../reference/map_freq_to_numeric.html">map_freq_to_numeric</a></span><span class="op">(</span><span class="va">merged_data</span>,<span class="va">x</span><span class="op">)</span> </span>
+<span></span>
+<span><span class="co"># deek</span></span>
+<span></span>
+<span></span>
+<span><span class="va">idata</span> <span class="op">=</span> <span class="fu"><a href="../reference/impute_data.html">impute_data</a></span><span class="op">(</span><span class="va">merged_data</span><span class="op">)</span></span>
 <span><span class="va">idata</span> <span class="op">=</span> <span class="va">idata</span><span class="op">[</span> <span class="va">idata</span><span class="op">$</span><span class="va">BPXDI1</span> <span class="op">&gt;</span> <span class="fl">20</span> <span class="op">&amp;</span> <span class="va">idata</span><span class="op">$</span><span class="va">BPXDI2</span> <span class="op">&gt;</span> <span class="fl">20</span> <span class="op">&amp;</span> <span class="va">idata</span><span class="op">$</span><span class="va">BPXDI3</span> <span class="op">&gt;</span> <span class="fl">20</span> <span class="op">&amp;</span> <span class="va">idata</span><span class="op">$</span><span class="va">BPXDI4</span> <span class="op">&gt;</span> <span class="fl">20</span>,  <span class="op">]</span></span>
 <span><span class="va">fdata</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/filter_na_columns.html">filter_na_columns</a></span><span class="op">(</span><span class="va">merged_data</span>, max_na_percent <span class="op">=</span> <span class="fl">0.5</span><span class="op">)</span>  <span class="co"># Removes columns with &gt;10% NAs</span></span>
 <span><span class="va">fdata</span> <span class="op">=</span> <span class="va">fdata</span><span class="op">[</span> <span class="fu"><a href="https://rdrr.io/pkg/subtyper/man/na2f.html" class="external-link">na2f</a></span><span class="op">(</span><span class="va">fdata</span><span class="op">$</span><span class="va">BPXDI1</span> <span class="op">&gt;</span> <span class="fl">20</span> <span class="op">&amp;</span> <span class="va">fdata</span><span class="op">$</span><span class="va">BPXDI2</span> <span class="op">&gt;</span> <span class="fl">20</span> <span class="op">&amp;</span> <span class="va">fdata</span><span class="op">$</span><span class="va">BPXDI3</span> <span class="op">&gt;</span> <span class="fl">20</span> <span class="op">)</span>,  <span class="op">]</span></span>
 <span></span>
-<span><span class="va">myform</span> <span class="op">=</span>  <span class="fu"><a href="../reference/create_formula.html">create_formula</a></span><span class="op">(</span> <span class="va">fdata</span>, <span class="st">'CFDDS'</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">'SEQN'</span>, <span class="st">'RIDAGEMN'</span>,<span class="st">'RIDRETH3'</span>, <span class="st">'CFASTAT'</span>, <span class="st">'CFDCRNC'</span>, <span class="st">'CFDCIT'</span>, <span class="st">'CFDCST'</span>, <span class="st">'CFDAPP'</span>, <span class="st">'CFDAST'</span>, <span class="st">'CFALANG'</span>, <span class="st">'BPAARM'</span>, <span class="st">'CFDCCS'</span>, <span class="st">'CFDCST'</span>, <span class="st">'CFDCIT'</span>, <span class="st">'CFDCSR'</span>, <span class="st">'CFDCIR'</span>, <span class="st">'CFDCST'</span>, <span class="st">'CFDCIT'</span>, <span class="st">'CFDARNC'</span>,</span>
-<span><span class="st">'INDHHIN2'</span>,<span class="st">'DMDHRBR4'</span>,<span class="st">'INDFMIN2'</span>,<span class="st">'PEASCST1'</span>,<span class="st">'PEASCCT1'</span>,<span class="st">'PEASCTM1'</span>,<span class="st">'BPACSZ'</span>,<span class="st">'BPXML1'</span>,<span class="st">'URXMBP'</span>,<span class="st">'URXMC1'</span>,<span class="st">'URDUMMAL'</span>,<span class="st">'SLD010H'</span>,<span class="st">'LBXBMN'</span>,<span class="st">'URXCNP'</span>,<span class="st">'URXECP'</span>,<span class="st">'URXMHH'</span>,<span class="st">'URXMHP'</span>,<span class="st">'URXMHNC'</span>,<span class="st">'LBXV06'</span>,<span class="st">'LBXV2A'</span>,<span class="st">'LBXV3B'</span>,<span class="st">'LBXV4C'</span>,<span class="st">'LBXVCB'</span>,<span class="st">'LBXVEB'</span>,<span class="st">'LBXVCB'</span>,<span class="st">'LBXVIPB'</span>,<span class="st">'LBXVMC'</span>,<span class="st">'LBXVOX'</span>,<span class="st">'LBXVTC'</span>,<span class="st">'LBXVTE'</span>,<span class="st">'LBXVXY'</span>,<span class="st">'URXUAS5'</span>,<span class="st">'URXUAB'</span>,<span class="st">'URXUAC'</span>,<span class="st">'URXUMMA'</span>,<span class="st">'URXUAS3'</span>,<span class="st">'LBXBSE'</span>,</span>
+<span><span class="va">myform</span> <span class="op">=</span>  <span class="fu"><a href="../reference/create_formula.html">create_formula</a></span><span class="op">(</span> <span class="va">fdata</span>, <span class="st">'z_digit_re'</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">'SEQN'</span>, <span class="st">'RIDAGEMN'</span>,<span class="st">'RIDRETH3'</span>, <span class="st">'CFASTAT'</span>, <span class="st">'CFDCRNC'</span>, <span class="st">'CFDCIT'</span>, <span class="st">'CFDCST'</span>, <span class="st">'CFDAPP'</span>, <span class="st">'CFDAST'</span>, <span class="st">'CFALANG'</span>, <span class="st">'BPAARM'</span>, <span class="st">'CFDCCS'</span>, <span class="st">'CFDCST'</span>, <span class="st">'CFDCIT'</span>, <span class="st">'CFDCSR'</span>, <span class="st">'CFDCIR'</span>, <span class="st">'CFDCST'</span>, <span class="st">'CFDCIT'</span>, <span class="st">'CFDARNC'</span>, <span class="st">'CFDDS'</span>,</span>
+<span><span class="st">'INDHHIN2'</span>,<span class="st">'DMDHRBR4'</span>,<span class="st">'INDFMIN2'</span>,<span class="st">'PEASCST1'</span>,<span class="st">'PEASCCT1'</span>,<span class="st">'PEASCTM1'</span>,<span class="st">'BPACSZ'</span>,<span class="st">'BPXML1'</span>,<span class="st">'URXMBP'</span>,<span class="st">'URXMC1'</span>,<span class="st">'URDUMMAL'</span>,<span class="st">'SLD010H'</span>,<span class="st">'LBXBMN'</span>,<span class="st">'URXCNP'</span>,<span class="st">'URXECP'</span>,<span class="st">'URXMHH'</span>,<span class="st">'URXMHP'</span>,<span class="st">'URXMHNC'</span>,<span class="st">'LBXV06'</span>,<span class="st">'LBXV2A'</span>,<span class="st">'LBXV3B'</span>,<span class="st">'LBXV4C'</span>,<span class="st">'LBXVCB'</span>,<span class="st">'LBXVEB'</span>,<span class="st">'LBXVCB'</span>,<span class="st">'LBXVIPB'</span>,<span class="st">'LBXVMC'</span>,<span class="st">'LBXVOX'</span>,<span class="st">'LBXVTC'</span>,<span class="st">'LBXVTE'</span>,<span class="st">'LBXVXY'</span>,<span class="st">'URXUAS5'</span>,<span class="st">'URXUAB'</span>,<span class="st">'URXUAC'</span>,<span class="st">'URXUMMA'</span>,<span class="st">'URXUAS3'</span>,<span class="st">'LBXBSE'</span>, <span class="st">'RIAGENDR'</span>, <span class="st">'RIDAGEYR'</span>, <span class="st">'RIDRETH1'</span>, <span class="st">'seqn'</span>,</span>
+<span><span class="st">'age_cat'</span>,<span class="st">'ridreth1'</span>,<span class="st">'ridreth3'</span>,<span class="st">'edu_cat'</span>,<span class="st">'cfastat'</span>,<span class="st">'year'</span>,<span class="st">'riagendr'</span>,<span class="st">'cerad_sum'</span>,</span>
+<span><span class="co"># 'wtint2yr','wtmec2yr',</span></span>
+<span><span class="st">'BMXARML'</span>,<span class="st">'BMXARMC'</span>,<span class="st">'BMXHT'</span>,<span class="st">'BMXLEG'</span>,<span class="st">'BMXWAIST'</span>,</span>
+<span><span class="st">'INDFMPIR'</span>,</span>
+<span><span class="fu"><a href="https://rdrr.io/pkg/subtyper/man/getNamesFromDataframe.html" class="external-link">getNamesFromDataframe</a></span><span class="op">(</span> <span class="st">'cfd'</span>,<span class="va">fdata</span><span class="op">)</span>,</span>
+<span><span class="fu"><a href="https://rdrr.io/pkg/subtyper/man/getNamesFromDataframe.html" class="external-link">getNamesFromDataframe</a></span><span class="op">(</span> <span class="st">'z_'</span>,<span class="va">fdata</span><span class="op">)</span>,</span>
+<span><span class="fu"><a href="https://rdrr.io/pkg/subtyper/man/getNamesFromDataframe.html" class="external-link">getNamesFromDataframe</a></span><span class="op">(</span> <span class="st">'low_'</span>,<span class="va">fdata</span><span class="op">)</span>,</span>
+<span><span class="fu"><a href="https://rdrr.io/pkg/subtyper/man/getNamesFromDataframe.html" class="external-link">getNamesFromDataframe</a></span><span class="op">(</span> <span class="st">'sdm'</span>,<span class="va">fdata</span><span class="op">)</span>,</span>
 <span><span class="co"># getNamesFromDataframe( 'DPQ',depression_data, exclusions=c('DPQ080','DPQ030''DPQ080',)),</span></span>
-<span><span class="fu"><a href="https://rdrr.io/pkg/subtyper/man/getNamesFromDataframe.html" class="external-link">getNamesFromDataframe</a></span><span class="op">(</span> <span class="st">'DPQ'</span>,<span class="va">depression_data</span>, exclusions<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">'DPQ100'</span><span class="op">)</span><span class="op">)</span>,</span>
+<span><span class="co"># getNamesFromDataframe( 'DPQ',depression_data, exclusions=c('DPQ100')),</span></span>
 <span><span class="fu"><a href="https://rdrr.io/pkg/subtyper/man/getNamesFromDataframe.html" class="external-link">getNamesFromDataframe</a></span><span class="op">(</span> <span class="st">'URXUCR'</span>,<span class="va">fdata</span> <span class="op">)</span>,</span>
 <span><span class="fu"><a href="https://rdrr.io/pkg/subtyper/man/getNamesFromDataframe.html" class="external-link">getNamesFromDataframe</a></span><span class="op">(</span> <span class="st">'BMXSAD'</span>,<span class="va">fdata</span> <span class="op">)</span>,</span>
 <span><span class="fu"><a href="https://rdrr.io/pkg/subtyper/man/getNamesFromDataframe.html" class="external-link">getNamesFromDataframe</a></span><span class="op">(</span> <span class="st">'BPAEN'</span>,<span class="va">fdata</span> <span class="op">)</span>,</span>
@@ -251,7 +275,7 @@ years). • OCD390G: Employment Status (in occupation questionnaire).</p>
 <span><span class="va">problematic_factors</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/check_formula_factors.html">check_formula_factors</a></span><span class="op">(</span><span class="va">myform</span>, <span class="va">df</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">problematic_factors</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## character(0)</span></span></code></pre>
-<div class="sourceCode" id="cb33"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb34"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">idata2</span><span class="op">=</span><span class="fu"><a href="../reference/impute_data.html">impute_data</a></span><span class="op">(</span><span class="va">fdata</span> <span class="op">)</span></span>
 <span><span class="va">mdl</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/lm.html" class="external-link">lm</a></span><span class="op">(</span> <span class="va">myform</span>, data<span class="op">=</span><span class="va">idata2</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span> <span class="va">mdl</span> <span class="op">)</span></span></code></pre></div>
@@ -261,88 +285,54 @@ years). • OCD390G: Employment Status (in occupation questionnaire).</p>
 <span><span class="co">## </span></span>
 <span><span class="co">## Residuals:</span></span>
 <span><span class="co">##     Min      1Q  Median      3Q     Max </span></span>
-<span><span class="co">## -57.065  -8.746  -0.149   8.751  51.405 </span></span>
+<span><span class="co">## -3.3508 -0.4932  0.0124  0.4939  2.5832 </span></span>
 <span><span class="co">## </span></span>
 <span><span class="co">## Coefficients:</span></span>
-<span><span class="co">##                                               Estimate Std. Error t value</span></span>
-<span><span class="co">## (Intercept)                                  41.200175   8.869718   4.645</span></span>
-<span><span class="co">## RIAGENDRFemale                                7.748299   0.795036   9.746</span></span>
-<span><span class="co">## RIDAGEYR                                     -0.778744   0.046964 -16.582</span></span>
-<span><span class="co">## RIDRETH1Other Hispanic                       -1.810618   1.243582  -1.456</span></span>
-<span><span class="co">## RIDRETH1Non-Hispanic White                   11.845160   1.081154  10.956</span></span>
-<span><span class="co">## RIDRETH1Non-Hispanic Black                   -1.011377   1.162275  -0.870</span></span>
-<span><span class="co">## RIDRETH1Other Race - Including Multi-Racial   9.752206   1.320450   7.386</span></span>
-<span><span class="co">## INDFMPIR                                      3.043934   0.184266  16.519</span></span>
-<span><span class="co">## DPQ100Somewhat difficult,                    -2.177083   0.821185  -2.651</span></span>
-<span><span class="co">## DPQ100Very difficult,                        -5.849294   1.779775  -3.287</span></span>
-<span><span class="co">## DPQ100Extremely difficult                    -6.132302   2.671340  -2.296</span></span>
-<span><span class="co">## DPQ100Don't know                            -21.345618  13.441302  -1.588</span></span>
-<span><span class="co">## DPQ100Refused                                -4.369821  13.473080  -0.324</span></span>
-<span><span class="co">## SLQ050No                                      0.234108   0.637776   0.367</span></span>
-<span><span class="co">## SLQ060No                                     -0.289101   0.905408  -0.319</span></span>
-<span><span class="co">## SLQ060Don't know                            -18.227650   6.077810  -2.999</span></span>
-<span><span class="co">## BPXSY1                                       -0.134809   0.044770  -3.011</span></span>
-<span><span class="co">## BPXDI1                                       -0.070171   0.052973  -1.325</span></span>
-<span><span class="co">## BPXSY2                                        0.106303   0.052752   2.015</span></span>
-<span><span class="co">## BPXDI2                                        0.111459   0.059465   1.874</span></span>
-<span><span class="co">## BPXSY3                                       -0.037299   0.048037  -0.776</span></span>
-<span><span class="co">## BPXDI3                                        0.055670   0.055414   1.005</span></span>
-<span><span class="co">## BMXHT                                         0.422215   0.058237   7.250</span></span>
-<span><span class="co">## BMXBMI                                        0.482143   0.115525   4.173</span></span>
-<span><span class="co">## BMXLEG                                       -0.081598   0.118799  -0.687</span></span>
-<span><span class="co">## BMXARML                                      -0.433072   0.175115  -2.473</span></span>
-<span><span class="co">## BMXARMC                                       0.008928   0.125241   0.071</span></span>
-<span><span class="co">## BMXWAIST                                     -0.118319   0.055342  -2.138</span></span>
-<span><span class="co">## BMDAVSAD                                     -0.371465   0.160727  -2.311</span></span>
-<span><span class="co">## LBXBPB                                       -0.329628   0.201804  -1.633</span></span>
-<span><span class="co">## LBXBCD                                       -3.169053   0.730773  -4.337</span></span>
-<span><span class="co">## LBXTHG                                        1.200915   0.950518   1.263</span></span>
-<span><span class="co">## LBXIHG                                        0.320148   1.682264   0.190</span></span>
-<span><span class="co">## LBXBGE                                        9.464073   9.732142   0.972</span></span>
-<span><span class="co">## LBXBGM                                       -1.144592   0.893582  -1.281</span></span>
-<span><span class="co">##                                             Pr(&gt;|t|)    </span></span>
-<span><span class="co">## (Intercept)                                 3.57e-06 ***</span></span>
-<span><span class="co">## RIAGENDRFemale                               &lt; 2e-16 ***</span></span>
-<span><span class="co">## RIDAGEYR                                     &lt; 2e-16 ***</span></span>
-<span><span class="co">## RIDRETH1Other Hispanic                       0.14552    </span></span>
-<span><span class="co">## RIDRETH1Non-Hispanic White                   &lt; 2e-16 ***</span></span>
-<span><span class="co">## RIDRETH1Non-Hispanic Black                   0.38429    </span></span>
-<span><span class="co">## RIDRETH1Other Race - Including Multi-Racial 2.04e-13 ***</span></span>
-<span><span class="co">## INDFMPIR                                     &lt; 2e-16 ***</span></span>
-<span><span class="co">## DPQ100Somewhat difficult,                    0.00807 ** </span></span>
-<span><span class="co">## DPQ100Very difficult,                        0.00103 ** </span></span>
-<span><span class="co">## DPQ100Extremely difficult                    0.02178 *  </span></span>
-<span><span class="co">## DPQ100Don't know                             0.11240    </span></span>
-<span><span class="co">## DPQ100Refused                                0.74571    </span></span>
-<span><span class="co">## SLQ050No                                     0.71360    </span></span>
-<span><span class="co">## SLQ060No                                     0.74952    </span></span>
-<span><span class="co">## SLQ060Don't know                             0.00273 ** </span></span>
-<span><span class="co">## BPXSY1                                       0.00263 ** </span></span>
-<span><span class="co">## BPXDI1                                       0.18540    </span></span>
-<span><span class="co">## BPXSY2                                       0.04399 *  </span></span>
-<span><span class="co">## BPXDI2                                       0.06099 .  </span></span>
-<span><span class="co">## BPXSY3                                       0.43755    </span></span>
-<span><span class="co">## BPXDI3                                       0.31518    </span></span>
-<span><span class="co">## BMXHT                                       5.49e-13 ***</span></span>
-<span><span class="co">## BMXBMI                                      3.10e-05 ***</span></span>
-<span><span class="co">## BMXLEG                                       0.49223    </span></span>
-<span><span class="co">## BMXARML                                      0.01346 *  </span></span>
-<span><span class="co">## BMXARMC                                      0.94317    </span></span>
-<span><span class="co">## BMXWAIST                                     0.03261 *  </span></span>
-<span><span class="co">## BMDAVSAD                                     0.02090 *  </span></span>
-<span><span class="co">## LBXBPB                                       0.10251    </span></span>
-<span><span class="co">## LBXBCD                                      1.50e-05 ***</span></span>
-<span><span class="co">## LBXTHG                                       0.20655    </span></span>
-<span><span class="co">## LBXIHG                                       0.84908    </span></span>
-<span><span class="co">## LBXBGE                                       0.33092    </span></span>
-<span><span class="co">## LBXBGM                                       0.20034    </span></span>
+<span><span class="co">##                    Estimate Std. Error t value Pr(&gt;|t|)    </span></span>
+<span><span class="co">## (Intercept)       2.646e+00  2.902e-01   9.117  &lt; 2e-16 ***</span></span>
+<span><span class="co">## female            2.684e-01  3.392e-02   7.913 3.71e-15 ***</span></span>
+<span><span class="co">## ridageyr         -5.133e-02  2.669e-03 -19.228  &lt; 2e-16 ***</span></span>
+<span><span class="co">## race              3.291e-02  1.928e-02   1.707  0.08798 .  </span></span>
+<span><span class="co">## dmdeduc2          3.060e-01  1.246e-02  24.555  &lt; 2e-16 ***</span></span>
+<span><span class="co">## wtint2yr          2.947e-05  1.916e-05   1.538  0.12410    </span></span>
+<span><span class="co">## wtmec2yr         -2.480e-05  1.881e-05  -1.318  0.18746    </span></span>
+<span><span class="co">## DPQ010           -4.927e-02  2.433e-02  -2.025  0.04295 *  </span></span>
+<span><span class="co">## DPQ020            1.075e-02  2.861e-02   0.376  0.70708    </span></span>
+<span><span class="co">## DPQ030            4.499e-02  1.887e-02   2.385  0.01716 *  </span></span>
+<span><span class="co">## DPQ040            9.192e-03  2.001e-02   0.459  0.64597    </span></span>
+<span><span class="co">## DPQ050           -3.701e-02  2.400e-02  -1.542  0.12320    </span></span>
+<span><span class="co">## DPQ060            3.667e-03  3.059e-02   0.120  0.90459    </span></span>
+<span><span class="co">## DPQ070           -7.271e-02  2.757e-02  -2.637  0.00840 ** </span></span>
+<span><span class="co">## DPQ080           -1.344e-01  3.002e-02  -4.477 7.88e-06 ***</span></span>
+<span><span class="co">## DPQ090           -8.698e-02  5.207e-02  -1.670  0.09498 .  </span></span>
+<span><span class="co">## DPQ100           -4.770e-02  3.182e-02  -1.499  0.13392    </span></span>
+<span><span class="co">## SLQ050No          2.276e-02  3.725e-02   0.611  0.54122    </span></span>
+<span><span class="co">## SLQ060No         -8.927e-03  5.133e-02  -0.174  0.86195    </span></span>
+<span><span class="co">## SLQ060Don't know -8.530e-01  3.445e-01  -2.476  0.01336 *  </span></span>
+<span><span class="co">## BPXSY1           -6.343e-03  2.540e-03  -2.497  0.01260 *  </span></span>
+<span><span class="co">## BPXDI1           -3.162e-03  3.011e-03  -1.050  0.29369    </span></span>
+<span><span class="co">## BPXSY2            6.077e-03  2.991e-03   2.031  0.04232 *  </span></span>
+<span><span class="co">## BPXDI2            4.427e-03  3.372e-03   1.313  0.18931    </span></span>
+<span><span class="co">## BPXSY3           -3.114e-03  2.719e-03  -1.145  0.25219    </span></span>
+<span><span class="co">## BPXDI3            2.595e-03  3.140e-03   0.826  0.40871    </span></span>
+<span><span class="co">## BMXBMI            1.412e-02  4.411e-03   3.201  0.00139 ** </span></span>
+<span><span class="co">## BMDAVSAD         -1.925e-02  6.918e-03  -2.782  0.00543 ** </span></span>
+<span><span class="co">## LBXBPB           -1.700e-02  1.138e-02  -1.493  0.13558    </span></span>
+<span><span class="co">## LBXBCD           -1.849e-01  4.114e-02  -4.494 7.29e-06 ***</span></span>
+<span><span class="co">## LBXTHG            5.532e-02  5.391e-02   1.026  0.30492    </span></span>
+<span><span class="co">## LBXIHG           -1.748e-02  9.537e-02  -0.183  0.85459    </span></span>
+<span><span class="co">## LBXBGE            2.829e-01  5.512e-01   0.513  0.60787    </span></span>
+<span><span class="co">## LBXBGM           -6.077e-02  5.070e-02  -1.199  0.23079    </span></span>
 <span><span class="co">## ---</span></span>
 <span><span class="co">## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</span></span>
 <span><span class="co">## </span></span>
-<span><span class="co">## Residual standard error: 13.37 on 2562 degrees of freedom</span></span>
-<span><span class="co">## Multiple R-squared:  0.4155, Adjusted R-squared:  0.4078 </span></span>
-<span><span class="co">## F-statistic: 53.58 on 34 and 2562 DF,  p-value: &lt; 2.2e-16</span></span></code></pre>
-<div class="sourceCode" id="cb35"><pre class="downlit sourceCode r">
+<span><span class="co">## Residual standard error: 0.7582 on 2563 degrees of freedom</span></span>
+<span><span class="co">## Multiple R-squared:  0.4236, Adjusted R-squared:  0.4162 </span></span>
+<span><span class="co">## F-statistic: 57.08 on 33 and 2563 DF,  p-value: &lt; 2.2e-16</span></span></code></pre>
+<div class="sourceCode" id="cb36"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co">##############</span></span>
+<span><span class="co">####</span></span></code></pre></div>
+<div class="sourceCode" id="cb37"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">regs</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/ANTsR/man/regularizeSimlr.html" class="external-link">regularizeSimlr</a></span><span class="op">(</span><span class="va">nh_list</span>,fraction<span class="op">=</span><span class="fl">0.15</span>,sigma<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fl">1.0</span>,<span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">nh_list</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="va">regs</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/ANTsR/man/regularizeSimlr.html" class="external-link">regularizeSimlr</a></span><span class="op">(</span><span class="va">nh_list</span><span class="op">)</span></span>
 <span><span class="va">regs</span><span class="op">[[</span><span class="fl">2</span><span class="op">]</span><span class="op">]</span><span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/diag.html" class="external-link">diag</a></span><span class="op">(</span><span class="fl">2</span><span class="op">)</span></span>

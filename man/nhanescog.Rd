@@ -5,7 +5,7 @@
 \alias{nhanescog}
 \title{NHANES cognition data}
 \format{
-Curated nhanes cognition data from CERAD
+Curated nhanes cognition data from CAPRA
 }
 \usage{
 nhanescog

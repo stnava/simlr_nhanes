@@ -19,6 +19,7 @@ library(subtyper)
 library( nhanesA )
 library( simlr.nhanes )
 library( dplyr )
+data("nhanescog_2011_2014")
 ```
 
 
@@ -104,9 +105,18 @@ merged_data <- merge_nhanes_data( 'SEQN', 'CFDDS',
   merge_same_type_columns(hvmt, hvmt13))
 
 table(merged_data$RIAGENDR)
+nhanescog$SEQN = nhanescog$seqn
+merged_data=merge(nhanescog, merged_data, by='SEQN')
 
 
+depnames = c( 
+#  getNamesFromDataframe( "SLQ", merged_data ),
+#  getNamesFromDataframe( "DPQ", merged_data, exclusions='DPQ100' )
+  getNamesFromDataframe( "DPQ", merged_data )
+)
+for ( x in depnames ) merged_data[,x]=map_freq_to_numeric(merged_data,x) 
 
+# deek
 
 
 idata = impute_data(merged_data)
@@ -114,10 +124,18 @@ idata = idata[ idata$BPXDI1 > 20 & idata$BPXDI2 > 20 & idata$BPXDI3 > 20 & idata
 fdata <- filter_na_columns(merged_data, max_na_percent = 0.5)  # Removes columns with >10% NAs
 fdata = fdata[ na2f(fdata$BPXDI1 > 20 & fdata$BPXDI2 > 20 & fdata$BPXDI3 > 20 ),  ]
 
-myform =  create_formula( fdata, 'CFDDS', c('SEQN', 'RIDAGEMN','RIDRETH3', 'CFASTAT', 'CFDCRNC', 'CFDCIT', 'CFDCST', 'CFDAPP', 'CFDAST', 'CFALANG', 'BPAARM', 'CFDCCS', 'CFDCST', 'CFDCIT', 'CFDCSR', 'CFDCIR', 'CFDCST', 'CFDCIT', 'CFDARNC',
-'INDHHIN2','DMDHRBR4','INDFMIN2','PEASCST1','PEASCCT1','PEASCTM1','BPACSZ','BPXML1','URXMBP','URXMC1','URDUMMAL','SLD010H','LBXBMN','URXCNP','URXECP','URXMHH','URXMHP','URXMHNC','LBXV06','LBXV2A','LBXV3B','LBXV4C','LBXVCB','LBXVEB','LBXVCB','LBXVIPB','LBXVMC','LBXVOX','LBXVTC','LBXVTE','LBXVXY','URXUAS5','URXUAB','URXUAC','URXUMMA','URXUAS3','LBXBSE',
+myform =  create_formula( fdata, 'z_digit_re', c('SEQN', 'RIDAGEMN','RIDRETH3', 'CFASTAT', 'CFDCRNC', 'CFDCIT', 'CFDCST', 'CFDAPP', 'CFDAST', 'CFALANG', 'BPAARM', 'CFDCCS', 'CFDCST', 'CFDCIT', 'CFDCSR', 'CFDCIR', 'CFDCST', 'CFDCIT', 'CFDARNC', 'CFDDS',
+'INDHHIN2','DMDHRBR4','INDFMIN2','PEASCST1','PEASCCT1','PEASCTM1','BPACSZ','BPXML1','URXMBP','URXMC1','URDUMMAL','SLD010H','LBXBMN','URXCNP','URXECP','URXMHH','URXMHP','URXMHNC','LBXV06','LBXV2A','LBXV3B','LBXV4C','LBXVCB','LBXVEB','LBXVCB','LBXVIPB','LBXVMC','LBXVOX','LBXVTC','LBXVTE','LBXVXY','URXUAS5','URXUAB','URXUAC','URXUMMA','URXUAS3','LBXBSE', 'RIAGENDR', 'RIDAGEYR', 'RIDRETH1', 'seqn',
+'age_cat','ridreth1','ridreth3','edu_cat','cfastat','year','riagendr','cerad_sum',
+# 'wtint2yr','wtmec2yr',
+'BMXARML','BMXARMC','BMXHT','BMXLEG','BMXWAIST',
+'INDFMPIR',
+getNamesFromDataframe( 'cfd',fdata),
+getNamesFromDataframe( 'z_',fdata),
+getNamesFromDataframe( 'low_',fdata),
+getNamesFromDataframe( 'sdm',fdata),
 # getNamesFromDataframe( 'DPQ',depression_data, exclusions=c('DPQ080','DPQ030''DPQ080',)),
-getNamesFromDataframe( 'DPQ',depression_data, exclusions=c('DPQ100')),
+# getNamesFromDataframe( 'DPQ',depression_data, exclusions=c('DPQ100')),
 getNamesFromDataframe( 'URXUCR',fdata ),
 getNamesFromDataframe( 'BMXSAD',fdata ),
 getNamesFromDataframe( 'BPAEN',fdata ),
@@ -141,7 +159,8 @@ print(problematic_factors)
 idata2=impute_data(fdata )
 mdl = lm( myform, data=idata2)
 summary( mdl )
-
+##############
+####
 ```
 
 
