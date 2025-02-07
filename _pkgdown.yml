@@ -1,0 +1,8 @@
+home:
+  title: Helper package for simlr NHANES example analyses
+  description: Understand simlr and its relationship to other methods in a practical setting
+
+template:
+  bootstrap: 5
+
+url: https://github.com/stnava/simlr_nhanes
