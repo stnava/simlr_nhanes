@@ -307,3 +307,35 @@ matrix_from_latent <- function(latent_matrix, target_p, noise_sd = 0.3) {
 #'  data("nhanescog_2011_2014")
 #' }
 "nhanescog"
+
+
+#' Calculate the Minimum Number of Columns in a List of Matrices
+#'
+#' This function loops through a list of matrices and returns the minimum 
+#' number of columns found across all matrices in the list.
+#'
+#' @param matrix_list A list containing matrices. Non-matrix elements will be ignored with a warning.
+#'
+#' @return An integer representing the minimum number of columns across all matrices in the list.
+#'
+#' @examples
+#' mat1 <- matrix(1:6, nrow = 2)
+#' mat2 <- matrix(1:12, nrow = 3)
+#' mat3 <- matrix(1:4, nrow = 2)
+#' min_columns_list(list(mat1, mat2, mat3)) # Returns 2
+#'
+#' @export
+min_columns_list <- function(matrix_list) {
+  # Filter only matrix elements and warn if any non-matrix elements are present
+  matrices <- lapply(matrix_list, function(x) {
+    if (!is.matrix(x)) warning("Non-matrix element detected and will be ignored.")
+    if (is.matrix(x)) return(x) else return(NULL)
+  })
+  
+  # Remove NULLs
+  matrices <- Filter(Negate(is.null), matrices)
+
+  # Return minimum number of columns
+  min_cols <- min(sapply(matrices, ncol))
+  return(min_cols)
+}
