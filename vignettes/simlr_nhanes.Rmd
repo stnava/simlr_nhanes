@@ -76,6 +76,9 @@ ig13 <- nhanes('IHgEM_H')  # Example for phthalates and blood metals
 uh <- nhanes('UHG_G')  # Example for phthalates and blood metals
 uh13 <- nhanes('UHG_H')  # Example for phthalates and blood metals
 
+di <- nhanes('DR1TOT_G')  # Example for phthalates and blood metals
+di13 <- nhanes('DR1TOT_H')  # Example for phthalates and blood metals
+
 
 merge_nhanes_data <- function( joinid, nacol,  ...) {
   datasets <- list(...)
@@ -89,6 +92,7 @@ merge_nhanes_data <- function( joinid, nacol,  ...) {
 merged_data <- merge_nhanes_data( 'SEQN', 'CFDDS',
   merge_same_type_columns(cog_data, cog_data13),
   merge_same_type_columns(demo_data,demo_data13),
+  merge_same_type_columns(di,di13),
   merge_same_type_columns(depression_data,depression_data13),
   merge_same_type_columns(sleep_data,sleep_data13),
   merge_same_type_columns(bp,bp13),
@@ -123,13 +127,17 @@ idata = impute_data(merged_data)
 idata = idata[ idata$BPXDI1 > 20 & idata$BPXDI2 > 20 & idata$BPXDI3 > 20 & idata$BPXDI4 > 20,  ]
 fdata <- filter_na_columns(merged_data, max_na_percent = 0.5)  # Removes columns with >10% NAs
 fdata = fdata[ na2f(fdata$BPXDI1 > 20 & fdata$BPXDI2 > 20 & fdata$BPXDI3 > 20 ),  ]
+fdata$race = factor( fdata$race )
+fdata$riagendr = factor( fdata$riagendr )
 
 myform =  create_formula( fdata, 'z_digit_re', c('SEQN', 'RIDAGEMN','RIDRETH3', 'CFASTAT', 'CFDCRNC', 'CFDCIT', 'CFDCST', 'CFDAPP', 'CFDAST', 'CFALANG', 'BPAARM', 'CFDCCS', 'CFDCST', 'CFDCIT', 'CFDCSR', 'CFDCIR', 'CFDCST', 'CFDCIT', 'CFDARNC', 'CFDDS',
 'INDHHIN2','DMDHRBR4','INDFMIN2','PEASCST1','PEASCCT1','PEASCTM1','BPACSZ','BPXML1','URXMBP','URXMC1','URDUMMAL','SLD010H','LBXBMN','URXCNP','URXECP','URXMHH','URXMHP','URXMHNC','LBXV06','LBXV2A','LBXV3B','LBXV4C','LBXVCB','LBXVEB','LBXVCB','LBXVIPB','LBXVMC','LBXVOX','LBXVTC','LBXVTE','LBXVXY','URXUAS5','URXUAB','URXUAC','URXUMMA','URXUAS3','LBXBSE', 'RIAGENDR', 'RIDAGEYR', 'RIDRETH1', 'seqn',
-'age_cat','ridreth1','ridreth3','edu_cat','cfastat','year','riagendr','cerad_sum',
+'age_cat','ridreth1','ridreth3','edu_cat','cfastat','year','female','cerad_sum',
 # 'wtint2yr','wtmec2yr',
 'BMXARML','BMXARMC','BMXHT','BMXLEG','BMXWAIST',
 'INDFMPIR',
+getNamesFromDataframe( 'DRQS',fdata),
+getNamesFromDataframe( 'DPD',fdata),
 getNamesFromDataframe( 'cfd',fdata),
 getNamesFromDataframe( 'z_',fdata),
 getNamesFromDataframe( 'low_',fdata),
@@ -142,6 +150,7 @@ getNamesFromDataframe( 'BPAEN',fdata ),
 getNamesFromDataframe( 'BPXP',fdata ),
 getNamesFromDataframe( 'DMD',fdata ),
 getNamesFromDataframe( 'DMDHHSZ',fdata ),
+getNamesFromDataframe( 'DRD',fdata ),
 getNamesFromDataframe( 'WT',fdata ),
 getNamesFromDataframe( 'SDM',fdata ),
 getNamesFromDataframe( 'DMQ',fdata ),
@@ -159,8 +168,8 @@ print(problematic_factors)
 idata2=impute_data(fdata )
 mdl = lm( myform, data=idata2)
 summary( mdl )
-mdl = lm( myform, data=fdata)
-summary( mdl )
+mdl0 = lm( myform, data=fdata)
+summary( mdl0 )
 ##############
 ####
 ```
@@ -168,8 +177,7 @@ summary( mdl )
 
 ```{r simlrcats,eval=TRUE,echo=TRUE}
 colcats=rep("Basic",ncol(fdata))
-colcats[ colnames(fdata) %in%  c("ridageyr","female") ]='demog'
-colcats[ colnames(fdata) %in%  c("dmdeduc2","INDFMPIR") ]='demog'
+colcats[ colnames(fdata) %in%  c("ridageyr","riagendr","race","dmdeduc2","INDFMPIR") ]='demog'
 bpname=getNamesFromDataframe( "BPX",fdata)
 bmname=getNamesFromDataframe( "BMX",fdata)
 colcats[ colnames(fdata) %in%  c(bmname,bpname,"Testosterone","TotChol","Diabetes" ) ]='physical'
@@ -177,20 +185,22 @@ colcats[ colnames(fdata) %in%   c(
   getNamesFromDataframe( "DPQ", fdata ), 
   getNamesFromDataframe( "SLQ", fdata ) )  ]='mentalhealth'
 colcats[ colnames(fdata) %in%  getNamesFromDataframe( "LBX", fdata ) ]='exposures'
+colcats[ colnames(fdata) %in%  getNamesFromDataframe( "DR1T", fdata ) ]='diet'
 # colcats[ colnames(fdata) %in%  getNamesFromDataframe( "cfd", fdata )[-1] ]='digitspan'
 tbl=table(colcats)
-
+##############
 nh_list=list()
 knm=names(tbl)[-1]
+mycc = complete.cases( fdata[ , colcats %in% knm ])
 for ( k in knm ) {
     print(k)
-    temp0=impute_data(fdata[,colcats==k])
+    temp0=(fdata[mycc,colcats==k])
     temp = data.frame(convert_to_numeric_matrix( temp0 ))
     for ( j in 1:ncol(temp) ) {
         hist( temp[,j], main=colnames(temp)[j])
 #        Sys.sleep(1)
         }
-    nh_list[[length(nh_list)+1]]=data.matrix( impute_data( temp ) )
+    nh_list[[length(nh_list)+1]]=data.matrix( ( temp ) )
 #    nh_list[[length(nh_list)]]=impute_and_report_na(nh_list[[length(nh_list)]] )
     }
 names(nh_list)=knm
@@ -200,18 +210,21 @@ names(nh_list)=knm
 
 
 ```{r nhanessimlr,eval=TRUE}
+################################################################################
 regs <- regularizeSimlr(nh_list,fraction=0.15,sigma=rep(1.0,length(nh_list)))
 regs <- regularizeSimlr(nh_list)
-regs[[2]]=diag(2)
-initu=initializeSimlr( nh_list, k=40, jointReduction=TRUE )
-resultNH <- simlr( nh_list, iterations=100,
+wdemog=which( knm == 'demog')
+regs[[ wdemog]]=diag( ncol(nh_list[[wdemog]]))
+initu=initializeSimlr( nh_list, k=50, jointReduction=TRUE )
+resultNH <- simlr( nh_list, 
+        iterations=3,
         sparsenessQuantiles=rep(0.5,length(nh_list)),
         positivities=rep("positive",length(nh_list)), 
         energyType='regression', mixAlg='ica',
 #        energyType='cca', mixAlg='pca',
-#        scale=c("centerAndScale", "np"),
-        scale=c( "robust", "center", "np" ),
-        constraint="Stiefelx1000x1000",
+        scale=c("centerAndScale", "np"),
+#        scale=c( "robust",  "np" ),
+        constraint="Grassmannx10x10",
         initialUMatrix=initu, verbose=T )
 #####################################################
 projlist=list()
@@ -223,19 +236,28 @@ for ( k in 1:length(nh_list)) {
     projlist[[length(projlist)+1]]=ux
 }
 simdf=simdf2=dplyr::bind_cols(projlist)
-simdf2$cfdds=fdata$cfdds
-simdf2$cfdast=fdata$cfdast
-myform = paste0( "cfdds ~ ",paste0( colnames(simdf), collapse='+'))
-mdl = lm( myform, data=simdf2 )
-print( summary( mdl ) )
+cognames=c("cerad_sum","cfdast","cfdds")
+cognames = c("z_cerad_re", "z_animal_re",     "z_digit_re",      "z_delayed_re",    "z_global_re"  )
+simdf2[,cognames]=fdata[mycc,cognames]
+for ( kk in 1:length(cognames)) {
+  myform = paste0( cognames[kk]," ~ ",paste0( colnames(simdf), collapse='+'))
+  mdl = lm( myform, data=simdf2 )
+  print( summary( mdl ) )
+  print( cognames[kk])
+  Sys.sleep(3)
+}
 #######################
-interpret_simlr_vector2( resultNH$v[['exposures']], 1, n2show=5, shortnames=F )
-interpret_simlr_vector2( resultNH$v[['exposures']], 2, n2show=5, shortnames=F )
+for ( k in knm ) {
+  print(k)
+  print( interpret_simlr_vector2( resultNH$v[[k]], 1, n2show=3, shortnames=F ) )
+  print( interpret_simlr_vector2( resultNH$v[[k]], 2, n2show=3, shortnames=F ) )
+}
+##########################################################################################
 # https://wwwn.cdc.gov/nchs/nhanes/search/default.aspx
 # > interpret_simlr_vector2( resultNH$v[['exposures']], 1, n2show=5, shortnames=F )
 #   LBXVBZ    LBXVOX    LBXVFN    LBX2DF 
 # benzene, Xylene, furan, Dimethylfuran
 # 1.0000000 0.3346728 0.1868323 0.0586727 
-#######################
+##########################################################################################
 ###
 ```
