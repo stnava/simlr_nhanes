@@ -17,6 +17,8 @@ library(ellipse)
 library(ANTsR)
 library(subtyper)
 library( nhanesA )
+library( simlr.nhanes )
+library( dplyr )
 ```
 
 
@@ -144,7 +146,7 @@ summary( mdl )
 
 
 
-```{r nhanessimlr}
+```{r nhanessimlr,eval=FALSE}
 regs <- regularizeSimlr(nh_list,fraction=0.15,sigma=rep(1.0,length(nh_list)))
 regs <- regularizeSimlr(nh_list)
 regs[[2]]=diag(2)

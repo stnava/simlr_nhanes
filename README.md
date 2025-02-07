@@ -8,3 +8,11 @@ documentation page [here](https://stnava.github.io/simlr_nhanes/)
 
 TODO
 
+Data sources:
+
+* NHANES [raw](https://wwwn.cdc.gov/nchs/nhanes/Default.aspx)
+
+* CAPRA curated data [here](https://capra.med.umich.edu/nhanes.html)
+
+* nhanesA [here](https://github.com/cjendres1/nhanes)
+
