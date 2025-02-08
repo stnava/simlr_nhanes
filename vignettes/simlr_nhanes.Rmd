@@ -123,7 +123,7 @@ for ( x in depnames ) merged_data[,x]=map_freq_to_numeric(merged_data,x)
 
 idata = impute_data(merged_data)
 idata = idata[ idata$BPXDI1 > 20 & idata$BPXDI2 > 20 & idata$BPXDI3 > 20 & idata$BPXDI4 > 20,  ]
-fdata <- filter_na_columns(merged_data, max_na_percent = 0.75)  # Removes columns with >10% NAs
+fdata <- filter_na_columns(merged_data, max_na_percent = 0.85)  # Removes columns with >10% NAs
 fdata = fdata[ na2f(fdata$BPXDI1 > 20 & fdata$BPXDI2 > 20 & fdata$BPXDI3 > 20 ),  ]
 fdata$race = factor( fdata$race )
 fdata$riagendr = factor( fdata$riagendr )
@@ -225,28 +225,28 @@ names(nh_list)=knm
 ################################################################################
 # regs <- regularizeSimlr(nh_list,fraction=0.15,sigma=rep(1.0,length(nh_list)))
 # regs <- regularizeSimlr(nh_list)
-reek
 regs=list()
 wdemog=which( knm == 'demog')
 for ( wdemog in 1:length(nh_list) ) regs[[ wdemog]]=diag( ncol(nh_list[[wdemog]]))
+initu=initializeSimlr( nh_list, k=round(max_columns_list(nh_list)), jointReduction=TRUE )
 initu=initializeSimlr( nh_list, k=min_columns_list(nh_list), jointReduction=TRUE )
 initu=initializeSimlr( nh_list, k=round(min_columns_list(nh_list)*2), jointReduction=TRUE )
-initu=initializeSimlr( nh_list, k=round(max_columns_list(nh_list)), jointReduction=TRUE )
 resultNH <- simlr( nh_list, 
-        iterations=300,
-        sparsenessQuantiles=rep(0.5,length(nh_list)),
+        iterations=25,
+        sparsenessQuantiles=rep(0.8,length(nh_list)),
         positivities=rep("positive",length(nh_list)), 
         energyType='regression', mixAlg='ica',
 #        energyType='cca', mixAlg='svd',
-        scale=c("centerAndScale",  "np"),
+        scale=c("centerAndScale", "whiten",  "np"),
         constraint="Stiefelx10x10",
         initialUMatrix=initu, verbose=T )
 #####################################################
 ```
 
 ```{r nhanessimlrstat,eval=TRUE}
+drwwrd
 projlist=list()
-mysimk=2
+mysimk=ncol(initu)
 for ( k in 2:length(nh_list)) {
     rownames(resultNH$v[[k]])=colnames( nh_list[[k]])
     ux=data.frame(nh_list[[k]] %*% abs(resultNH$v[[k]][,1:mysimk]))
@@ -272,22 +272,37 @@ if ( doimp ) {
 #################################
 covars=" ~ riagendr + ridageyr + race + dmdeduc2 + INDFMPIR + "
 covars=" ~ riagendr + ridageyr + race + dmdeduc2 +  "
-for ( kk in 1:length(cognames)) {
-  myform = paste0( cognames[kk], covars,paste0( colnames(simdf), collapse='+'))
-  tempdf = simdf2[mycc,]
+if ( FALSE )
+  for ( kk in 1:length(cognames)) {
+    myform = paste0( cognames[kk], covars,paste0( colnames(simdf), collapse='+'))
+    tempdf = simdf2[mycc,]
+    mdl = lm( myform, data=tempdf )
+  #  if (doimp) mdl = lm( myform, data=tempdf, weights=tempdf$wtint2yr ) else mdl = lm( myform, data=tempdf, weights=tempdf$wtint2yr  )
+    print( summary( mdl ) )
+    print( cognames[kk])
+    Sys.sleep(3)
+  }
+#############################
+for ( kk in 1:ncol(initu)) {
+  bform = paste0( cognames[length(cognames)], covars, "1" )
+  myform = paste0( cognames[length(cognames)], covars,paste0( paste0(names(projlist),kk), collapse='+'))
+  tempdf = simdf2[,]
+  bmdl = lm( bform, data=tempdf )
   mdl = lm( myform, data=tempdf )
 #  if (doimp) mdl = lm( myform, data=tempdf, weights=tempdf$wtint2yr ) else mdl = lm( myform, data=tempdf, weights=tempdf$wtint2yr  )
-  print( summary( mdl ) )
-  print( cognames[kk])
-  Sys.sleep(3)
-}
-#######################
-for ( k in names(projlist) ) {
-  print(k)
-  for ( j in 1:mysimk ) {
-    print( interpret_simlr_vector2( resultNH$v[[k]], j, n2show=3, shortnames=F ) )
+  myanv = anova( bmdl, mdl )
+  if ( myanv$Pr[2] < 1e-20 ) {
+    print( tail( coefficients( summary( mdl ) ), 4 ))
+    print( myanv$Pr[2] )
+    print( cognames[length(cognames)])
+    for ( k in names(projlist) ) {
+      print( k )
+      print( interpret_simlr_vector2( resultNH$v[[k]], kk, n2show=3, shortnames=F ) )
+      }
+    Sys.sleep(3)
   }
 }
+#######################
 ##########################################################################################
 # https://wwwn.cdc.gov/nchs/nhanes/search/default.aspx
 # > interpret_simlr_vector2( resultNH$v[['exposures']], 1, n2show=5, shortnames=F )
@@ -295,5 +310,4 @@ for ( k in names(projlist) ) {
 # benzene, Xylene, furan, Dimethylfuran
 # 1.0000000 0.3346728 0.1868323 0.0586727 
 ##########################################################################################
-###
 ```
