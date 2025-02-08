@@ -244,7 +244,7 @@ resultNH <- simlr( nh_list,
 ```
 
 ```{r nhanessimlrstat,eval=TRUE}
-drwwrd
+# drwwrd
 projlist=list()
 mysimk=ncol(initu)
 for ( k in 2:length(nh_list)) {
@@ -272,16 +272,6 @@ if ( doimp ) {
 #################################
 covars=" ~ riagendr + ridageyr + race + dmdeduc2 + INDFMPIR + "
 covars=" ~ riagendr + ridageyr + race + dmdeduc2 +  "
-if ( FALSE )
-  for ( kk in 1:length(cognames)) {
-    myform = paste0( cognames[kk], covars,paste0( colnames(simdf), collapse='+'))
-    tempdf = simdf2[mycc,]
-    mdl = lm( myform, data=tempdf )
-  #  if (doimp) mdl = lm( myform, data=tempdf, weights=tempdf$wtint2yr ) else mdl = lm( myform, data=tempdf, weights=tempdf$wtint2yr  )
-    print( summary( mdl ) )
-    print( cognames[kk])
-    Sys.sleep(3)
-  }
 #############################
 for ( kk in 1:ncol(initu)) {
   bform = paste0( cognames[length(cognames)], covars, "1" )
@@ -291,15 +281,16 @@ for ( kk in 1:ncol(initu)) {
   mdl = lm( myform, data=tempdf )
 #  if (doimp) mdl = lm( myform, data=tempdf, weights=tempdf$wtint2yr ) else mdl = lm( myform, data=tempdf, weights=tempdf$wtint2yr  )
   myanv = anova( bmdl, mdl )
-  if ( myanv$Pr[2] < 1e-20 ) {
+  if ( myanv$Pr[2] < 1e-4 ) {
     print( tail( coefficients( summary( mdl ) ), 4 ))
     print( myanv$Pr[2] )
     print( cognames[length(cognames)])
     for ( k in names(projlist) ) {
       print( k )
       print( interpret_simlr_vector2( resultNH$v[[k]], kk, n2show=3, shortnames=F ) )
+      visreg::visreg(mdl, paste0(k,kk) )
       }
-    Sys.sleep(3)
+#    Sys.sleep(3)
   }
 }
 #######################
@@ -310,4 +301,18 @@ for ( kk in 1:ncol(initu)) {
 # benzene, Xylene, furan, Dimethylfuran
 # 1.0000000 0.3346728 0.1868323 0.0586727 
 ##########################################################################################
+```
+
+
+
+```{r hold,echo=FALSE,eval=FALSE}
+for ( kk in 1:length(cognames)) {
+    myform = paste0( cognames[kk], covars,paste0( colnames(simdf), collapse='+'))
+    tempdf = simdf2[mycc,]
+    mdl = lm( myform, data=tempdf )
+  #  if (doimp) mdl = lm( myform, data=tempdf, weights=tempdf$wtint2yr ) else mdl = lm( myform, data=tempdf, weights=tempdf$wtint2yr  )
+    print( summary( mdl ) )
+    print( cognames[kk])
+    Sys.sleep(3)
+  }
 ```
