@@ -207,7 +207,11 @@ for ( k in knm ) {
       temp0 = impute_data( fdata[ ,colcats==k] )
     } else temp0=(fdata[mycc,colcats==k])
     temp = data.frame(convert_to_numeric_matrix( temp0 ))
-    if ( k == 'exposures' ) temp = robustMatrixTransform( temp )
+    if ( TRUE ) {
+      vv=apply( temp, 2, FUN=var )
+      temp = temp[ , vv > 0 ]
+#      temp = robustMatrixTransform( temp )
+    }
     for ( j in 1:ncol(temp) ) {
         hist( temp[,j], main=colnames(temp)[j])
 #        Sys.sleep(1)
@@ -226,15 +230,17 @@ names(nh_list)=knm
 ################################################################################
 # regs <- regularizeSimlr(nh_list,fraction=0.15,sigma=rep(1.0,length(nh_list)))
 # regs <- regularizeSimlr(nh_list)
+#
 regs=list()
 wdemog=which( knm == 'demog')
 for ( wdemog in 1:length(nh_list) ) regs[[ wdemog]]=diag( ncol(nh_list[[wdemog]]))
+names( regs ) = knm[ -1 ]
 initu=initializeSimlr( nh_list, k=round(max_columns_list(nh_list)), jointReduction=TRUE )
 initu=initializeSimlr( nh_list, k=min_columns_list(nh_list), jointReduction=TRUE )
 initu=initializeSimlr( nh_list, k=round(min_columns_list(nh_list)*2), jointReduction=TRUE )
 resultNH <- simlr( nh_list, 
         iterations=25,
-        sparsenessQuantiles=rep(0.8,length(nh_list)),
+        sparsenessQuantiles=rep(0.5,length(nh_list)),
         positivities=rep("positive",length(nh_list)), 
         energyType='regression', mixAlg='ica',
 #        energyType='cca', mixAlg='svd',
@@ -277,20 +283,23 @@ covars=" ~ riagendr + ridageyr + race + dmdeduc2 +  "
 for ( kk in 1:ncol(initu)) {
   bform = paste0( cognames[length(cognames)], covars, "1" )
   myform = paste0( cognames[length(cognames)], covars,paste0( paste0(names(projlist),kk), collapse='+'))
-  tempdf = simdf2[,]
+  tempdf = simdf2[mycc,]
   bmdl = lm( bform, data=tempdf )
   mdl = lm( myform, data=tempdf )
 #  if (doimp) mdl = lm( myform, data=tempdf, weights=tempdf$wtint2yr ) else mdl = lm( myform, data=tempdf, weights=tempdf$wtint2yr  )
   myanv = anova( bmdl, mdl )
-  if ( myanv$Pr[2] < 1e-4 ) {
+  if ( myanv$Pr[2] < 1e-5 ) {
+    cat("*** result begin ***********************************\n")
+    print("individual coefficients")
     print( tail( coefficients( summary( mdl ) ), 4 ))
-    print( myanv$Pr[2] )
+    print( paste("multivar-ANOVA p-value", myanv$Pr[2] ) )
     print( cognames[length(cognames)])
     for ( k in names(projlist) ) {
-      print( k )
+      print( paste("Simlr weights", k ) )
       print( interpret_simlr_vector2( resultNH$v[[k]], kk, n2show=3, shortnames=F ) )
       visreg::visreg(mdl, paste0(k,kk) )
       }
+    cat("*** result end ***********************************\n\n")
 #    Sys.sleep(3)
   }
 }
