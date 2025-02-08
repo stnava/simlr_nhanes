@@ -33,9 +33,7 @@ INDFMPIR: Poverty Income Ratio (0 = no income, higher values = higher income rel
 	•	DMDEDUC2: Education Level (for adults 20+ years).
 	•	OCD390G: Employment Status (in occupation questionnaire).
 
-```{r nhanes}
-
-
+```{r nhanes,cache=TRUE,echo=FALSE}
 # Demographic data (e.g., 2011-2012 cycle)
 demo_data <- nhanes('DEMO_G')
 cog_data <- nhanes('CFQ_G')
@@ -125,7 +123,7 @@ for ( x in depnames ) merged_data[,x]=map_freq_to_numeric(merged_data,x)
 
 idata = impute_data(merged_data)
 idata = idata[ idata$BPXDI1 > 20 & idata$BPXDI2 > 20 & idata$BPXDI3 > 20 & idata$BPXDI4 > 20,  ]
-fdata <- filter_na_columns(merged_data, max_na_percent = 0.5)  # Removes columns with >10% NAs
+fdata <- filter_na_columns(merged_data, max_na_percent = 0.75)  # Removes columns with >10% NAs
 fdata = fdata[ na2f(fdata$BPXDI1 > 20 & fdata$BPXDI2 > 20 & fdata$BPXDI3 > 20 ),  ]
 fdata$race = factor( fdata$race )
 fdata$riagendr = factor( fdata$riagendr )
@@ -178,6 +176,7 @@ idata2=impute_data(fdata )
 
 
 ```{r simlrcats,eval=TRUE,echo=TRUE}
+####################################
 colcats=rep("Basic",ncol(fdata))
 colcats[ colnames(fdata) %in%  c("ridageyr","riagendr","race","dmdeduc2","INDFMPIR") ]='demog'
 bpname=getNamesFromDataframe( "BPX",fdata)
@@ -186,20 +185,22 @@ colcats[ colnames(fdata) %in%  c(bmname,bpname,"Testosterone","TotChol","Diabete
 colcats[ colnames(fdata) %in%   c(
   getNamesFromDataframe( "DPQ", fdata ), 
   getNamesFromDataframe( "SLQ", fdata ) )  ]='mentalhealth'
-colcats[ colnames(fdata) %in%  getNamesFromDataframe( "LBX", fdata, exclusions='LC' ) ]='exposures'
-colcats[ colnames(fdata) %in%  getNamesFromDataframe( "LBD", fdata, exclusions='LC' ) ]='exposures'
-colcats[ colnames(fdata) %in%  getNamesFromDataframe( "URX", fdata, exclusions='LC' ) ]='exposures'
-colcats[ colnames(fdata) %in%  getNamesFromDataframe( "URD", fdata, exclusions='LC' ) ]='exposures'
-colcats[ colnames(fdata) %in%  getNamesFromDataframe( "LBC", fdata, exclusions='LC' ) ]='exposures'
+x=c('LC','.x','.y','URDUMMAL','LBXVDE','LBX4CE')
+colcats[ colnames(fdata) %in%  getNamesFromDataframe( "LBX", fdata, exclusions=x ) ]='exposures'
+colcats[ colnames(fdata) %in%  getNamesFromDataframe( "LBD", fdata, exclusions=x ) ]='exposures'
+#colcats[ colnames(fdata) %in%  getNamesFromDataframe( "URX", fdata, exclusions=x ) ]='exposures'
+# colcats[ colnames(fdata) %in%  getNamesFromDataframe( "URD", fdata, exclusions=x ) ]='exposures'
+# colcats[ colnames(fdata) %in%  getNamesFromDataframe( "LBC", fdata, exclusions=x ) ]='exposures'
 colcats[ colnames(fdata) %in%  getNamesFromDataframe( "DR1T", fdata ) ]='diet'
 # colcats[ colnames(fdata) %in%  getNamesFromDataframe( "cfd", fdata )[-1] ]='digitspan'
 tbl=table(colcats)
 ##############
 nh_list=list()
 knm=names(tbl)[-1]
-mycc = complete.cases( fdata[ , colcats %in% knm ])
+mycc = complete.cases( fdata[ , colcats %in% 'demog' ])
+mycc = complete.cases( fdata[ , colcats %in% 'exposures' ])
+table(mycc)
 doimp=TRUE
-derewaf
 for ( k in knm ) {
     print(k)
     if ( doimp ) {
@@ -220,27 +221,32 @@ names(nh_list)=knm
 ```
 
 
-```{r nhanessimlr,eval=TRUE}
+```{r nhanessimlrrun,eval=TRUE}
 ################################################################################
-regs <- regularizeSimlr(nh_list,fraction=0.15,sigma=rep(1.0,length(nh_list)))
-regs <- regularizeSimlr(nh_list)
+# regs <- regularizeSimlr(nh_list,fraction=0.15,sigma=rep(1.0,length(nh_list)))
+# regs <- regularizeSimlr(nh_list)
+reek
+regs=list()
 wdemog=which( knm == 'demog')
-# for ( wdemog in 1:length(nh_list) ) regs[[ wdemog]]=diag( ncol(nh_list[[wdemog]]))
-initu=initializeSimlr( nh_list, k=round(min_columns_list(nh_list)*2), jointReduction=TRUE )
+for ( wdemog in 1:length(nh_list) ) regs[[ wdemog]]=diag( ncol(nh_list[[wdemog]]))
 initu=initializeSimlr( nh_list, k=min_columns_list(nh_list), jointReduction=TRUE )
+initu=initializeSimlr( nh_list, k=round(min_columns_list(nh_list)*2), jointReduction=TRUE )
 initu=initializeSimlr( nh_list, k=round(max_columns_list(nh_list)), jointReduction=TRUE )
 resultNH <- simlr( nh_list, 
         iterations=300,
-        sparsenessQuantiles=rep(0.65,length(nh_list)),
+        sparsenessQuantiles=rep(0.5,length(nh_list)),
         positivities=rep("positive",length(nh_list)), 
-#        energyType='regression', mixAlg='ica',
-        energyType='cca', mixAlg='svd',
-        scale=c("centerAndScale", "robust",  "np"),
+        energyType='regression', mixAlg='ica',
+#        energyType='cca', mixAlg='svd',
+        scale=c("centerAndScale",  "np"),
         constraint="Stiefelx10x10",
         initialUMatrix=initu, verbose=T )
 #####################################################
+```
+
+```{r nhanessimlrstat,eval=TRUE}
 projlist=list()
-mysimk=1
+mysimk=2
 for ( k in 2:length(nh_list)) {
     rownames(resultNH$v[[k]])=colnames( nh_list[[k]])
     ux=data.frame(nh_list[[k]] %*% abs(resultNH$v[[k]][,1:mysimk]))
@@ -255,7 +261,7 @@ cognames = c(
 #  "z_cerad_edu", "z_animal_edu",     "z_digit_edu",      "z_delayed_edu",    "z_global_edu"
 )
 # cognames=c("cerad_sum","cfdast","cfdds")
-dnames = c( "riagendr", "ridageyr", "race", "dmdeduc2", "INDFMPIR")
+dnames = c( "riagendr", "ridageyr", "race", "dmdeduc2", "INDFMPIR",'wtint2yr','wtmec2yr')
 if ( doimp ) {
   simdf2[,dnames]=fdata[,dnames]
   simdf2[,cognames]=fdata[,cognames]
@@ -264,10 +270,13 @@ if ( doimp ) {
   simdf2[,cognames]=fdata[mycc,cognames]
   }
 #################################
+covars=" ~ riagendr + ridageyr + race + dmdeduc2 + INDFMPIR + "
+covars=" ~ riagendr + ridageyr + race + dmdeduc2 +  "
 for ( kk in 1:length(cognames)) {
-  myform = paste0( cognames[kk]," ~ riagendr + ridageyr + race + dmdeduc2 + INDFMPIR + ",paste0( colnames(simdf), collapse='+'))
+  myform = paste0( cognames[kk], covars,paste0( colnames(simdf), collapse='+'))
   tempdf = simdf2[mycc,]
-  if (doimp) mdl = lm( myform, data=tempdf ) else mdl = lm( myform, data=tempdf )
+  mdl = lm( myform, data=tempdf )
+#  if (doimp) mdl = lm( myform, data=tempdf, weights=tempdf$wtint2yr ) else mdl = lm( myform, data=tempdf, weights=tempdf$wtint2yr  )
   print( summary( mdl ) )
   print( cognames[kk])
   Sys.sleep(3)
@@ -275,8 +284,9 @@ for ( kk in 1:length(cognames)) {
 #######################
 for ( k in names(projlist) ) {
   print(k)
-  print( interpret_simlr_vector2( resultNH$v[[k]], 1, n2show=3, shortnames=F ) )
-  if ( mysimk > 1 ) print( interpret_simlr_vector2( resultNH$v[[k]], 2, n2show=3, shortnames=F ) )
+  for ( j in 1:mysimk ) {
+    print( interpret_simlr_vector2( resultNH$v[[k]], j, n2show=3, shortnames=F ) )
+  }
 }
 ##########################################################################################
 # https://wwwn.cdc.gov/nchs/nhanes/search/default.aspx
