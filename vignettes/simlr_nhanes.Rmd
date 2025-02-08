@@ -207,10 +207,13 @@ for ( k in knm ) {
       temp0 = impute_data( fdata[ ,colcats==k] )
     } else temp0=(fdata[mycc,colcats==k])
     temp = data.frame(convert_to_numeric_matrix( temp0 ))
-    if ( TRUE ) {
-      vv=apply( temp, 2, FUN=var )
-      temp = temp[ , vv > 0 ]
-#      temp = robustMatrixTransform( temp )
+    vv=apply( temp, 2, FUN=var )
+    temp = temp[ , vv > 0 ]
+    if ( k %in% c('exposures','diet') ) {
+      nn = colnames(temp)
+      for (  jj in 1:ncol(temp) ) temp = truncatehi(temp, nn[jj], t = 10, removeit = FALSE)
+      # temp = robustMatrixTransform( temp )
+      colnames(temp) = nn
     }
     for ( j in 1:ncol(temp) ) {
         hist( temp[,j], main=colnames(temp)[j])
@@ -239,7 +242,8 @@ initu=initializeSimlr( nh_list, k=round(max_columns_list(nh_list)), jointReducti
 #initu=initializeSimlr( nh_list, k=min_columns_list(nh_list), jointReduction=TRUE )
 #initu=initializeSimlr( nh_list, k=round(min_columns_list(nh_list)*2), jointReduction=TRUE )
 ###########################
-resultNH <- simlr( nh_list, 
+if ( ! exists("resultNH") )
+  resultNH <- simlr( nh_list, 
         iterations=200,
         sparsenessQuantiles=rep(0.5,length(nh_list)),
         positivities=rep("positive",length(nh_list)), 
@@ -290,7 +294,7 @@ for ( kk in 1:ncol(initu)) {
   mdl = lm( myform, data=tempdf )
 #  if (doimp) mdl = lm( myform, data=tempdf, weights=tempdf$wtint2yr ) else mdl = lm( myform, data=tempdf, weights=tempdf$wtint2yr  )
   myanv = anova( bmdl, mdl )
-  if ( myanv$Pr[2] < 1e-6 ) {
+  if ( myanv$Pr[2] < 0.01/mysimk ) {
     cat("*** result begin ***********************************\n")
     print("individual coefficients")
     tailcoffs = tail( coefficients( summary( mdl ) ), 4 )
