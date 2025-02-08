@@ -245,8 +245,8 @@ resultNH <- simlr( nh_list,
         positivities=rep("positive",length(nh_list)), 
         energyType='regression', mixAlg='ica',
 #        energyType='cca', mixAlg='svd',
-#        scale=c("centerAndScale",  "np"),
-        scale=c("robust", "center", "np"),
+        scale=c("centerAndScale",  "np"),
+#        scale=c("robust", "center", "np"),
         constraint="Stiefelx10x10",
         initialUMatrix=initu, verbose=T )
 #####################################################
