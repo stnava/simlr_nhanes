@@ -76,8 +76,8 @@ ig13 <- nhanes('IHgEM_H')  # Example for phthalates and blood metals
 uh <- nhanes('UHG_G')  # Example for phthalates and blood metals
 uh13 <- nhanes('UHG_H')  # Example for phthalates and blood metals
 
-di <- nhanes('DR1TOT_G')  # Example for phthalates and blood metals
-di13 <- nhanes('DR1TOT_H')  # Example for phthalates and blood metals
+di <- nhanes('DR1TOT_G')  # diet
+di13 <- nhanes('DR1TOT_H')  # diet
 
 
 merge_nhanes_data <- function( joinid, nacol,  ...) {
@@ -186,7 +186,11 @@ colcats[ colnames(fdata) %in%  c(bmname,bpname,"Testosterone","TotChol","Diabete
 colcats[ colnames(fdata) %in%   c(
   getNamesFromDataframe( "DPQ", fdata ), 
   getNamesFromDataframe( "SLQ", fdata ) )  ]='mentalhealth'
-colcats[ colnames(fdata) %in%  getNamesFromDataframe( "LBX", fdata ) ]='exposures'
+colcats[ colnames(fdata) %in%  getNamesFromDataframe( "LBX", fdata, exclusions='LC' ) ]='exposures'
+colcats[ colnames(fdata) %in%  getNamesFromDataframe( "LBD", fdata, exclusions='LC' ) ]='exposures'
+colcats[ colnames(fdata) %in%  getNamesFromDataframe( "URX", fdata, exclusions='LC' ) ]='exposures'
+colcats[ colnames(fdata) %in%  getNamesFromDataframe( "URD", fdata, exclusions='LC' ) ]='exposures'
+colcats[ colnames(fdata) %in%  getNamesFromDataframe( "LBC", fdata, exclusions='LC' ) ]='exposures'
 colcats[ colnames(fdata) %in%  getNamesFromDataframe( "DR1T", fdata ) ]='diet'
 # colcats[ colnames(fdata) %in%  getNamesFromDataframe( "cfd", fdata )[-1] ]='digitspan'
 tbl=table(colcats)
@@ -194,15 +198,20 @@ tbl=table(colcats)
 nh_list=list()
 knm=names(tbl)[-1]
 mycc = complete.cases( fdata[ , colcats %in% knm ])
+doimp=TRUE
+derewaf
 for ( k in knm ) {
     print(k)
-    temp0=(fdata[mycc,colcats==k])
+    if ( doimp ) {
+      temp0 = impute_data( fdata[ ,colcats==k] )
+    } else temp0=(fdata[mycc,colcats==k])
     temp = data.frame(convert_to_numeric_matrix( temp0 ))
     for ( j in 1:ncol(temp) ) {
         hist( temp[,j], main=colnames(temp)[j])
 #        Sys.sleep(1)
         }
     nh_list[[length(nh_list)+1]]=data.matrix( ( temp ) )
+    print(colnames(nh_list[[length(nh_list)]]))
 #    nh_list[[length(nh_list)]]=impute_and_report_na(nh_list[[length(nh_list)]] )
     }
 names(nh_list)=knm
@@ -237,29 +246,37 @@ for ( k in 2:length(nh_list)) {
     ux=data.frame(nh_list[[k]] %*% abs(resultNH$v[[k]][,1:mysimk]))
     colnames(ux)=paste0(names(nh_list)[k],1:ncol(ux))
     projlist[[length(projlist)+1]]=ux
+    names( projlist )[length(projlist)]=knm[k]
 }
 simdf=simdf2=dplyr::bind_cols(projlist)
-cognames=c("cerad_sum","cfdast","cfdds")
 cognames = c(
   "z_cerad_re", "z_animal_re",      "z_delayed_re",    "z_global_re",     "z_digit_re"
 #  "z_cerad_age", "z_animal_age",     "z_digit_age",      "z_delayed_age",    "z_global_age",
 #  "z_cerad_edu", "z_animal_edu",     "z_digit_edu",      "z_delayed_edu",    "z_global_edu"
 )
+# cognames=c("cerad_sum","cfdast","cfdds")
 dnames = c( "riagendr", "ridageyr", "race", "dmdeduc2", "INDFMPIR")
-simdf2[,dnames]=fdata[mycc,dnames]
-simdf2[,cognames]=fdata[mycc,cognames]
+if ( doimp ) {
+  simdf2[,dnames]=fdata[,dnames]
+  simdf2[,cognames]=fdata[,cognames]
+  } else {
+  simdf2[,dnames]=fdata[mycc,dnames]
+  simdf2[,cognames]=fdata[mycc,cognames]
+  }
+#################################
 for ( kk in 1:length(cognames)) {
   myform = paste0( cognames[kk]," ~ riagendr + ridageyr + race + dmdeduc2 + INDFMPIR + ",paste0( colnames(simdf), collapse='+'))
-  mdl = lm( myform, data=simdf2 )
+  tempdf = simdf2[mycc,]
+  if (doimp) mdl = lm( myform, data=tempdf ) else mdl = lm( myform, data=tempdf )
   print( summary( mdl ) )
   print( cognames[kk])
   Sys.sleep(3)
 }
 #######################
-for ( k in knm ) {
+for ( k in names(projlist) ) {
   print(k)
   print( interpret_simlr_vector2( resultNH$v[[k]], 1, n2show=3, shortnames=F ) )
-  print( interpret_simlr_vector2( resultNH$v[[k]], 2, n2show=3, shortnames=F ) )
+  if ( mysimk > 1 ) print( interpret_simlr_vector2( resultNH$v[[k]], 2, n2show=3, shortnames=F ) )
 }
 ##########################################################################################
 # https://wwwn.cdc.gov/nchs/nhanes/search/default.aspx
