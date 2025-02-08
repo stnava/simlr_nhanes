@@ -183,6 +183,7 @@ map_freq_to_numeric <- function(df, colname) {
 #' @param df2 Second data frame.
 #'
 #' @return A merged data frame containing matching columns.
+#' @importFrom dplyr bind_rows
 #' @examples
 #' merge_same_type_columns(data.frame(a = 1:3), data.frame(a = 4:6))
 #' @export
