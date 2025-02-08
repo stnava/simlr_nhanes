@@ -236,15 +236,17 @@ wdemog=which( knm == 'demog')
 for ( wdemog in 1:length(nh_list) ) regs[[ wdemog]]=diag( ncol(nh_list[[wdemog]]))
 names( regs ) = knm[ -1 ]
 initu=initializeSimlr( nh_list, k=round(max_columns_list(nh_list)), jointReduction=TRUE )
-initu=initializeSimlr( nh_list, k=min_columns_list(nh_list), jointReduction=TRUE )
-initu=initializeSimlr( nh_list, k=round(min_columns_list(nh_list)*2), jointReduction=TRUE )
+#initu=initializeSimlr( nh_list, k=min_columns_list(nh_list), jointReduction=TRUE )
+#initu=initializeSimlr( nh_list, k=round(min_columns_list(nh_list)*2), jointReduction=TRUE )
+###########################
 resultNH <- simlr( nh_list, 
-        iterations=25,
+        iterations=200,
         sparsenessQuantiles=rep(0.5,length(nh_list)),
         positivities=rep("positive",length(nh_list)), 
         energyType='regression', mixAlg='ica',
 #        energyType='cca', mixAlg='svd',
-        scale=c("centerAndScale", "whiten",  "np"),
+#        scale=c("centerAndScale",  "np"),
+        scale=c("robust", "center", "np"),
         constraint="Stiefelx10x10",
         initialUMatrix=initu, verbose=T )
 #####################################################
@@ -288,22 +290,24 @@ for ( kk in 1:ncol(initu)) {
   mdl = lm( myform, data=tempdf )
 #  if (doimp) mdl = lm( myform, data=tempdf, weights=tempdf$wtint2yr ) else mdl = lm( myform, data=tempdf, weights=tempdf$wtint2yr  )
   myanv = anova( bmdl, mdl )
-  if ( myanv$Pr[2] < 1e-5 ) {
+  if ( myanv$Pr[2] < 1e-6 ) {
     cat("*** result begin ***********************************\n")
     print("individual coefficients")
-    print( tail( coefficients( summary( mdl ) ), 4 ))
-    print( paste("multivar-ANOVA p-value", myanv$Pr[2] ) )
+    tailcoffs = tail( coefficients( summary( mdl ) ), 4 )
+    print( tailcoffs )
+    print( paste("multivar-ANOVA p-value", insight::format_p(myanv$Pr[2],digits=4) ) )
     print( cognames[length(cognames)])
     for ( k in names(projlist) ) {
       print( paste("Simlr weights", k ) )
       print( interpret_simlr_vector2( resultNH$v[[k]], kk, n2show=3, shortnames=F ) )
-      visreg::visreg(mdl, paste0(k,kk) )
+      ttl = paste0(k,kk, " ", insight::format_p(tailcoffs[paste0(k,kk),"Pr(>|t|)"],digits=4)  )
+      visreg::visreg(mdl, paste0(k,kk), main=ttl )
       }
     cat("*** result end ***********************************\n\n")
 #    Sys.sleep(3)
   }
 }
-#######################
+##########################################################################################
 ##########################################################################################
 # https://wwwn.cdc.gov/nchs/nhanes/search/default.aspx
 # > interpret_simlr_vector2( resultNH$v[['exposures']], 1, n2show=5, shortnames=F )
