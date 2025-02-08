@@ -207,6 +207,7 @@ for ( k in knm ) {
       temp0 = impute_data( fdata[ ,colcats==k] )
     } else temp0=(fdata[mycc,colcats==k])
     temp = data.frame(convert_to_numeric_matrix( temp0 ))
+    if ( k == 'exposures' ) temp = robustMatrixTransform( temp )
     for ( j in 1:ncol(temp) ) {
         hist( temp[,j], main=colnames(temp)[j])
 #        Sys.sleep(1)

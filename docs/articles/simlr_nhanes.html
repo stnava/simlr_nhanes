@@ -145,157 +145,17 @@ substituted for the long form in nhanesA commands.</p>
 income relative to poverty threshold). • INDHHIN2: Annual Household
 Income (categorized ranges). • DMDEDUC2: Education Level (for adults 20+
 years). • OCD390G: Employment Status (in occupation questionnaire).</p>
-<div class="sourceCode" id="cb26"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co"># Demographic data (e.g., 2011-2012 cycle)</span></span>
-<span><span class="va">demo_data</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/nhanesA/man/nhanes.html" class="external-link">nhanes</a></span><span class="op">(</span><span class="st">'DEMO_G'</span><span class="op">)</span></span>
-<span><span class="va">cog_data</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/nhanesA/man/nhanes.html" class="external-link">nhanes</a></span><span class="op">(</span><span class="st">'CFQ_G'</span><span class="op">)</span></span>
-<span><span class="va">depression_data</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/nhanesA/man/nhanes.html" class="external-link">nhanes</a></span><span class="op">(</span><span class="st">'DPQ_G'</span><span class="op">)</span></span>
-<span><span class="va">sleep_data</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/nhanesA/man/nhanes.html" class="external-link">nhanes</a></span><span class="op">(</span><span class="st">'SLQ_G'</span><span class="op">)</span></span>
-<span><span class="va">bp</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/nhanesA/man/nhanes.html" class="external-link">nhanes</a></span><span class="op">(</span> <span class="st">"BPX_G"</span><span class="op">)</span></span>
-<span><span class="va">bm</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/nhanesA/man/nhanes.html" class="external-link">nhanes</a></span><span class="op">(</span> <span class="st">"BMX_G"</span><span class="op">)</span></span>
-<span><span class="va">env_data</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/nhanesA/man/nhanes.html" class="external-link">nhanes</a></span><span class="op">(</span><span class="st">'PBCD_G'</span><span class="op">)</span>  <span class="co"># Example for phthalates and blood metals</span></span>
-<span></span>
-<span><span class="co"># Demographic data (e.g., 2013-2014 cycle)</span></span>
-<span><span class="va">demo_data13</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/nhanesA/man/nhanes.html" class="external-link">nhanes</a></span><span class="op">(</span><span class="st">'DEMO_H'</span><span class="op">)</span></span>
-<span><span class="va">cog_data13</span><span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/nhanesA/man/nhanes.html" class="external-link">nhanes</a></span><span class="op">(</span><span class="st">'CFQ_H'</span><span class="op">)</span></span>
-<span><span class="va">depression_data13</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/nhanesA/man/nhanes.html" class="external-link">nhanes</a></span><span class="op">(</span><span class="st">'DPQ_H'</span><span class="op">)</span></span>
-<span><span class="va">sleep_data13</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/nhanesA/man/nhanes.html" class="external-link">nhanes</a></span><span class="op">(</span><span class="st">'SLQ_H'</span><span class="op">)</span></span>
-<span><span class="va">bp13</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/nhanesA/man/nhanes.html" class="external-link">nhanes</a></span><span class="op">(</span> <span class="st">"BPX_H"</span><span class="op">)</span></span>
-<span><span class="va">bm13</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/nhanesA/man/nhanes.html" class="external-link">nhanes</a></span><span class="op">(</span> <span class="st">"BMX_H"</span><span class="op">)</span></span>
-<span><span class="va">env_data13</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/nhanesA/man/nhanes.html" class="external-link">nhanes</a></span><span class="op">(</span><span class="st">'PBCD_H'</span><span class="op">)</span>  <span class="co"># Example for phthalates and blood metals</span></span>
-<span></span>
-<span></span>
-<span><span class="va">phdata</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/nhanesA/man/nhanes.html" class="external-link">nhanes</a></span><span class="op">(</span><span class="st">'PHTHTE_G'</span><span class="op">)</span>  <span class="co"># Example for phthalates and blood metals</span></span>
-<span><span class="va">phdata13</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/nhanesA/man/nhanes.html" class="external-link">nhanes</a></span><span class="op">(</span><span class="st">'PHTHTE_H'</span><span class="op">)</span>  <span class="co"># Example for phthalates and blood metals</span></span>
-<span><span class="co"># pfasd &lt;- nhanes('SSPFAS_G')  # Example for phthalates and blood metals</span></span>
-<span><span class="co"># pfasd13 &lt;- nhanes('SSPFAS_H')  # Example for phthalates and blood metals</span></span>
-<span><span class="va">vocd</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/nhanesA/man/nhanes.html" class="external-link">nhanes</a></span><span class="op">(</span><span class="st">'VOCWB_G'</span><span class="op">)</span>  <span class="co"># Example for phthalates and blood metals</span></span>
-<span><span class="va">vocd13</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/nhanesA/man/nhanes.html" class="external-link">nhanes</a></span><span class="op">(</span><span class="st">'VOCWB_H'</span><span class="op">)</span>  <span class="co"># Example for phthalates and blood metals</span></span>
-<span><span class="va">hvmt</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/nhanesA/man/nhanes.html" class="external-link">nhanes</a></span><span class="op">(</span><span class="st">'UAS_G'</span><span class="op">)</span>  <span class="co"># Example for phthalates and blood metals</span></span>
-<span><span class="va">hvmt13</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/nhanesA/man/nhanes.html" class="external-link">nhanes</a></span><span class="op">(</span><span class="st">'UAS_H'</span><span class="op">)</span>  <span class="co"># Example for phthalates and blood metals</span></span>
-<span><span class="va">pst</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/nhanesA/man/nhanes.html" class="external-link">nhanes</a></span><span class="op">(</span><span class="st">'PSTPOL_G'</span><span class="op">)</span>  <span class="co"># Example for phthalates and blood metals</span></span>
-<span><span class="va">pst13</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/nhanesA/man/nhanes.html" class="external-link">nhanes</a></span><span class="op">(</span><span class="st">'PSTPOL_H'</span><span class="op">)</span>  <span class="co"># Example for phthalates and blood metals</span></span>
-<span><span class="va">pfc</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/nhanesA/man/nhanes.html" class="external-link">nhanes</a></span><span class="op">(</span><span class="st">'PFC_G'</span><span class="op">)</span>  <span class="co"># Example for phthalates and blood metals</span></span>
-<span><span class="va">pfc13</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/nhanesA/man/nhanes.html" class="external-link">nhanes</a></span><span class="op">(</span><span class="st">'PFC_H'</span><span class="op">)</span>  <span class="co"># Example for phthalates and blood metals</span></span></code></pre></div>
-<pre><code><span><span class="co">## simpleWarning in download.file(url, tf, mode = "wb", quiet = TRUE): downloaded length 0 != reported length 1245</span></span></code></pre>
-<div class="sourceCode" id="cb28"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">mm</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/nhanesA/man/nhanes.html" class="external-link">nhanes</a></span><span class="op">(</span><span class="st">'UHM_G'</span><span class="op">)</span>  <span class="co"># Example for phthalates and blood metals</span></span>
-<span><span class="va">mm13</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/nhanesA/man/nhanes.html" class="external-link">nhanes</a></span><span class="op">(</span><span class="st">'UHM_H'</span><span class="op">)</span>  <span class="co"># Example for phthalates and blood metals</span></span></code></pre></div>
-<pre><code><span><span class="co">## simpleWarning in download.file(url, tf, mode = "wb", quiet = TRUE): downloaded length 0 != reported length 1245</span></span></code></pre>
-<div class="sourceCode" id="cb30"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">cu</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/nhanesA/man/nhanes.html" class="external-link">nhanes</a></span><span class="op">(</span><span class="st">'CUSEZN_G'</span><span class="op">)</span>  <span class="co"># Example for phthalates and blood metals</span></span>
-<span><span class="va">cu13</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/nhanesA/man/nhanes.html" class="external-link">nhanes</a></span><span class="op">(</span><span class="st">'CUSEZN_H'</span><span class="op">)</span>  <span class="co"># Example for phthalates and blood metals</span></span>
-<span><span class="va">ig</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/nhanesA/man/nhanes.html" class="external-link">nhanes</a></span><span class="op">(</span><span class="st">'IHgEM_G'</span><span class="op">)</span>  <span class="co"># Example for phthalates and blood metals</span></span>
-<span><span class="va">ig13</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/nhanesA/man/nhanes.html" class="external-link">nhanes</a></span><span class="op">(</span><span class="st">'IHgEM_H'</span><span class="op">)</span>  <span class="co"># Example for phthalates and blood metals</span></span>
-<span><span class="va">uh</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/nhanesA/man/nhanes.html" class="external-link">nhanes</a></span><span class="op">(</span><span class="st">'UHG_G'</span><span class="op">)</span>  <span class="co"># Example for phthalates and blood metals</span></span>
-<span><span class="va">uh13</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/nhanesA/man/nhanes.html" class="external-link">nhanes</a></span><span class="op">(</span><span class="st">'UHG_H'</span><span class="op">)</span>  <span class="co"># Example for phthalates and blood metals</span></span>
-<span></span>
-<span><span class="va">di</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/nhanesA/man/nhanes.html" class="external-link">nhanes</a></span><span class="op">(</span><span class="st">'DR1TOT_G'</span><span class="op">)</span>  <span class="co"># Example for phthalates and blood metals</span></span>
-<span><span class="va">di13</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/nhanesA/man/nhanes.html" class="external-link">nhanes</a></span><span class="op">(</span><span class="st">'DR1TOT_H'</span><span class="op">)</span>  <span class="co"># Example for phthalates and blood metals</span></span>
-<span></span>
-<span></span>
-<span><span class="va">merge_nhanes_data</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span> <span class="va">joinid</span>, <span class="va">nacol</span>,  <span class="va">...</span><span class="op">)</span> <span class="op">{</span></span>
-<span>  <span class="va">datasets</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="va">...</span><span class="op">)</span></span>
-<span>  <span class="va">dfout</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/funprog.html" class="external-link">Reduce</a></span><span class="op">(</span><span class="kw">function</span><span class="op">(</span><span class="va">x</span>, <span class="va">y</span><span class="op">)</span> <span class="op">{</span></span>
-<span>    <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate-joins.html" class="external-link">left_join</a></span><span class="op">(</span><span class="va">x</span>, <span class="va">y</span>, by <span class="op">=</span> <span class="va">joinid</span><span class="op">)</span>  <span class="co"># Adjust "ID" to your common column name</span></span>
-<span>  <span class="op">}</span>, <span class="va">datasets</span><span class="op">)</span></span>
-<span>  <span class="va">dfout</span> <span class="op">=</span> <span class="va">dfout</span><span class="op">[</span> <span class="op">!</span><span class="fu"><a href="https://rdrr.io/r/base/NA.html" class="external-link">is.na</a></span><span class="op">(</span> <span class="va">dfout</span><span class="op">[</span>,<span class="va">nacol</span><span class="op">]</span> <span class="op">)</span>, <span class="op">]</span></span>
-<span>  <span class="kw"><a href="https://rdrr.io/r/base/function.html" class="external-link">return</a></span><span class="op">(</span> <span class="va">dfout</span> <span class="op">)</span></span>
-<span><span class="op">}</span></span>
-<span></span>
-<span><span class="va">merged_data</span> <span class="op">&lt;-</span> <span class="fu">merge_nhanes_data</span><span class="op">(</span> <span class="st">'SEQN'</span>, <span class="st">'CFDDS'</span>,</span>
-<span>  <span class="fu"><a href="../reference/merge_same_type_columns.html">merge_same_type_columns</a></span><span class="op">(</span><span class="va">cog_data</span>, <span class="va">cog_data13</span><span class="op">)</span>,</span>
-<span>  <span class="fu"><a href="../reference/merge_same_type_columns.html">merge_same_type_columns</a></span><span class="op">(</span><span class="va">demo_data</span>,<span class="va">demo_data13</span><span class="op">)</span>,</span>
-<span>  <span class="fu"><a href="../reference/merge_same_type_columns.html">merge_same_type_columns</a></span><span class="op">(</span><span class="va">di</span>,<span class="va">di13</span><span class="op">)</span>,</span>
-<span>  <span class="fu"><a href="../reference/merge_same_type_columns.html">merge_same_type_columns</a></span><span class="op">(</span><span class="va">depression_data</span>,<span class="va">depression_data13</span><span class="op">)</span>,</span>
-<span>  <span class="fu"><a href="../reference/merge_same_type_columns.html">merge_same_type_columns</a></span><span class="op">(</span><span class="va">sleep_data</span>,<span class="va">sleep_data13</span><span class="op">)</span>,</span>
-<span>  <span class="fu"><a href="../reference/merge_same_type_columns.html">merge_same_type_columns</a></span><span class="op">(</span><span class="va">bp</span>,<span class="va">bp13</span><span class="op">)</span>,</span>
-<span>  <span class="fu"><a href="../reference/merge_same_type_columns.html">merge_same_type_columns</a></span><span class="op">(</span><span class="va">bm</span>,<span class="va">bm13</span><span class="op">)</span>,</span>
-<span>  <span class="fu"><a href="../reference/merge_same_type_columns.html">merge_same_type_columns</a></span><span class="op">(</span><span class="va">env_data</span>, <span class="va">env_data13</span><span class="op">)</span>,</span>
-<span>  <span class="fu"><a href="../reference/merge_same_type_columns.html">merge_same_type_columns</a></span><span class="op">(</span><span class="va">phdata</span>, <span class="va">phdata13</span><span class="op">)</span>,</span>
-<span>  <span class="fu"><a href="../reference/merge_same_type_columns.html">merge_same_type_columns</a></span><span class="op">(</span><span class="va">vocd</span>, <span class="va">vocd13</span><span class="op">)</span>,</span>
-<span>  <span class="fu"><a href="../reference/merge_same_type_columns.html">merge_same_type_columns</a></span><span class="op">(</span><span class="va">cu</span>, <span class="va">cu13</span><span class="op">)</span>,</span>
-<span>  <span class="fu"><a href="../reference/merge_same_type_columns.html">merge_same_type_columns</a></span><span class="op">(</span><span class="va">ig</span>, <span class="va">ig13</span><span class="op">)</span>,</span>
-<span>  <span class="fu"><a href="../reference/merge_same_type_columns.html">merge_same_type_columns</a></span><span class="op">(</span><span class="va">uh</span>, <span class="va">uh13</span><span class="op">)</span>,</span>
-<span>  <span class="va">mm</span>,</span>
-<span><span class="co">#  merge_same_type_columns(pst, pst13) )</span></span>
-<span><span class="co">#  merge_same_type_columns(pfc, pfc13) ,</span></span>
-<span>  <span class="fu"><a href="../reference/merge_same_type_columns.html">merge_same_type_columns</a></span><span class="op">(</span><span class="va">hvmt</span>, <span class="va">hvmt13</span><span class="op">)</span><span class="op">)</span></span>
-<span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/table.html" class="external-link">table</a></span><span class="op">(</span><span class="va">merged_data</span><span class="op">$</span><span class="va">RIAGENDR</span><span class="op">)</span></span></code></pre></div>
+<pre><code><span><span class="co">## simpleWarning in download.file(url, tf, mode = "wb", quiet = TRUE): downloaded length 0 != reported length 1245</span></span>
+<span><span class="co">## </span></span>
+<span><span class="co">## </span></span>
+<span><span class="co">## simpleWarning in download.file(url, tf, mode = "wb", quiet = TRUE): downloaded length 0 != reported length 1245</span></span></code></pre>
 <pre><code><span><span class="co">## </span></span>
 <span><span class="co">##   Male Female </span></span>
 <span><span class="co">##   1469   1545</span></span></code></pre>
-<div class="sourceCode" id="cb32"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">nhanescog</span><span class="op">$</span><span class="va">SEQN</span> <span class="op">=</span> <span class="va">nhanescog</span><span class="op">$</span><span class="va">seqn</span></span>
-<span><span class="va">merged_data</span><span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/merge.html" class="external-link">merge</a></span><span class="op">(</span><span class="va">nhanescog</span>, <span class="va">merged_data</span>, by<span class="op">=</span><span class="st">'SEQN'</span><span class="op">)</span></span>
-<span></span>
-<span></span>
-<span><span class="va">depnames</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span> </span>
-<span>  <span class="fu"><a href="https://rdrr.io/pkg/subtyper/man/getNamesFromDataframe.html" class="external-link">getNamesFromDataframe</a></span><span class="op">(</span> <span class="st">"SLQ"</span>, <span class="va">merged_data</span> <span class="op">)</span>,</span>
-<span><span class="co">#  getNamesFromDataframe( "DPQ", merged_data, exclusions='DPQ100' )</span></span>
-<span>  <span class="fu"><a href="https://rdrr.io/pkg/subtyper/man/getNamesFromDataframe.html" class="external-link">getNamesFromDataframe</a></span><span class="op">(</span> <span class="st">"DPQ"</span>, <span class="va">merged_data</span> <span class="op">)</span></span>
-<span><span class="op">)</span></span>
-<span><span class="kw">for</span> <span class="op">(</span> <span class="va">x</span> <span class="kw">in</span> <span class="va">depnames</span> <span class="op">)</span> <span class="va">merged_data</span><span class="op">[</span>,<span class="va">x</span><span class="op">]</span><span class="op">=</span><span class="fu"><a href="../reference/map_freq_to_numeric.html">map_freq_to_numeric</a></span><span class="op">(</span><span class="va">merged_data</span>,<span class="va">x</span><span class="op">)</span> </span>
-<span></span>
-<span><span class="co"># deek</span></span>
-<span></span>
-<span></span>
-<span><span class="va">idata</span> <span class="op">=</span> <span class="fu"><a href="../reference/impute_data.html">impute_data</a></span><span class="op">(</span><span class="va">merged_data</span><span class="op">)</span></span>
-<span><span class="va">idata</span> <span class="op">=</span> <span class="va">idata</span><span class="op">[</span> <span class="va">idata</span><span class="op">$</span><span class="va">BPXDI1</span> <span class="op">&gt;</span> <span class="fl">20</span> <span class="op">&amp;</span> <span class="va">idata</span><span class="op">$</span><span class="va">BPXDI2</span> <span class="op">&gt;</span> <span class="fl">20</span> <span class="op">&amp;</span> <span class="va">idata</span><span class="op">$</span><span class="va">BPXDI3</span> <span class="op">&gt;</span> <span class="fl">20</span> <span class="op">&amp;</span> <span class="va">idata</span><span class="op">$</span><span class="va">BPXDI4</span> <span class="op">&gt;</span> <span class="fl">20</span>,  <span class="op">]</span></span>
-<span><span class="va">fdata</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/filter_na_columns.html">filter_na_columns</a></span><span class="op">(</span><span class="va">merged_data</span>, max_na_percent <span class="op">=</span> <span class="fl">0.5</span><span class="op">)</span>  <span class="co"># Removes columns with &gt;10% NAs</span></span>
-<span><span class="va">fdata</span> <span class="op">=</span> <span class="va">fdata</span><span class="op">[</span> <span class="fu"><a href="https://rdrr.io/pkg/subtyper/man/na2f.html" class="external-link">na2f</a></span><span class="op">(</span><span class="va">fdata</span><span class="op">$</span><span class="va">BPXDI1</span> <span class="op">&gt;</span> <span class="fl">20</span> <span class="op">&amp;</span> <span class="va">fdata</span><span class="op">$</span><span class="va">BPXDI2</span> <span class="op">&gt;</span> <span class="fl">20</span> <span class="op">&amp;</span> <span class="va">fdata</span><span class="op">$</span><span class="va">BPXDI3</span> <span class="op">&gt;</span> <span class="fl">20</span> <span class="op">)</span>,  <span class="op">]</span></span>
-<span><span class="va">fdata</span><span class="op">$</span><span class="va">race</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/factor.html" class="external-link">factor</a></span><span class="op">(</span> <span class="va">fdata</span><span class="op">$</span><span class="va">race</span> <span class="op">)</span></span>
-<span><span class="va">fdata</span><span class="op">$</span><span class="va">riagendr</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/factor.html" class="external-link">factor</a></span><span class="op">(</span> <span class="va">fdata</span><span class="op">$</span><span class="va">riagendr</span> <span class="op">)</span></span>
-<span></span>
-<span><span class="va">myformR</span> <span class="op">=</span>  <span class="fu"><a href="../reference/create_formula.html">create_formula</a></span><span class="op">(</span> <span class="va">fdata</span>, <span class="st">'z_digit_re'</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">'SEQN'</span>, <span class="st">'RIDAGEMN'</span>,<span class="st">'RIDRETH3'</span>, <span class="st">'CFASTAT'</span>, <span class="st">'CFDCRNC'</span>, <span class="st">'CFDCIT'</span>, <span class="st">'CFDCST'</span>, <span class="st">'CFDAPP'</span>, <span class="st">'CFDAST'</span>, <span class="st">'CFALANG'</span>, <span class="st">'BPAARM'</span>, <span class="st">'CFDCCS'</span>, <span class="st">'CFDCST'</span>, <span class="st">'CFDCIT'</span>, <span class="st">'CFDCSR'</span>, <span class="st">'CFDCIR'</span>, <span class="st">'CFDCST'</span>, <span class="st">'CFDCIT'</span>, <span class="st">'CFDARNC'</span>, <span class="st">'CFDDS'</span>,</span>
-<span><span class="st">'INDHHIN2'</span>,<span class="st">'DMDHRBR4'</span>,<span class="st">'INDFMIN2'</span>,<span class="st">'PEASCST1'</span>,<span class="st">'PEASCCT1'</span>,<span class="st">'PEASCTM1'</span>,<span class="st">'BPACSZ'</span>,<span class="st">'BPXML1'</span>,<span class="st">'URXMBP'</span>,<span class="st">'URXMC1'</span>,<span class="st">'URDUMMAL'</span>,<span class="st">'SLD010H'</span>,<span class="st">'LBXBMN'</span>,<span class="st">'URXCNP'</span>,<span class="st">'URXECP'</span>,<span class="st">'URXMHH'</span>,<span class="st">'URXMHP'</span>,<span class="st">'URXMHNC'</span>,<span class="st">'LBXV06'</span>,<span class="st">'LBXV2A'</span>,<span class="st">'LBXV3B'</span>,<span class="st">'LBXV4C'</span>,<span class="st">'LBXVCB'</span>,<span class="st">'LBXVEB'</span>,<span class="st">'LBXVCB'</span>,<span class="st">'LBXVIPB'</span>,<span class="st">'LBXVMC'</span>,<span class="st">'LBXVOX'</span>,<span class="st">'LBXVTC'</span>,<span class="st">'LBXVTE'</span>,<span class="st">'LBXVXY'</span>,<span class="st">'URXUAS5'</span>,<span class="st">'URXUAB'</span>,<span class="st">'URXUAC'</span>,<span class="st">'URXUMMA'</span>,<span class="st">'URXUAS3'</span>,<span class="st">'LBXBSE'</span>, <span class="st">'RIAGENDR'</span>, <span class="st">'RIDAGEYR'</span>, <span class="st">'RIDRETH1'</span>, <span class="st">'seqn'</span>,</span>
-<span><span class="st">'age_cat'</span>,<span class="st">'ridreth1'</span>,<span class="st">'ridreth3'</span>,<span class="st">'edu_cat'</span>,<span class="st">'cfastat'</span>,<span class="st">'year'</span>,<span class="st">'female'</span>,<span class="st">'cerad_sum'</span>,</span>
-<span><span class="co"># 'wtint2yr','wtmec2yr',</span></span>
-<span><span class="st">'BMXARML'</span>,<span class="st">'BMXARMC'</span>,<span class="st">'BMXHT'</span>,<span class="st">'BMXLEG'</span>,<span class="st">'BMXWAIST'</span>,</span>
-<span><span class="st">'INDFMPIR'</span>, <span class="st">'DRABF'</span>,</span>
-<span><span class="fu"><a href="https://rdrr.io/pkg/subtyper/man/getNamesFromDataframe.html" class="external-link">getNamesFromDataframe</a></span><span class="op">(</span> <span class="st">'DRQS'</span>,<span class="va">fdata</span><span class="op">)</span>,</span>
-<span><span class="fu"><a href="https://rdrr.io/pkg/subtyper/man/getNamesFromDataframe.html" class="external-link">getNamesFromDataframe</a></span><span class="op">(</span> <span class="st">'DPD'</span>,<span class="va">fdata</span><span class="op">)</span>,</span>
-<span><span class="fu"><a href="https://rdrr.io/pkg/subtyper/man/getNamesFromDataframe.html" class="external-link">getNamesFromDataframe</a></span><span class="op">(</span> <span class="st">'cfd'</span>,<span class="va">fdata</span><span class="op">)</span>,</span>
-<span><span class="fu"><a href="https://rdrr.io/pkg/subtyper/man/getNamesFromDataframe.html" class="external-link">getNamesFromDataframe</a></span><span class="op">(</span> <span class="st">'z_'</span>,<span class="va">fdata</span><span class="op">)</span>,</span>
-<span><span class="fu"><a href="https://rdrr.io/pkg/subtyper/man/getNamesFromDataframe.html" class="external-link">getNamesFromDataframe</a></span><span class="op">(</span> <span class="st">'low_'</span>,<span class="va">fdata</span><span class="op">)</span>,</span>
-<span><span class="fu"><a href="https://rdrr.io/pkg/subtyper/man/getNamesFromDataframe.html" class="external-link">getNamesFromDataframe</a></span><span class="op">(</span> <span class="st">'sdm'</span>,<span class="va">fdata</span><span class="op">)</span>,</span>
-<span><span class="co"># getNamesFromDataframe( 'DPQ',depression_data, exclusions=c('DPQ080','DPQ030''DPQ080',)),</span></span>
-<span><span class="co"># getNamesFromDataframe( 'DPQ',depression_data, exclusions=c('DPQ100')),</span></span>
-<span><span class="fu"><a href="https://rdrr.io/pkg/subtyper/man/getNamesFromDataframe.html" class="external-link">getNamesFromDataframe</a></span><span class="op">(</span> <span class="st">'URXUCR'</span>,<span class="va">fdata</span> <span class="op">)</span>,</span>
-<span><span class="fu"><a href="https://rdrr.io/pkg/subtyper/man/getNamesFromDataframe.html" class="external-link">getNamesFromDataframe</a></span><span class="op">(</span> <span class="st">'BMXSAD'</span>,<span class="va">fdata</span> <span class="op">)</span>,</span>
-<span><span class="fu"><a href="https://rdrr.io/pkg/subtyper/man/getNamesFromDataframe.html" class="external-link">getNamesFromDataframe</a></span><span class="op">(</span> <span class="st">'BPAEN'</span>,<span class="va">fdata</span> <span class="op">)</span>,</span>
-<span><span class="fu"><a href="https://rdrr.io/pkg/subtyper/man/getNamesFromDataframe.html" class="external-link">getNamesFromDataframe</a></span><span class="op">(</span> <span class="st">'BPXP'</span>,<span class="va">fdata</span> <span class="op">)</span>,</span>
-<span><span class="fu"><a href="https://rdrr.io/pkg/subtyper/man/getNamesFromDataframe.html" class="external-link">getNamesFromDataframe</a></span><span class="op">(</span> <span class="st">'DMD'</span>,<span class="va">fdata</span> <span class="op">)</span>,</span>
-<span><span class="fu"><a href="https://rdrr.io/pkg/subtyper/man/getNamesFromDataframe.html" class="external-link">getNamesFromDataframe</a></span><span class="op">(</span> <span class="st">'DMDHHSZ'</span>,<span class="va">fdata</span> <span class="op">)</span>,</span>
-<span><span class="fu"><a href="https://rdrr.io/pkg/subtyper/man/getNamesFromDataframe.html" class="external-link">getNamesFromDataframe</a></span><span class="op">(</span> <span class="st">'DRD'</span>,<span class="va">fdata</span> <span class="op">)</span>,</span>
-<span><span class="fu"><a href="https://rdrr.io/pkg/subtyper/man/getNamesFromDataframe.html" class="external-link">getNamesFromDataframe</a></span><span class="op">(</span> <span class="st">'DBD'</span>,<span class="va">fdata</span> <span class="op">)</span>,</span>
-<span><span class="co">#getNamesFromDataframe( 'DR1',fdata ),</span></span>
-<span><span class="fu"><a href="https://rdrr.io/pkg/subtyper/man/getNamesFromDataframe.html" class="external-link">getNamesFromDataframe</a></span><span class="op">(</span> <span class="st">'WT'</span>,<span class="va">fdata</span> <span class="op">)</span>,</span>
-<span><span class="fu"><a href="https://rdrr.io/pkg/subtyper/man/getNamesFromDataframe.html" class="external-link">getNamesFromDataframe</a></span><span class="op">(</span> <span class="st">'SDM'</span>,<span class="va">fdata</span> <span class="op">)</span>,</span>
-<span><span class="fu"><a href="https://rdrr.io/pkg/subtyper/man/getNamesFromDataframe.html" class="external-link">getNamesFromDataframe</a></span><span class="op">(</span> <span class="st">'DMQ'</span>,<span class="va">fdata</span> <span class="op">)</span>,</span>
-<span><span class="fu"><a href="https://rdrr.io/pkg/subtyper/man/getNamesFromDataframe.html" class="external-link">getNamesFromDataframe</a></span><span class="op">(</span> <span class="st">'FIA'</span>,<span class="va">fdata</span> <span class="op">)</span>,</span>
-<span><span class="fu"><a href="https://rdrr.io/pkg/subtyper/man/getNamesFromDataframe.html" class="external-link">getNamesFromDataframe</a></span><span class="op">(</span> <span class="st">'MIA'</span>,<span class="va">fdata</span> <span class="op">)</span>,</span>
-<span><span class="fu"><a href="https://rdrr.io/pkg/subtyper/man/getNamesFromDataframe.html" class="external-link">getNamesFromDataframe</a></span><span class="op">(</span> <span class="st">'AIA'</span>,<span class="va">fdata</span> <span class="op">)</span>,</span>
-<span><span class="fu"><a href="https://rdrr.io/pkg/subtyper/man/getNamesFromDataframe.html" class="external-link">getNamesFromDataframe</a></span><span class="op">(</span> <span class="st">'DMDCIT'</span>,<span class="va">fdata</span> <span class="op">)</span>,</span>
-<span><span class="fu"><a href="https://rdrr.io/pkg/subtyper/man/getNamesFromDataframe.html" class="external-link">getNamesFromDataframe</a></span><span class="op">(</span> <span class="st">'DMDYRS'</span>,<span class="va">fdata</span> <span class="op">)</span>,</span>
-<span><span class="fu"><a href="https://rdrr.io/pkg/subtyper/man/getNamesFromDataframe.html" class="external-link">getNamesFromDataframe</a></span><span class="op">(</span> <span class="st">'RIDE'</span>,<span class="va">fdata</span> <span class="op">)</span>,</span>
-<span><span class="fu"><a href="https://rdrr.io/pkg/subtyper/man/getNamesFromDataframe.html" class="external-link">getNamesFromDataframe</a></span><span class="op">(</span> <span class="st">'CFDCST'</span>,<span class="va">fdata</span> <span class="op">)</span>,</span>
-<span><span class="fu"><a href="https://rdrr.io/pkg/subtyper/man/getNamesFromDataframe.html" class="external-link">getNamesFromDataframe</a></span><span class="op">(</span> <span class="st">'SDDSRVY'</span>, <span class="va">fdata</span> <span class="op">)</span>,</span>
-<span><span class="fu"><a href="https://rdrr.io/pkg/subtyper/man/getNamesFromDataframe.html" class="external-link">getNamesFromDataframe</a></span><span class="op">(</span> <span class="st">'CFDCIT'</span>,<span class="va">fdata</span> <span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/pkg/subtyper/man/getNamesFromDataframe.html" class="external-link">getNamesFromDataframe</a></span><span class="op">(</span> <span class="st">'LC'</span>,<span class="va">fdata</span> <span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/pkg/subtyper/man/getNamesFromDataframe.html" class="external-link">getNamesFromDataframe</a></span><span class="op">(</span> <span class="st">'SI'</span>,<span class="va">fdata</span> <span class="op">)</span> <span class="op">)</span> <span class="op">)</span></span>
-<span><span class="va">problematic_factors</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/check_formula_factors.html">check_formula_factors</a></span><span class="op">(</span><span class="va">myformR</span>, <span class="va">df</span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">problematic_factors</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## character(0)</span></span></code></pre>
-<div class="sourceCode" id="cb34"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">idata2</span><span class="op">=</span><span class="fu"><a href="../reference/impute_data.html">impute_data</a></span><span class="op">(</span><span class="va">fdata</span> <span class="op">)</span></span>
-<span><span class="co"># mdl = lm( myformR, data=idata2)</span></span>
-<span><span class="co"># summary( mdl )</span></span>
-<span><span class="co"># mdl0 = lm( myformR, data=fdata)</span></span>
-<span><span class="co"># summary( mdl0 )</span></span>
-<span><span class="co">##############</span></span>
-<span><span class="co">####</span></span></code></pre></div>
-<div class="sourceCode" id="cb35"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">colcats</span><span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="st">"Basic"</span>,<span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">ncol</a></span><span class="op">(</span><span class="va">fdata</span><span class="op">)</span><span class="op">)</span></span>
+<div class="sourceCode" id="cb29"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co">####################################</span></span>
+<span><span class="va">colcats</span><span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="st">"Basic"</span>,<span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">ncol</a></span><span class="op">(</span><span class="va">fdata</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="va">colcats</span><span class="op">[</span> <span class="fu"><a href="https://rdrr.io/r/base/colnames.html" class="external-link">colnames</a></span><span class="op">(</span><span class="va">fdata</span><span class="op">)</span> <span class="op"><a href="https://rdrr.io/r/base/match.html" class="external-link">%in%</a></span>  <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"ridageyr"</span>,<span class="st">"riagendr"</span>,<span class="st">"race"</span>,<span class="st">"dmdeduc2"</span>,<span class="st">"INDFMPIR"</span><span class="op">)</span> <span class="op">]</span><span class="op">=</span><span class="st">'demog'</span></span>
 <span><span class="va">bpname</span><span class="op">=</span><span class="fu"><a href="https://rdrr.io/pkg/subtyper/man/getNamesFromDataframe.html" class="external-link">getNamesFromDataframe</a></span><span class="op">(</span> <span class="st">"BPX"</span>,<span class="va">fdata</span><span class="op">)</span></span>
 <span><span class="va">bmname</span><span class="op">=</span><span class="fu"><a href="https://rdrr.io/pkg/subtyper/man/getNamesFromDataframe.html" class="external-link">getNamesFromDataframe</a></span><span class="op">(</span> <span class="st">"BMX"</span>,<span class="va">fdata</span><span class="op">)</span></span>
@@ -303,318 +163,589 @@ years). • OCD390G: Employment Status (in occupation questionnaire).</p>
 <span><span class="va">colcats</span><span class="op">[</span> <span class="fu"><a href="https://rdrr.io/r/base/colnames.html" class="external-link">colnames</a></span><span class="op">(</span><span class="va">fdata</span><span class="op">)</span> <span class="op"><a href="https://rdrr.io/r/base/match.html" class="external-link">%in%</a></span>   <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span></span>
 <span>  <span class="fu"><a href="https://rdrr.io/pkg/subtyper/man/getNamesFromDataframe.html" class="external-link">getNamesFromDataframe</a></span><span class="op">(</span> <span class="st">"DPQ"</span>, <span class="va">fdata</span> <span class="op">)</span>, </span>
 <span>  <span class="fu"><a href="https://rdrr.io/pkg/subtyper/man/getNamesFromDataframe.html" class="external-link">getNamesFromDataframe</a></span><span class="op">(</span> <span class="st">"SLQ"</span>, <span class="va">fdata</span> <span class="op">)</span> <span class="op">)</span>  <span class="op">]</span><span class="op">=</span><span class="st">'mentalhealth'</span></span>
-<span><span class="va">colcats</span><span class="op">[</span> <span class="fu"><a href="https://rdrr.io/r/base/colnames.html" class="external-link">colnames</a></span><span class="op">(</span><span class="va">fdata</span><span class="op">)</span> <span class="op"><a href="https://rdrr.io/r/base/match.html" class="external-link">%in%</a></span>  <span class="fu"><a href="https://rdrr.io/pkg/subtyper/man/getNamesFromDataframe.html" class="external-link">getNamesFromDataframe</a></span><span class="op">(</span> <span class="st">"LBX"</span>, <span class="va">fdata</span> <span class="op">)</span> <span class="op">]</span><span class="op">=</span><span class="st">'exposures'</span></span>
+<span><span class="va">x</span><span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">'LC'</span>,<span class="st">'.x'</span>,<span class="st">'.y'</span>,<span class="st">'URDUMMAL'</span>,<span class="st">'LBXVDE'</span>,<span class="st">'LBX4CE'</span><span class="op">)</span></span>
+<span><span class="va">colcats</span><span class="op">[</span> <span class="fu"><a href="https://rdrr.io/r/base/colnames.html" class="external-link">colnames</a></span><span class="op">(</span><span class="va">fdata</span><span class="op">)</span> <span class="op"><a href="https://rdrr.io/r/base/match.html" class="external-link">%in%</a></span>  <span class="fu"><a href="https://rdrr.io/pkg/subtyper/man/getNamesFromDataframe.html" class="external-link">getNamesFromDataframe</a></span><span class="op">(</span> <span class="st">"LBX"</span>, <span class="va">fdata</span>, exclusions<span class="op">=</span><span class="va">x</span> <span class="op">)</span> <span class="op">]</span><span class="op">=</span><span class="st">'exposures'</span></span>
+<span><span class="va">colcats</span><span class="op">[</span> <span class="fu"><a href="https://rdrr.io/r/base/colnames.html" class="external-link">colnames</a></span><span class="op">(</span><span class="va">fdata</span><span class="op">)</span> <span class="op"><a href="https://rdrr.io/r/base/match.html" class="external-link">%in%</a></span>  <span class="fu"><a href="https://rdrr.io/pkg/subtyper/man/getNamesFromDataframe.html" class="external-link">getNamesFromDataframe</a></span><span class="op">(</span> <span class="st">"LBD"</span>, <span class="va">fdata</span>, exclusions<span class="op">=</span><span class="va">x</span> <span class="op">)</span> <span class="op">]</span><span class="op">=</span><span class="st">'exposures'</span></span>
+<span><span class="co">#colcats[ colnames(fdata) %in%  getNamesFromDataframe( "URX", fdata, exclusions=x ) ]='exposures'</span></span>
+<span><span class="co"># colcats[ colnames(fdata) %in%  getNamesFromDataframe( "URD", fdata, exclusions=x ) ]='exposures'</span></span>
+<span><span class="co"># colcats[ colnames(fdata) %in%  getNamesFromDataframe( "LBC", fdata, exclusions=x ) ]='exposures'</span></span>
 <span><span class="va">colcats</span><span class="op">[</span> <span class="fu"><a href="https://rdrr.io/r/base/colnames.html" class="external-link">colnames</a></span><span class="op">(</span><span class="va">fdata</span><span class="op">)</span> <span class="op"><a href="https://rdrr.io/r/base/match.html" class="external-link">%in%</a></span>  <span class="fu"><a href="https://rdrr.io/pkg/subtyper/man/getNamesFromDataframe.html" class="external-link">getNamesFromDataframe</a></span><span class="op">(</span> <span class="st">"DR1T"</span>, <span class="va">fdata</span> <span class="op">)</span> <span class="op">]</span><span class="op">=</span><span class="st">'diet'</span></span>
 <span><span class="co"># colcats[ colnames(fdata) %in%  getNamesFromDataframe( "cfd", fdata )[-1] ]='digitspan'</span></span>
 <span><span class="va">tbl</span><span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/table.html" class="external-link">table</a></span><span class="op">(</span><span class="va">colcats</span><span class="op">)</span></span>
 <span><span class="co">##############</span></span>
 <span><span class="va">nh_list</span><span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="va">knm</span><span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">tbl</span><span class="op">)</span><span class="op">[</span><span class="op">-</span><span class="fl">1</span><span class="op">]</span></span>
-<span><span class="va">mycc</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/complete.cases.html" class="external-link">complete.cases</a></span><span class="op">(</span> <span class="va">fdata</span><span class="op">[</span> , <span class="va">colcats</span> <span class="op"><a href="https://rdrr.io/r/base/match.html" class="external-link">%in%</a></span> <span class="va">knm</span> <span class="op">]</span><span class="op">)</span></span>
+<span><span class="va">mycc</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/complete.cases.html" class="external-link">complete.cases</a></span><span class="op">(</span> <span class="va">fdata</span><span class="op">[</span> , <span class="va">colcats</span> <span class="op"><a href="https://rdrr.io/r/base/match.html" class="external-link">%in%</a></span> <span class="st">'demog'</span> <span class="op">]</span><span class="op">)</span></span>
+<span><span class="va">mycc</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/complete.cases.html" class="external-link">complete.cases</a></span><span class="op">(</span> <span class="va">fdata</span><span class="op">[</span> , <span class="va">colcats</span> <span class="op"><a href="https://rdrr.io/r/base/match.html" class="external-link">%in%</a></span> <span class="st">'exposures'</span> <span class="op">]</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/table.html" class="external-link">table</a></span><span class="op">(</span><span class="va">mycc</span><span class="op">)</span></span></code></pre></div>
+<pre><code><span><span class="co">## mycc</span></span>
+<span><span class="co">## FALSE  TRUE </span></span>
+<span><span class="co">##  2135   462</span></span></code></pre>
+<div class="sourceCode" id="cb31"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">doimp</span><span class="op">=</span><span class="cn">TRUE</span></span>
 <span><span class="kw">for</span> <span class="op">(</span> <span class="va">k</span> <span class="kw">in</span> <span class="va">knm</span> <span class="op">)</span> <span class="op">{</span></span>
 <span>    <span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">k</span><span class="op">)</span></span>
-<span>    <span class="va">temp0</span><span class="op">=</span><span class="op">(</span><span class="va">fdata</span><span class="op">[</span><span class="va">mycc</span>,<span class="va">colcats</span><span class="op">==</span><span class="va">k</span><span class="op">]</span><span class="op">)</span></span>
+<span>    <span class="kw">if</span> <span class="op">(</span> <span class="va">doimp</span> <span class="op">)</span> <span class="op">{</span></span>
+<span>      <span class="va">temp0</span> <span class="op">=</span> <span class="fu"><a href="../reference/impute_data.html">impute_data</a></span><span class="op">(</span> <span class="va">fdata</span><span class="op">[</span> ,<span class="va">colcats</span><span class="op">==</span><span class="va">k</span><span class="op">]</span> <span class="op">)</span></span>
+<span>    <span class="op">}</span> <span class="kw">else</span> <span class="va">temp0</span><span class="op">=</span><span class="op">(</span><span class="va">fdata</span><span class="op">[</span><span class="va">mycc</span>,<span class="va">colcats</span><span class="op">==</span><span class="va">k</span><span class="op">]</span><span class="op">)</span></span>
 <span>    <span class="va">temp</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span><span class="fu"><a href="../reference/convert_to_numeric_matrix.html">convert_to_numeric_matrix</a></span><span class="op">(</span> <span class="va">temp0</span> <span class="op">)</span><span class="op">)</span></span>
 <span>    <span class="kw">for</span> <span class="op">(</span> <span class="va">j</span> <span class="kw">in</span> <span class="fl">1</span><span class="op">:</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">ncol</a></span><span class="op">(</span><span class="va">temp</span><span class="op">)</span> <span class="op">)</span> <span class="op">{</span></span>
 <span>        <span class="fu"><a href="https://rdrr.io/r/graphics/hist.html" class="external-link">hist</a></span><span class="op">(</span> <span class="va">temp</span><span class="op">[</span>,<span class="va">j</span><span class="op">]</span>, main<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/colnames.html" class="external-link">colnames</a></span><span class="op">(</span><span class="va">temp</span><span class="op">)</span><span class="op">[</span><span class="va">j</span><span class="op">]</span><span class="op">)</span></span>
 <span><span class="co">#        Sys.sleep(1)</span></span>
 <span>        <span class="op">}</span></span>
 <span>    <span class="va">nh_list</span><span class="op">[[</span><span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">nh_list</span><span class="op">)</span><span class="op">+</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span><span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/data.matrix.html" class="external-link">data.matrix</a></span><span class="op">(</span> <span class="op">(</span> <span class="va">temp</span> <span class="op">)</span> <span class="op">)</span></span>
+<span>    <span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/colnames.html" class="external-link">colnames</a></span><span class="op">(</span><span class="va">nh_list</span><span class="op">[[</span><span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">nh_list</span><span class="op">)</span><span class="op">]</span><span class="op">]</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#    nh_list[[length(nh_list)]]=impute_and_report_na(nh_list[[length(nh_list)]] )</span></span>
 <span>    <span class="op">}</span></span></code></pre></div>
 <pre><code><span><span class="co">## [1] "demog"</span></span></code></pre>
 <p><img src="simlr_nhanes_files/figure-html/simlrcats-1.png" width="700"><img src="simlr_nhanes_files/figure-html/simlrcats-2.png" width="700"><img src="simlr_nhanes_files/figure-html/simlrcats-3.png" width="700"><img src="simlr_nhanes_files/figure-html/simlrcats-4.png" width="700"><img src="simlr_nhanes_files/figure-html/simlrcats-5.png" width="700"><img src="simlr_nhanes_files/figure-html/simlrcats-6.png" width="700"><img src="simlr_nhanes_files/figure-html/simlrcats-7.png" width="700"><img src="simlr_nhanes_files/figure-html/simlrcats-8.png" width="700"><img src="simlr_nhanes_files/figure-html/simlrcats-9.png" width="700"></p>
-<pre><code><span><span class="co">## [1] "diet"</span></span></code></pre>
+<pre><code><span><span class="co">## [1] "ridageyr"   "dmdeduc2"   "INDFMPIR"   "riagendr_1" "riagendr_2"</span></span>
+<span><span class="co">## [6] "race_1"     "race_2"     "race_3"     "race_4"    </span></span>
+<span><span class="co">## [1] "diet"</span></span></code></pre>
 <p><img src="simlr_nhanes_files/figure-html/simlrcats-10.png" width="700"><img src="simlr_nhanes_files/figure-html/simlrcats-11.png" width="700"><img src="simlr_nhanes_files/figure-html/simlrcats-12.png" width="700"><img src="simlr_nhanes_files/figure-html/simlrcats-13.png" width="700"><img src="simlr_nhanes_files/figure-html/simlrcats-14.png" width="700"><img src="simlr_nhanes_files/figure-html/simlrcats-15.png" width="700"><img src="simlr_nhanes_files/figure-html/simlrcats-16.png" width="700"><img src="simlr_nhanes_files/figure-html/simlrcats-17.png" width="700"><img src="simlr_nhanes_files/figure-html/simlrcats-18.png" width="700"><img src="simlr_nhanes_files/figure-html/simlrcats-19.png" width="700"><img src="simlr_nhanes_files/figure-html/simlrcats-20.png" width="700"><img src="simlr_nhanes_files/figure-html/simlrcats-21.png" width="700"><img src="simlr_nhanes_files/figure-html/simlrcats-22.png" width="700"><img src="simlr_nhanes_files/figure-html/simlrcats-23.png" width="700"><img src="simlr_nhanes_files/figure-html/simlrcats-24.png" width="700"><img src="simlr_nhanes_files/figure-html/simlrcats-25.png" width="700"><img src="simlr_nhanes_files/figure-html/simlrcats-26.png" width="700"><img src="simlr_nhanes_files/figure-html/simlrcats-27.png" width="700"><img src="simlr_nhanes_files/figure-html/simlrcats-28.png" width="700"><img src="simlr_nhanes_files/figure-html/simlrcats-29.png" width="700"><img src="simlr_nhanes_files/figure-html/simlrcats-30.png" width="700"><img src="simlr_nhanes_files/figure-html/simlrcats-31.png" width="700"><img src="simlr_nhanes_files/figure-html/simlrcats-32.png" width="700"><img src="simlr_nhanes_files/figure-html/simlrcats-33.png" width="700"><img src="simlr_nhanes_files/figure-html/simlrcats-34.png" width="700"><img src="simlr_nhanes_files/figure-html/simlrcats-35.png" width="700"><img src="simlr_nhanes_files/figure-html/simlrcats-36.png" width="700"><img src="simlr_nhanes_files/figure-html/simlrcats-37.png" width="700"><img src="simlr_nhanes_files/figure-html/simlrcats-38.png" width="700"><img src="simlr_nhanes_files/figure-html/simlrcats-39.png" width="700"><img src="simlr_nhanes_files/figure-html/simlrcats-40.png" width="700"><img src="simlr_nhanes_files/figure-html/simlrcats-41.png" width="700"><img src="simlr_nhanes_files/figure-html/simlrcats-42.png" width="700"><img src="simlr_nhanes_files/figure-html/simlrcats-43.png" width="700"><img src="simlr_nhanes_files/figure-html/simlrcats-44.png" width="700"><img src="simlr_nhanes_files/figure-html/simlrcats-45.png" width="700"><img src="simlr_nhanes_files/figure-html/simlrcats-46.png" width="700"><img src="simlr_nhanes_files/figure-html/simlrcats-47.png" width="700"><img src="simlr_nhanes_files/figure-html/simlrcats-48.png" width="700"><img src="simlr_nhanes_files/figure-html/simlrcats-49.png" width="700"><img src="simlr_nhanes_files/figure-html/simlrcats-50.png" width="700"><img src="simlr_nhanes_files/figure-html/simlrcats-51.png" width="700"><img src="simlr_nhanes_files/figure-html/simlrcats-52.png" width="700"><img src="simlr_nhanes_files/figure-html/simlrcats-53.png" width="700"><img src="simlr_nhanes_files/figure-html/simlrcats-54.png" width="700"><img src="simlr_nhanes_files/figure-html/simlrcats-55.png" width="700"><img src="simlr_nhanes_files/figure-html/simlrcats-56.png" width="700"><img src="simlr_nhanes_files/figure-html/simlrcats-57.png" width="700"><img src="simlr_nhanes_files/figure-html/simlrcats-58.png" width="700"><img src="simlr_nhanes_files/figure-html/simlrcats-59.png" width="700"><img src="simlr_nhanes_files/figure-html/simlrcats-60.png" width="700"><img src="simlr_nhanes_files/figure-html/simlrcats-61.png" width="700"><img src="simlr_nhanes_files/figure-html/simlrcats-62.png" width="700"><img src="simlr_nhanes_files/figure-html/simlrcats-63.png" width="700"><img src="simlr_nhanes_files/figure-html/simlrcats-64.png" width="700"><img src="simlr_nhanes_files/figure-html/simlrcats-65.png" width="700"><img src="simlr_nhanes_files/figure-html/simlrcats-66.png" width="700"><img src="simlr_nhanes_files/figure-html/simlrcats-67.png" width="700"><img src="simlr_nhanes_files/figure-html/simlrcats-68.png" width="700"><img src="simlr_nhanes_files/figure-html/simlrcats-69.png" width="700"><img src="simlr_nhanes_files/figure-html/simlrcats-70.png" width="700"><img src="simlr_nhanes_files/figure-html/simlrcats-71.png" width="700"><img src="simlr_nhanes_files/figure-html/simlrcats-72.png" width="700"><img src="simlr_nhanes_files/figure-html/simlrcats-73.png" width="700"><img src="simlr_nhanes_files/figure-html/simlrcats-74.png" width="700"><img src="simlr_nhanes_files/figure-html/simlrcats-75.png" width="700"><img src="simlr_nhanes_files/figure-html/simlrcats-76.png" width="700"><img src="simlr_nhanes_files/figure-html/simlrcats-77.png" width="700"><img src="simlr_nhanes_files/figure-html/simlrcats-78.png" width="700"><img src="simlr_nhanes_files/figure-html/simlrcats-79.png" width="700"><img src="simlr_nhanes_files/figure-html/simlrcats-80.png" width="700"></p>
-<pre><code><span><span class="co">## [1] "exposures"</span></span></code></pre>
-<p><img src="simlr_nhanes_files/figure-html/simlrcats-81.png" width="700"><img src="simlr_nhanes_files/figure-html/simlrcats-82.png" width="700"><img src="simlr_nhanes_files/figure-html/simlrcats-83.png" width="700"><img src="simlr_nhanes_files/figure-html/simlrcats-84.png" width="700"><img src="simlr_nhanes_files/figure-html/simlrcats-85.png" width="700"><img src="simlr_nhanes_files/figure-html/simlrcats-86.png" width="700"><img src="simlr_nhanes_files/figure-html/simlrcats-87.png" width="700"><img src="simlr_nhanes_files/figure-html/simlrcats-88.png" width="700"></p>
-<pre><code><span><span class="co">## [1] "mentalhealth"</span></span></code></pre>
-<p><img src="simlr_nhanes_files/figure-html/simlrcats-89.png" width="700"><img src="simlr_nhanes_files/figure-html/simlrcats-90.png" width="700"><img src="simlr_nhanes_files/figure-html/simlrcats-91.png" width="700"><img src="simlr_nhanes_files/figure-html/simlrcats-92.png" width="700"><img src="simlr_nhanes_files/figure-html/simlrcats-93.png" width="700"><img src="simlr_nhanes_files/figure-html/simlrcats-94.png" width="700"><img src="simlr_nhanes_files/figure-html/simlrcats-95.png" width="700"><img src="simlr_nhanes_files/figure-html/simlrcats-96.png" width="700"><img src="simlr_nhanes_files/figure-html/simlrcats-97.png" width="700"><img src="simlr_nhanes_files/figure-html/simlrcats-98.png" width="700"><img src="simlr_nhanes_files/figure-html/simlrcats-99.png" width="700"><img src="simlr_nhanes_files/figure-html/simlrcats-100.png" width="700"></p>
-<pre><code><span><span class="co">## [1] "physical"</span></span></code></pre>
-<p><img src="simlr_nhanes_files/figure-html/simlrcats-101.png" width="700"><img src="simlr_nhanes_files/figure-html/simlrcats-102.png" width="700"><img src="simlr_nhanes_files/figure-html/simlrcats-103.png" width="700"><img src="simlr_nhanes_files/figure-html/simlrcats-104.png" width="700"><img src="simlr_nhanes_files/figure-html/simlrcats-105.png" width="700"><img src="simlr_nhanes_files/figure-html/simlrcats-106.png" width="700"><img src="simlr_nhanes_files/figure-html/simlrcats-107.png" width="700"><img src="simlr_nhanes_files/figure-html/simlrcats-108.png" width="700"><img src="simlr_nhanes_files/figure-html/simlrcats-109.png" width="700"><img src="simlr_nhanes_files/figure-html/simlrcats-110.png" width="700"><img src="simlr_nhanes_files/figure-html/simlrcats-111.png" width="700"><img src="simlr_nhanes_files/figure-html/simlrcats-112.png" width="700"><img src="simlr_nhanes_files/figure-html/simlrcats-113.png" width="700"><img src="simlr_nhanes_files/figure-html/simlrcats-114.png" width="700"><img src="simlr_nhanes_files/figure-html/simlrcats-115.png" width="700"><img src="simlr_nhanes_files/figure-html/simlrcats-116.png" width="700"><img src="simlr_nhanes_files/figure-html/simlrcats-117.png" width="700"><img src="simlr_nhanes_files/figure-html/simlrcats-118.png" width="700"><img src="simlr_nhanes_files/figure-html/simlrcats-119.png" width="700"><img src="simlr_nhanes_files/figure-html/simlrcats-120.png" width="700"><img src="simlr_nhanes_files/figure-html/simlrcats-121.png" width="700"></p>
-<div class="sourceCode" id="cb41"><pre class="downlit sourceCode r">
+<pre><code><span><span class="co">##  [1] "DR1TNUMF"                     "DR1TKCAL"                    </span></span>
+<span><span class="co">##  [3] "DR1TPROT"                     "DR1TCARB"                    </span></span>
+<span><span class="co">##  [5] "DR1TSUGR"                     "DR1TFIBE"                    </span></span>
+<span><span class="co">##  [7] "DR1TTFAT"                     "DR1TSFAT"                    </span></span>
+<span><span class="co">##  [9] "DR1TMFAT"                     "DR1TPFAT"                    </span></span>
+<span><span class="co">## [11] "DR1TCHOL"                     "DR1TATOC"                    </span></span>
+<span><span class="co">## [13] "DR1TATOA"                     "DR1TRET"                     </span></span>
+<span><span class="co">## [15] "DR1TVARA"                     "DR1TACAR"                    </span></span>
+<span><span class="co">## [17] "DR1TBCAR"                     "DR1TCRYP"                    </span></span>
+<span><span class="co">## [19] "DR1TLYCO"                     "DR1TLZ"                      </span></span>
+<span><span class="co">## [21] "DR1TVB1"                      "DR1TVB2"                     </span></span>
+<span><span class="co">## [23] "DR1TNIAC"                     "DR1TVB6"                     </span></span>
+<span><span class="co">## [25] "DR1TFOLA"                     "DR1TFA"                      </span></span>
+<span><span class="co">## [27] "DR1TFF"                       "DR1TFDFE"                    </span></span>
+<span><span class="co">## [29] "DR1TCHL"                      "DR1TVB12"                    </span></span>
+<span><span class="co">## [31] "DR1TB12A"                     "DR1TVC"                      </span></span>
+<span><span class="co">## [33] "DR1TVD"                       "DR1TVK"                      </span></span>
+<span><span class="co">## [35] "DR1TCALC"                     "DR1TPHOS"                    </span></span>
+<span><span class="co">## [37] "DR1TMAGN"                     "DR1TIRON"                    </span></span>
+<span><span class="co">## [39] "DR1TZINC"                     "DR1TCOPP"                    </span></span>
+<span><span class="co">## [41] "DR1TSODI"                     "DR1TPOTA"                    </span></span>
+<span><span class="co">## [43] "DR1TSELE"                     "DR1TCAFF"                    </span></span>
+<span><span class="co">## [45] "DR1TTHEO"                     "DR1TALCO"                    </span></span>
+<span><span class="co">## [47] "DR1TMOIS"                     "DR1TS040"                    </span></span>
+<span><span class="co">## [49] "DR1TS060"                     "DR1TS080"                    </span></span>
+<span><span class="co">## [51] "DR1TS100"                     "DR1TS120"                    </span></span>
+<span><span class="co">## [53] "DR1TS140"                     "DR1TS160"                    </span></span>
+<span><span class="co">## [55] "DR1TS180"                     "DR1TM161"                    </span></span>
+<span><span class="co">## [57] "DR1TM181"                     "DR1TM201"                    </span></span>
+<span><span class="co">## [59] "DR1TM221"                     "DR1TP182"                    </span></span>
+<span><span class="co">## [61] "DR1TP183"                     "DR1TP184"                    </span></span>
+<span><span class="co">## [63] "DR1TP204"                     "DR1TP205"                    </span></span>
+<span><span class="co">## [65] "DR1TP225"                     "DR1TP226"                    </span></span>
+<span><span class="co">## [67] "DR1TWS_Community.supply"      "DR1TWS_Well.or.rain.cistern" </span></span>
+<span><span class="co">## [69] "DR1TWS_Spring"                "DR1TWS_Don.t.drink.tap.water"</span></span>
+<span><span class="co">## [71] "DR1TWS_Don.t.know"           </span></span>
+<span><span class="co">## [1] "exposures"</span></span></code></pre>
+<p><img src="simlr_nhanes_files/figure-html/simlrcats-81.png" width="700"><img src="simlr_nhanes_files/figure-html/simlrcats-82.png" width="700"><img src="simlr_nhanes_files/figure-html/simlrcats-83.png" width="700"><img src="simlr_nhanes_files/figure-html/simlrcats-84.png" width="700"><img src="simlr_nhanes_files/figure-html/simlrcats-85.png" width="700"><img src="simlr_nhanes_files/figure-html/simlrcats-86.png" width="700"><img src="simlr_nhanes_files/figure-html/simlrcats-87.png" width="700"><img src="simlr_nhanes_files/figure-html/simlrcats-88.png" width="700"><img src="simlr_nhanes_files/figure-html/simlrcats-89.png" width="700"><img src="simlr_nhanes_files/figure-html/simlrcats-90.png" width="700"><img src="simlr_nhanes_files/figure-html/simlrcats-91.png" width="700"><img src="simlr_nhanes_files/figure-html/simlrcats-92.png" width="700"><img src="simlr_nhanes_files/figure-html/simlrcats-93.png" width="700"><img src="simlr_nhanes_files/figure-html/simlrcats-94.png" width="700"><img src="simlr_nhanes_files/figure-html/simlrcats-95.png" width="700"><img src="simlr_nhanes_files/figure-html/simlrcats-96.png" width="700"><img src="simlr_nhanes_files/figure-html/simlrcats-97.png" width="700"><img src="simlr_nhanes_files/figure-html/simlrcats-98.png" width="700"><img src="simlr_nhanes_files/figure-html/simlrcats-99.png" width="700"><img src="simlr_nhanes_files/figure-html/simlrcats-100.png" width="700"><img src="simlr_nhanes_files/figure-html/simlrcats-101.png" width="700"><img src="simlr_nhanes_files/figure-html/simlrcats-102.png" width="700"><img src="simlr_nhanes_files/figure-html/simlrcats-103.png" width="700"><img src="simlr_nhanes_files/figure-html/simlrcats-104.png" width="700"><img src="simlr_nhanes_files/figure-html/simlrcats-105.png" width="700"><img src="simlr_nhanes_files/figure-html/simlrcats-106.png" width="700"><img src="simlr_nhanes_files/figure-html/simlrcats-107.png" width="700"><img src="simlr_nhanes_files/figure-html/simlrcats-108.png" width="700"><img src="simlr_nhanes_files/figure-html/simlrcats-109.png" width="700"><img src="simlr_nhanes_files/figure-html/simlrcats-110.png" width="700"><img src="simlr_nhanes_files/figure-html/simlrcats-111.png" width="700"><img src="simlr_nhanes_files/figure-html/simlrcats-112.png" width="700"><img src="simlr_nhanes_files/figure-html/simlrcats-113.png" width="700"><img src="simlr_nhanes_files/figure-html/simlrcats-114.png" width="700"><img src="simlr_nhanes_files/figure-html/simlrcats-115.png" width="700"><img src="simlr_nhanes_files/figure-html/simlrcats-116.png" width="700"><img src="simlr_nhanes_files/figure-html/simlrcats-117.png" width="700"><img src="simlr_nhanes_files/figure-html/simlrcats-118.png" width="700"><img src="simlr_nhanes_files/figure-html/simlrcats-119.png" width="700"></p>
+<pre><code><span><span class="co">##  [1] "LBXBPB"   "LBDBPBSI" "LBXBCD"   "LBDBCDSI" "LBXTHG"   "LBDTHGSI"</span></span>
+<span><span class="co">##  [7] "LBXBSE"   "LBDBSESI" "LBXBMN"   "LBDBMNSI" "LBX2DF"   "LBXV06"  </span></span>
+<span><span class="co">## [13] "LBXV1D"   "LBXV2A"   "LBXV3B"   "LBXV4C"   "LBXVBZ"   "LBXVCB"  </span></span>
+<span><span class="co">## [19] "LBXVCT"   "LBXVDB"   "LBXVEB"   "LBXVFN"   "LBXVIPB"  "LBXVMC"  </span></span>
+<span><span class="co">## [25] "LBXVNB"   "LBXVOX"   "LBXVTC"   "LBXVTE"   "LBXVXY"   "LBXSCU"  </span></span>
+<span><span class="co">## [31] "LBDSCUSI" "LBXSSE"   "LBDSSESI" "LBXSZN"   "LBDSZNSI" "LBXIHG"  </span></span>
+<span><span class="co">## [37] "LBDIHGSI" "LBXBGE"   "LBXBGM"  </span></span>
+<span><span class="co">## [1] "mentalhealth"</span></span></code></pre>
+<p><img src="simlr_nhanes_files/figure-html/simlrcats-120.png" width="700"><img src="simlr_nhanes_files/figure-html/simlrcats-121.png" width="700"><img src="simlr_nhanes_files/figure-html/simlrcats-122.png" width="700"><img src="simlr_nhanes_files/figure-html/simlrcats-123.png" width="700"><img src="simlr_nhanes_files/figure-html/simlrcats-124.png" width="700"><img src="simlr_nhanes_files/figure-html/simlrcats-125.png" width="700"><img src="simlr_nhanes_files/figure-html/simlrcats-126.png" width="700"><img src="simlr_nhanes_files/figure-html/simlrcats-127.png" width="700"><img src="simlr_nhanes_files/figure-html/simlrcats-128.png" width="700"><img src="simlr_nhanes_files/figure-html/simlrcats-129.png" width="700"><img src="simlr_nhanes_files/figure-html/simlrcats-130.png" width="700"><img src="simlr_nhanes_files/figure-html/simlrcats-131.png" width="700"></p>
+<pre><code><span><span class="co">##  [1] "DPQ010" "DPQ020" "DPQ030" "DPQ040" "DPQ050" "DPQ060" "DPQ070" "DPQ080"</span></span>
+<span><span class="co">##  [9] "DPQ090" "DPQ100" "SLQ050" "SLQ060"</span></span>
+<span><span class="co">## [1] "physical"</span></span></code></pre>
+<p><img src="simlr_nhanes_files/figure-html/simlrcats-132.png" width="700"><img src="simlr_nhanes_files/figure-html/simlrcats-133.png" width="700"><img src="simlr_nhanes_files/figure-html/simlrcats-134.png" width="700"><img src="simlr_nhanes_files/figure-html/simlrcats-135.png" width="700"><img src="simlr_nhanes_files/figure-html/simlrcats-136.png" width="700"><img src="simlr_nhanes_files/figure-html/simlrcats-137.png" width="700"><img src="simlr_nhanes_files/figure-html/simlrcats-138.png" width="700"><img src="simlr_nhanes_files/figure-html/simlrcats-139.png" width="700"><img src="simlr_nhanes_files/figure-html/simlrcats-140.png" width="700"><img src="simlr_nhanes_files/figure-html/simlrcats-141.png" width="700"><img src="simlr_nhanes_files/figure-html/simlrcats-142.png" width="700"><img src="simlr_nhanes_files/figure-html/simlrcats-143.png" width="700"><img src="simlr_nhanes_files/figure-html/simlrcats-144.png" width="700"><img src="simlr_nhanes_files/figure-html/simlrcats-145.png" width="700"><img src="simlr_nhanes_files/figure-html/simlrcats-146.png" width="700"><img src="simlr_nhanes_files/figure-html/simlrcats-147.png" width="700"><img src="simlr_nhanes_files/figure-html/simlrcats-148.png" width="700"><img src="simlr_nhanes_files/figure-html/simlrcats-149.png" width="700"><img src="simlr_nhanes_files/figure-html/simlrcats-150.png" width="700"><img src="simlr_nhanes_files/figure-html/simlrcats-151.png" width="700"><img src="simlr_nhanes_files/figure-html/simlrcats-152.png" width="700"></p>
+<pre><code><span><span class="co">##  [1] "BPXPLS"            "BPXML1"            "BPXSY1"           </span></span>
+<span><span class="co">##  [4] "BPXDI1"            "BPXSY2"            "BPXDI2"           </span></span>
+<span><span class="co">##  [7] "BPXSY3"            "BPXDI3"            "BMXWT"            </span></span>
+<span><span class="co">## [10] "BMXHT"             "BMXBMI"            "BMXLEG"           </span></span>
+<span><span class="co">## [13] "BMXARML"           "BMXARMC"           "BMXWAIST"         </span></span>
+<span><span class="co">## [16] "BMXSAD1"           "BMXSAD2"           "BPXPULS_Regular"  </span></span>
+<span><span class="co">## [19] "BPXPULS_Irregular" "BPXPTY_Radial"     "BPXPTY_Brachial"</span></span></code></pre>
+<div class="sourceCode" id="cb38"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">nh_list</span><span class="op">)</span><span class="op">=</span><span class="va">knm</span></span>
 <span><span class="co">#####</span></span></code></pre></div>
-<div class="sourceCode" id="cb42"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb39"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co">################################################################################</span></span>
-<span><span class="va">regs</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/ANTsR/man/regularizeSimlr.html" class="external-link">regularizeSimlr</a></span><span class="op">(</span><span class="va">nh_list</span>,fraction<span class="op">=</span><span class="fl">0.15</span>,sigma<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fl">1.0</span>,<span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">nh_list</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="co"># regs &lt;- regularizeSimlr(nh_list,fraction=0.15,sigma=rep(1.0,length(nh_list)))</span></span>
 <span><span class="co"># regs &lt;- regularizeSimlr(nh_list)</span></span>
+<span><span class="va">regs</span><span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="va">wdemog</span><span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/which.html" class="external-link">which</a></span><span class="op">(</span> <span class="va">knm</span> <span class="op">==</span> <span class="st">'demog'</span><span class="op">)</span></span>
 <span><span class="kw">for</span> <span class="op">(</span> <span class="va">wdemog</span> <span class="kw">in</span> <span class="fl">1</span><span class="op">:</span><span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">nh_list</span><span class="op">)</span> <span class="op">)</span> <span class="va">regs</span><span class="op">[[</span> <span class="va">wdemog</span><span class="op">]</span><span class="op">]</span><span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/diag.html" class="external-link">diag</a></span><span class="op">(</span> <span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">ncol</a></span><span class="op">(</span><span class="va">nh_list</span><span class="op">[[</span><span class="va">wdemog</span><span class="op">]</span><span class="op">]</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="va">initu</span><span class="op">=</span><span class="fu"><a href="https://rdrr.io/pkg/ANTsR/man/initializeSimlr.html" class="external-link">initializeSimlr</a></span><span class="op">(</span> <span class="va">nh_list</span>, k<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/Round.html" class="external-link">round</a></span><span class="op">(</span><span class="fu"><a href="../reference/max_columns_list.html">max_columns_list</a></span><span class="op">(</span><span class="va">nh_list</span><span class="op">)</span><span class="op">)</span>, jointReduction<span class="op">=</span><span class="cn">TRUE</span> <span class="op">)</span></span>
 <span><span class="va">initu</span><span class="op">=</span><span class="fu"><a href="https://rdrr.io/pkg/ANTsR/man/initializeSimlr.html" class="external-link">initializeSimlr</a></span><span class="op">(</span> <span class="va">nh_list</span>, k<span class="op">=</span><span class="fu"><a href="../reference/min_columns_list.html">min_columns_list</a></span><span class="op">(</span><span class="va">nh_list</span><span class="op">)</span>, jointReduction<span class="op">=</span><span class="cn">TRUE</span> <span class="op">)</span></span>
-<span><span class="va">initu</span><span class="op">=</span><span class="fu"><a href="https://rdrr.io/pkg/ANTsR/man/initializeSimlr.html" class="external-link">initializeSimlr</a></span><span class="op">(</span> <span class="va">nh_list</span>, k<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/Round.html" class="external-link">round</a></span><span class="op">(</span><span class="fu"><a href="../reference/max_columns_list.html">max_columns_list</a></span><span class="op">(</span><span class="va">nh_list</span><span class="op">)</span><span class="op">*</span><span class="fl">0.8</span><span class="op">)</span>, jointReduction<span class="op">=</span><span class="cn">TRUE</span> <span class="op">)</span></span>
+<span><span class="va">initu</span><span class="op">=</span><span class="fu"><a href="https://rdrr.io/pkg/ANTsR/man/initializeSimlr.html" class="external-link">initializeSimlr</a></span><span class="op">(</span> <span class="va">nh_list</span>, k<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/Round.html" class="external-link">round</a></span><span class="op">(</span><span class="fu"><a href="../reference/min_columns_list.html">min_columns_list</a></span><span class="op">(</span><span class="va">nh_list</span><span class="op">)</span><span class="op">*</span><span class="fl">2</span><span class="op">)</span>, jointReduction<span class="op">=</span><span class="cn">TRUE</span> <span class="op">)</span></span>
 <span><span class="va">resultNH</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/ANTsR/man/simlr.html" class="external-link">simlr</a></span><span class="op">(</span> <span class="va">nh_list</span>, </span>
-<span>        iterations<span class="op">=</span><span class="fl">300</span>,</span>
-<span>        sparsenessQuantiles<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fl">0.5</span>,<span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">nh_list</span><span class="op">)</span><span class="op">)</span>,</span>
+<span>        iterations<span class="op">=</span><span class="fl">25</span>,</span>
+<span>        sparsenessQuantiles<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fl">0.8</span>,<span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">nh_list</span><span class="op">)</span><span class="op">)</span>,</span>
 <span>        positivities<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="st">"positive"</span>,<span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">nh_list</span><span class="op">)</span><span class="op">)</span>, </span>
 <span>        energyType<span class="op">=</span><span class="st">'regression'</span>, mixAlg<span class="op">=</span><span class="st">'ica'</span>,</span>
-<span>        scale<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"centerAndScale"</span>, <span class="st">"np"</span><span class="op">)</span>,</span>
-<span>        constraint<span class="op">=</span><span class="st">"Grassmann10x10"</span>,</span>
+<span><span class="co">#        energyType='cca', mixAlg='svd',</span></span>
+<span>        scale<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"centerAndScale"</span>, <span class="st">"whiten"</span>,  <span class="st">"np"</span><span class="op">)</span>,</span>
+<span>        constraint<span class="op">=</span><span class="st">"Stiefelx10x10"</span>,</span>
 <span>        initialUMatrix<span class="op">=</span><span class="va">initu</span>, verbose<span class="op">=</span><span class="cn">T</span> <span class="op">)</span></span></code></pre></div>
-<pre><code><span><span class="co">## [1] "Grassmann10" "10"          NA           </span></span>
+<pre><code><span><span class="co">## [1] "Stiefel" "10"      "10"     </span></span>
 <span><span class="co">## [1] "     &lt;0&gt; BUILD-V &lt;0&gt; BUILD-V &lt;0&gt; BUILD-V &lt;0&gt; BUILD-V &lt;0&gt;    "</span></span>
-<span><span class="co">## [1] "initialDataTerm: 0.593888053182845  &lt;o&gt; mixer: ica  &lt;o&gt; E:  regression"</span></span>
-<span><span class="co">## [1] "Iteration: 1 bestEv: 0.131533767903763 bestIt: 1 CE: 0.131533767903763 featOrth: 0.185393812154811"</span></span>
-<span><span class="co">## [1] "Iteration: 2 bestEv: 0.014580345828066 bestIt: 2 CE: 0.014580345828066 featOrth: 0.177587924468365"</span></span>
-<span><span class="co">## [1] "Iteration: 3 bestEv: 0.00972400840828558 bestIt: 3 CE: 0.00972400840828558 featOrth: 0.170789108846086"</span></span>
-<span><span class="co">## [1] "Iteration: 4 bestEv: 0.00929340919525152 bestIt: 4 CE: 0.00929340919525152 featOrth: 0.171918764924679"</span></span>
-<span><span class="co">## [1] "Iteration: 5 bestEv: 0.00926420065944516 bestIt: 5 CE: 0.00926420065944516 featOrth: 0.179303688370239"</span></span>
-<span><span class="co">## [1] "Iteration: 6 bestEv: 0.00926420065944516 bestIt: 5 CE: 0.00928872374751078 featOrth: 0.172043856120498"</span></span>
-<span><span class="co">## [1] "Iteration: 7 bestEv: 0.00926420065944516 bestIt: 5 CE: 0.0093533481148329 featOrth: 0.167421852921786"</span></span>
-<span><span class="co">## [1] "Iteration: 8 bestEv: 0.00926420065944516 bestIt: 5 CE: 0.0109201151137066 featOrth: 0.170788731981664"</span></span>
-<span><span class="co">## [1] "Iteration: 9 bestEv: 0.00921267704800759 bestIt: 9 CE: 0.00921267704800759 featOrth: 0.15714394573728"</span></span>
-<span><span class="co">## [1] "Iteration: 10 bestEv: 0.00921267704800759 bestIt: 9 CE: 0.00929368309767859 featOrth: 0.171575823745724"</span></span>
-<span><span class="co">## [1] "Iteration: 11 bestEv: 0.00921267704800759 bestIt: 9 CE: 0.00949694985979574 featOrth: 0.179294651968243"</span></span>
-<span><span class="co">## [1] "Iteration: 12 bestEv: 0.00921267704800759 bestIt: 9 CE: 0.0104830624359319 featOrth: 0.16027976803683"</span></span>
-<span><span class="co">## [1] "Iteration: 13 bestEv: 0.00918119344976842 bestIt: 13 CE: 0.00918119344976842 featOrth: 0.20132836427469"</span></span>
-<span><span class="co">## [1] "Iteration: 14 bestEv: 0.00918119344976842 bestIt: 13 CE: 0.00927270973652535 featOrth: 0.192842641700413"</span></span>
-<span><span class="co">## [1] "Iteration: 15 bestEv: 0.00918119344976842 bestIt: 13 CE: 0.00923642759596951 featOrth: 0.198352661315128"</span></span>
-<span><span class="co">## [1] "Iteration: 16 bestEv: 0.00918119344976842 bestIt: 13 CE: 0.0092432817251862 featOrth: 0.196240693544665"</span></span>
-<span><span class="co">## [1] "Iteration: 17 bestEv: 0.00918119344976842 bestIt: 13 CE: 0.00926729763947461 featOrth: 0.19088090354336"</span></span>
-<span><span class="co">## [1] "Iteration: 18 bestEv: 0.00918119344976842 bestIt: 13 CE: 0.00924159338136808 featOrth: 0.185747144005552"</span></span>
-<span><span class="co">## [1] "Iteration: 19 bestEv: 0.00918119344976842 bestIt: 13 CE: 0.00924689396026111 featOrth: 0.186389346103714"</span></span></code></pre>
-<div class="sourceCode" id="cb44"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co">#####################################################</span></span>
+<span><span class="co">## [1] "initialDataTerm: 1.14616014056659  &lt;o&gt; mixer: ica  &lt;o&gt; E:  regression"</span></span>
+<span><span class="co">## [1] "Iteration: 1 bestEv: 6.6144364542225 bestIt: 1 CE: 6.6144364542225 featOrth: 0.040652268476362"</span></span>
+<span><span class="co">## [1] "Iteration: 2 bestEv: 0.172168990436699 bestIt: 2 CE: 0.172168990436699 featOrth: 0.0110231975851054"</span></span>
+<span><span class="co">## [1] "Iteration: 3 bestEv: 0.0557347612729529 bestIt: 3 CE: 0.0557347612729529 featOrth: 0.00593660604496206"</span></span>
+<span><span class="co">## [1] "Iteration: 4 bestEv: 0.0160826083343218 bestIt: 4 CE: 0.0160826083343219 featOrth: 0.00155509430320964"</span></span>
+<span><span class="co">## [1] "Iteration: 5 bestEv: 0.0152743509501418 bestIt: 5 CE: 0.0152743509501418 featOrth: 0.00152882288121397"</span></span>
+<span><span class="co">## [1] "Iteration: 6 bestEv: 0.00231983599509618 bestIt: 6 CE: 0.00231983599509618 featOrth: 0.000141402330419976"</span></span>
+<span><span class="co">## [1] "Iteration: 7 bestEv: 0.00106632684786268 bestIt: 7 CE: 0.00106632684786268 featOrth: 1.24549675889812e-05"</span></span>
+<span><span class="co">## [1] "Iteration: 8 bestEv: 0.000969383002094735 bestIt: 8 CE: 0.000969383002094735 featOrth: 8.24506552245683e-06"</span></span>
+<span><span class="co">## [1] "Iteration: 9 bestEv: 0.000888733461521805 bestIt: 9 CE: 0.000888733461521805 featOrth: 6.27482794400545e-06"</span></span>
+<span><span class="co">## [1] "Iteration: 10 bestEv: 0.000812321664653679 bestIt: 10 CE: 0.000812321664653679 featOrth: 5.96449026751145e-06"</span></span>
+<span><span class="co">## [1] "Iteration: 11 bestEv: 0.000812321664653679 bestIt: 10 CE: 0.000821158671203225 featOrth: 5.92667195082105e-06"</span></span>
+<span><span class="co">## [1] "Iteration: 12 bestEv: 0.000785046688938895 bestIt: 12 CE: 0.000785046688938894 featOrth: 6.35467236595237e-06"</span></span>
+<span><span class="co">## [1] "Iteration: 13 bestEv: 0.00076679280456548 bestIt: 13 CE: 0.00076679280456548 featOrth: 4.74757436384902e-06"</span></span>
+<span><span class="co">## [1] "Iteration: 14 bestEv: 0.000741025995149963 bestIt: 14 CE: 0.000741025995149963 featOrth: 3.928088103831e-06"</span></span>
+<span><span class="co">## [1] "Iteration: 15 bestEv: 0.000741025995149963 bestIt: 14 CE: 0.000741873490142953 featOrth: 3.75937744585596e-06"</span></span>
+<span><span class="co">## [1] "Iteration: 16 bestEv: 0.000704613150769644 bestIt: 16 CE: 0.000704613150769644 featOrth: 1.24421770227602e-06"</span></span>
+<span><span class="co">## [1] "Iteration: 17 bestEv: 0.000700135693934767 bestIt: 17 CE: 0.000700135693934767 featOrth: 6.81153475789711e-07"</span></span>
+<span><span class="co">## [1] "Iteration: 18 bestEv: 0.000698905751105107 bestIt: 18 CE: 0.000698905751105107 featOrth: 6.92176163092218e-07"</span></span>
+<span><span class="co">## [1] "Iteration: 19 bestEv: 0.000697246344233688 bestIt: 19 CE: 0.000697246344233688 featOrth: 3.61687245024115e-07"</span></span>
+<span><span class="co">## [1] "Iteration: 20 bestEv: 0.000697246344233688 bestIt: 19 CE: 0.000698191583520209 featOrth: 3.7935723001703e-07"</span></span>
+<span><span class="co">## [1] "Iteration: 21 bestEv: 0.000697246344233688 bestIt: 19 CE: 0.000698165026211065 featOrth: 3.63174803662746e-07"</span></span>
+<span><span class="co">## [1] "Iteration: 22 bestEv: 0.000697246344233688 bestIt: 19 CE: 0.000700452959691897 featOrth: 3.82971777706358e-07"</span></span></code></pre>
+<pre><code><span><span class="co">## fastICA produced NaN - svd instead</span></span>
+<span><span class="co">## fastICA produced NaN - svd instead</span></span></code></pre>
+<pre><code><span><span class="co">## [1] "Iteration: 23 bestEv: 0.000683235759773637 bestIt: 23 CE: 0.000683235759773637 featOrth: 3.66183675678397e-07"</span></span></code></pre>
+<pre><code><span><span class="co">## fastICA produced NaN - svd instead</span></span>
+<span><span class="co">## fastICA produced NaN - svd instead</span></span></code></pre>
+<pre><code><span><span class="co">## [1] "Iteration: 24 bestEv: 0.000683235759773637 bestIt: 23 CE: 0.000683235759773637 featOrth: 3.66183675678397e-07"</span></span></code></pre>
+<pre><code><span><span class="co">## fastICA produced NaN - svd instead</span></span>
+<span><span class="co">## fastICA produced NaN - svd instead</span></span></code></pre>
+<pre><code><span><span class="co">## [1] "Iteration: 25 bestEv: 0.000683235759773637 bestIt: 23 CE: 0.000683235759773637 featOrth: 3.66183675678397e-07"</span></span></code></pre>
+<div class="sourceCode" id="cb47"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co">#####################################################</span></span></code></pre></div>
+<div class="sourceCode" id="cb48"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># drwwrd</span></span>
 <span><span class="va">projlist</span><span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="op">)</span></span>
-<span><span class="va">mysimk</span><span class="op">=</span><span class="fl">2</span></span>
+<span><span class="va">mysimk</span><span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">ncol</a></span><span class="op">(</span><span class="va">initu</span><span class="op">)</span></span>
 <span><span class="kw">for</span> <span class="op">(</span> <span class="va">k</span> <span class="kw">in</span> <span class="fl">2</span><span class="op">:</span><span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">nh_list</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span>
 <span>    <span class="fu"><a href="https://rdrr.io/r/base/colnames.html" class="external-link">rownames</a></span><span class="op">(</span><span class="va">resultNH</span><span class="op">$</span><span class="va">v</span><span class="op">[[</span><span class="va">k</span><span class="op">]</span><span class="op">]</span><span class="op">)</span><span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/colnames.html" class="external-link">colnames</a></span><span class="op">(</span> <span class="va">nh_list</span><span class="op">[[</span><span class="va">k</span><span class="op">]</span><span class="op">]</span><span class="op">)</span></span>
 <span>    <span class="va">ux</span><span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span><span class="va">nh_list</span><span class="op">[[</span><span class="va">k</span><span class="op">]</span><span class="op">]</span> <span class="op"><a href="https://rdrr.io/r/base/matmult.html" class="external-link">%*%</a></span> <span class="fu"><a href="https://rdrr.io/r/base/MathFun.html" class="external-link">abs</a></span><span class="op">(</span><span class="va">resultNH</span><span class="op">$</span><span class="va">v</span><span class="op">[[</span><span class="va">k</span><span class="op">]</span><span class="op">]</span><span class="op">[</span>,<span class="fl">1</span><span class="op">:</span><span class="va">mysimk</span><span class="op">]</span><span class="op">)</span><span class="op">)</span></span>
 <span>    <span class="fu"><a href="https://rdrr.io/r/base/colnames.html" class="external-link">colnames</a></span><span class="op">(</span><span class="va">ux</span><span class="op">)</span><span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">nh_list</span><span class="op">)</span><span class="op">[</span><span class="va">k</span><span class="op">]</span>,<span class="fl">1</span><span class="op">:</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">ncol</a></span><span class="op">(</span><span class="va">ux</span><span class="op">)</span><span class="op">)</span></span>
 <span>    <span class="va">projlist</span><span class="op">[[</span><span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">projlist</span><span class="op">)</span><span class="op">+</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span><span class="op">=</span><span class="va">ux</span></span>
+<span>    <span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span> <span class="va">projlist</span> <span class="op">)</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">projlist</span><span class="op">)</span><span class="op">]</span><span class="op">=</span><span class="va">knm</span><span class="op">[</span><span class="va">k</span><span class="op">]</span></span>
 <span><span class="op">}</span></span>
 <span><span class="va">simdf</span><span class="op">=</span><span class="va">simdf2</span><span class="op">=</span><span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/bind_cols.html" class="external-link">bind_cols</a></span><span class="op">(</span><span class="va">projlist</span><span class="op">)</span></span>
-<span><span class="va">cognames</span><span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"cerad_sum"</span>,<span class="st">"cfdast"</span>,<span class="st">"cfdds"</span><span class="op">)</span></span>
 <span><span class="va">cognames</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span></span>
 <span>  <span class="st">"z_cerad_re"</span>, <span class="st">"z_animal_re"</span>,      <span class="st">"z_delayed_re"</span>,    <span class="st">"z_global_re"</span>,     <span class="st">"z_digit_re"</span></span>
 <span><span class="co">#  "z_cerad_age", "z_animal_age",     "z_digit_age",      "z_delayed_age",    "z_global_age",</span></span>
 <span><span class="co">#  "z_cerad_edu", "z_animal_edu",     "z_digit_edu",      "z_delayed_edu",    "z_global_edu"</span></span>
 <span><span class="op">)</span></span>
-<span><span class="va">dnames</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span> <span class="st">"riagendr"</span>, <span class="st">"ridageyr"</span>, <span class="st">"race"</span>, <span class="st">"dmdeduc2"</span>, <span class="st">"INDFMPIR"</span><span class="op">)</span></span>
-<span><span class="va">simdf2</span><span class="op">[</span>,<span class="va">dnames</span><span class="op">]</span><span class="op">=</span><span class="va">fdata</span><span class="op">[</span><span class="va">mycc</span>,<span class="va">dnames</span><span class="op">]</span></span>
-<span><span class="va">simdf2</span><span class="op">[</span>,<span class="va">cognames</span><span class="op">]</span><span class="op">=</span><span class="va">fdata</span><span class="op">[</span><span class="va">mycc</span>,<span class="va">cognames</span><span class="op">]</span></span>
-<span><span class="kw">for</span> <span class="op">(</span> <span class="va">kk</span> <span class="kw">in</span> <span class="fl">1</span><span class="op">:</span><span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">cognames</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span>
-<span>  <span class="va">myform</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span> <span class="va">cognames</span><span class="op">[</span><span class="va">kk</span><span class="op">]</span>,<span class="st">" ~ riagendr + ridageyr + race + dmdeduc2 + INDFMPIR + "</span>,<span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span> <span class="fu"><a href="https://rdrr.io/r/base/colnames.html" class="external-link">colnames</a></span><span class="op">(</span><span class="va">simdf</span><span class="op">)</span>, collapse<span class="op">=</span><span class="st">'+'</span><span class="op">)</span><span class="op">)</span></span>
-<span>  <span class="va">mdl</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/lm.html" class="external-link">lm</a></span><span class="op">(</span> <span class="va">myform</span>, data<span class="op">=</span><span class="va">simdf2</span> <span class="op">)</span></span>
-<span>  <span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span> <span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span> <span class="va">mdl</span> <span class="op">)</span> <span class="op">)</span></span>
-<span>  <span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span> <span class="va">cognames</span><span class="op">[</span><span class="va">kk</span><span class="op">]</span><span class="op">)</span></span>
-<span>  <span class="fu"><a href="https://rdrr.io/r/base/Sys.sleep.html" class="external-link">Sys.sleep</a></span><span class="op">(</span><span class="fl">3</span><span class="op">)</span></span>
+<span><span class="co"># cognames=c("cerad_sum","cfdast","cfdds")</span></span>
+<span><span class="va">dnames</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span> <span class="st">"riagendr"</span>, <span class="st">"ridageyr"</span>, <span class="st">"race"</span>, <span class="st">"dmdeduc2"</span>, <span class="st">"INDFMPIR"</span>,<span class="st">'wtint2yr'</span>,<span class="st">'wtmec2yr'</span><span class="op">)</span></span>
+<span><span class="kw">if</span> <span class="op">(</span> <span class="va">doimp</span> <span class="op">)</span> <span class="op">{</span></span>
+<span>  <span class="va">simdf2</span><span class="op">[</span>,<span class="va">dnames</span><span class="op">]</span><span class="op">=</span><span class="va">fdata</span><span class="op">[</span>,<span class="va">dnames</span><span class="op">]</span></span>
+<span>  <span class="va">simdf2</span><span class="op">[</span>,<span class="va">cognames</span><span class="op">]</span><span class="op">=</span><span class="va">fdata</span><span class="op">[</span>,<span class="va">cognames</span><span class="op">]</span></span>
+<span>  <span class="op">}</span> <span class="kw">else</span> <span class="op">{</span></span>
+<span>  <span class="va">simdf2</span><span class="op">[</span>,<span class="va">dnames</span><span class="op">]</span><span class="op">=</span><span class="va">fdata</span><span class="op">[</span><span class="va">mycc</span>,<span class="va">dnames</span><span class="op">]</span></span>
+<span>  <span class="va">simdf2</span><span class="op">[</span>,<span class="va">cognames</span><span class="op">]</span><span class="op">=</span><span class="va">fdata</span><span class="op">[</span><span class="va">mycc</span>,<span class="va">cognames</span><span class="op">]</span></span>
+<span>  <span class="op">}</span></span>
+<span><span class="co">#################################</span></span>
+<span><span class="va">covars</span><span class="op">=</span><span class="st">" ~ riagendr + ridageyr + race + dmdeduc2 + INDFMPIR + "</span></span>
+<span><span class="va">covars</span><span class="op">=</span><span class="st">" ~ riagendr + ridageyr + race + dmdeduc2 +  "</span></span>
+<span><span class="co">#############################</span></span>
+<span><span class="kw">for</span> <span class="op">(</span> <span class="va">kk</span> <span class="kw">in</span> <span class="fl">1</span><span class="op">:</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">ncol</a></span><span class="op">(</span><span class="va">initu</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span>
+<span>  <span class="va">bform</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span> <span class="va">cognames</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">cognames</span><span class="op">)</span><span class="op">]</span>, <span class="va">covars</span>, <span class="st">"1"</span> <span class="op">)</span></span>
+<span>  <span class="va">myform</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span> <span class="va">cognames</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">cognames</span><span class="op">)</span><span class="op">]</span>, <span class="va">covars</span>,<span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">projlist</span><span class="op">)</span>,<span class="va">kk</span><span class="op">)</span>, collapse<span class="op">=</span><span class="st">'+'</span><span class="op">)</span><span class="op">)</span></span>
+<span>  <span class="va">tempdf</span> <span class="op">=</span> <span class="va">simdf2</span><span class="op">[</span>,<span class="op">]</span></span>
+<span>  <span class="va">bmdl</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/lm.html" class="external-link">lm</a></span><span class="op">(</span> <span class="va">bform</span>, data<span class="op">=</span><span class="va">tempdf</span> <span class="op">)</span></span>
+<span>  <span class="va">mdl</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/lm.html" class="external-link">lm</a></span><span class="op">(</span> <span class="va">myform</span>, data<span class="op">=</span><span class="va">tempdf</span> <span class="op">)</span></span>
+<span><span class="co">#  if (doimp) mdl = lm( myform, data=tempdf, weights=tempdf$wtint2yr ) else mdl = lm( myform, data=tempdf, weights=tempdf$wtint2yr  )</span></span>
+<span>  <span class="va">myanv</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/anova.html" class="external-link">anova</a></span><span class="op">(</span> <span class="va">bmdl</span>, <span class="va">mdl</span> <span class="op">)</span></span>
+<span>  <span class="kw">if</span> <span class="op">(</span> <span class="va">myanv</span><span class="op">$</span><span class="va">Pr</span><span class="op">[</span><span class="fl">2</span><span class="op">]</span> <span class="op">&lt;</span> <span class="fl">1e-4</span> <span class="op">)</span> <span class="op">{</span></span>
+<span>    <span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span> <span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">tail</a></span><span class="op">(</span> <span class="fu"><a href="https://rdrr.io/r/stats/coef.html" class="external-link">coefficients</a></span><span class="op">(</span> <span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span> <span class="va">mdl</span> <span class="op">)</span> <span class="op">)</span>, <span class="fl">4</span> <span class="op">)</span><span class="op">)</span></span>
+<span>    <span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span> <span class="va">myanv</span><span class="op">$</span><span class="va">Pr</span><span class="op">[</span><span class="fl">2</span><span class="op">]</span> <span class="op">)</span></span>
+<span>    <span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span> <span class="va">cognames</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">cognames</span><span class="op">)</span><span class="op">]</span><span class="op">)</span></span>
+<span>    <span class="kw">for</span> <span class="op">(</span> <span class="va">k</span> <span class="kw">in</span> <span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">projlist</span><span class="op">)</span> <span class="op">)</span> <span class="op">{</span></span>
+<span>      <span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span> <span class="va">k</span> <span class="op">)</span></span>
+<span>      <span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span> <span class="fu"><a href="https://rdrr.io/pkg/ANTsR/man/interpret_simlr_vector2.html" class="external-link">interpret_simlr_vector2</a></span><span class="op">(</span> <span class="va">resultNH</span><span class="op">$</span><span class="va">v</span><span class="op">[[</span><span class="va">k</span><span class="op">]</span><span class="op">]</span>, <span class="va">kk</span>, n2show<span class="op">=</span><span class="fl">3</span>, shortnames<span class="op">=</span><span class="cn">F</span> <span class="op">)</span> <span class="op">)</span></span>
+<span>      <span class="fu">visreg</span><span class="fu">::</span><span class="fu"><a href="http://pbreheny.github.io/visreg/reference/visreg.html" class="external-link">visreg</a></span><span class="op">(</span><span class="va">mdl</span>, <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="va">k</span>,<span class="va">kk</span><span class="op">)</span> <span class="op">)</span></span>
+<span>      <span class="op">}</span></span>
+<span><span class="co">#    Sys.sleep(3)</span></span>
+<span>  <span class="op">}</span></span>
 <span><span class="op">}</span></span></code></pre></div>
-<pre><code><span><span class="co">## </span></span>
-<span><span class="co">## Call:</span></span>
-<span><span class="co">## lm(formula = myform, data = simdf2)</span></span>
-<span><span class="co">## </span></span>
-<span><span class="co">## Residuals:</span></span>
-<span><span class="co">##      Min       1Q   Median       3Q      Max </span></span>
-<span><span class="co">## -2.62995 -0.51465  0.06326  0.61070  2.28327 </span></span>
-<span><span class="co">## </span></span>
-<span><span class="co">## Coefficients:</span></span>
-<span><span class="co">##                 Estimate Std. Error t value Pr(&gt;|t|)    </span></span>
-<span><span class="co">## (Intercept)    2.257e+00  5.045e-01   4.474 8.71e-06 ***</span></span>
-<span><span class="co">## riagendr2      4.442e-01  5.944e-02   7.473 1.95e-13 ***</span></span>
-<span><span class="co">## ridageyr      -4.246e-02  4.447e-03  -9.549  &lt; 2e-16 ***</span></span>
-<span><span class="co">## race2         -2.094e-02  7.597e-02  -0.276   0.7829    </span></span>
-<span><span class="co">## race3          1.102e-01  8.395e-02   1.312   0.1898    </span></span>
-<span><span class="co">## race4          8.225e-03  1.077e-01   0.076   0.9391    </span></span>
-<span><span class="co">## dmdeduc2       1.647e-01  2.707e-02   6.084 1.76e-09 ***</span></span>
-<span><span class="co">## INDFMPIR       3.598e-02  2.029e-02   1.773   0.0766 .  </span></span>
-<span><span class="co">## diet1         -9.797e+00  5.996e+00  -1.634   0.1026    </span></span>
-<span><span class="co">## diet2          3.942e+01  1.908e+01   2.066   0.0391 *  </span></span>
-<span><span class="co">## exposures1     4.381e+02  1.776e+02   2.467   0.0138 *  </span></span>
-<span><span class="co">## exposures2     5.259e+02  6.075e+02   0.866   0.3869    </span></span>
-<span><span class="co">## mentalhealth1  1.317e+03  3.178e+03   0.415   0.6786    </span></span>
-<span><span class="co">## mentalhealth2 -9.015e+03  4.994e+03  -1.805   0.0714 .  </span></span>
-<span><span class="co">## physical1     -3.003e+02  2.472e+02  -1.215   0.2247    </span></span>
-<span><span class="co">## physical2      7.916e+01  3.920e+02   0.202   0.8400    </span></span>
-<span><span class="co">## ---</span></span>
-<span><span class="co">## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</span></span>
-<span><span class="co">## </span></span>
-<span><span class="co">## Residual standard error: 0.8173 on 853 degrees of freedom</span></span>
-<span><span class="co">##   (12 observations deleted due to missingness)</span></span>
-<span><span class="co">## Multiple R-squared:  0.2401, Adjusted R-squared:  0.2268 </span></span>
-<span><span class="co">## F-statistic: 17.97 on 15 and 853 DF,  p-value: &lt; 2.2e-16</span></span>
-<span><span class="co">## </span></span>
-<span><span class="co">## [1] "z_cerad_re"</span></span>
-<span><span class="co">## </span></span>
-<span><span class="co">## Call:</span></span>
-<span><span class="co">## lm(formula = myform, data = simdf2)</span></span>
-<span><span class="co">## </span></span>
-<span><span class="co">## Residuals:</span></span>
-<span><span class="co">##      Min       1Q   Median       3Q      Max </span></span>
-<span><span class="co">## -2.82269 -0.59675 -0.05828  0.57159  3.14260 </span></span>
-<span><span class="co">## </span></span>
-<span><span class="co">## Coefficients:</span></span>
-<span><span class="co">##                 Estimate Std. Error t value Pr(&gt;|t|)    </span></span>
-<span><span class="co">## (Intercept)    1.787e+00  5.672e-01   3.150 0.001688 ** </span></span>
-<span><span class="co">## riagendr2     -2.566e-02  6.684e-02  -0.384 0.701113    </span></span>
-<span><span class="co">## ridageyr      -3.981e-02  5.011e-03  -7.944 6.21e-15 ***</span></span>
-<span><span class="co">## race2         -1.125e-01  8.556e-02  -1.315 0.188789    </span></span>
-<span><span class="co">## race3         -2.389e-02  9.391e-02  -0.254 0.799240    </span></span>
-<span><span class="co">## race4         -1.538e-01  1.216e-01  -1.266 0.205989    </span></span>
-<span><span class="co">## dmdeduc2       2.038e-01  3.051e-02   6.681 4.30e-11 ***</span></span>
-<span><span class="co">## INDFMPIR       6.924e-02  2.281e-02   3.036 0.002473 ** </span></span>
-<span><span class="co">## diet1         -1.525e+01  6.977e+00  -2.186 0.029060 *  </span></span>
-<span><span class="co">## diet2          7.354e+01  2.162e+01   3.401 0.000702 ***</span></span>
-<span><span class="co">## exposures1     2.453e+02  2.002e+02   1.225 0.220732    </span></span>
-<span><span class="co">## exposures2     9.384e+02  6.782e+02   1.384 0.166871    </span></span>
-<span><span class="co">## mentalhealth1  6.817e+02  3.556e+03   0.192 0.848042    </span></span>
-<span><span class="co">## mentalhealth2 -1.076e+04  5.618e+03  -1.916 0.055763 .  </span></span>
-<span><span class="co">## physical1     -1.302e+02  2.774e+02  -0.469 0.638918    </span></span>
-<span><span class="co">## physical2      1.031e+02  4.402e+02   0.234 0.814868    </span></span>
-<span><span class="co">## ---</span></span>
-<span><span class="co">## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</span></span>
-<span><span class="co">## </span></span>
-<span><span class="co">## Residual standard error: 0.9127 on 845 degrees of freedom</span></span>
-<span><span class="co">##   (20 observations deleted due to missingness)</span></span>
-<span><span class="co">## Multiple R-squared:  0.203,  Adjusted R-squared:  0.1889 </span></span>
-<span><span class="co">## F-statistic: 14.35 on 15 and 845 DF,  p-value: &lt; 2.2e-16</span></span>
-<span><span class="co">## </span></span>
-<span><span class="co">## [1] "z_animal_re"</span></span>
-<span><span class="co">## </span></span>
-<span><span class="co">## Call:</span></span>
-<span><span class="co">## lm(formula = myform, data = simdf2)</span></span>
-<span><span class="co">## </span></span>
-<span><span class="co">## Residuals:</span></span>
-<span><span class="co">##      Min       1Q   Median       3Q      Max </span></span>
-<span><span class="co">## -3.12691 -0.50897  0.05723  0.61997  1.98392 </span></span>
-<span><span class="co">## </span></span>
-<span><span class="co">## Coefficients:</span></span>
-<span><span class="co">##                 Estimate Std. Error t value Pr(&gt;|t|)    </span></span>
-<span><span class="co">## (Intercept)    2.439e+00  5.342e-01   4.566 5.71e-06 ***</span></span>
-<span><span class="co">## riagendr2      3.722e-01  6.292e-02   5.915 4.80e-09 ***</span></span>
-<span><span class="co">## ridageyr      -4.279e-02  4.705e-03  -9.096  &lt; 2e-16 ***</span></span>
-<span><span class="co">## race2         -3.718e-02  8.035e-02  -0.463   0.6437    </span></span>
-<span><span class="co">## race3         -3.392e-02  8.890e-02  -0.382   0.7028    </span></span>
-<span><span class="co">## race4         -1.368e-01  1.140e-01  -1.200   0.2305    </span></span>
-<span><span class="co">## dmdeduc2       1.333e-01  2.863e-02   4.656 3.73e-06 ***</span></span>
-<span><span class="co">## INDFMPIR       2.095e-02  2.146e-02   0.976   0.3292    </span></span>
-<span><span class="co">## diet1         -7.089e+00  6.252e+00  -1.134   0.2571    </span></span>
-<span><span class="co">## diet2          2.064e+01  2.019e+01   1.023   0.3067    </span></span>
-<span><span class="co">## exposures1     3.667e+02  1.880e+02   1.951   0.0514 .  </span></span>
-<span><span class="co">## exposures2     7.239e+02  6.431e+02   1.126   0.2606    </span></span>
-<span><span class="co">## mentalhealth1  6.613e+02  3.364e+03   0.197   0.8442    </span></span>
-<span><span class="co">## mentalhealth2 -6.617e+03  5.283e+03  -1.253   0.2107    </span></span>
-<span><span class="co">## physical1     -4.686e+02  2.614e+02  -1.793   0.0734 .  </span></span>
-<span><span class="co">## physical2      5.337e+02  4.149e+02   1.287   0.1986    </span></span>
-<span><span class="co">## ---</span></span>
-<span><span class="co">## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</span></span>
-<span><span class="co">## </span></span>
-<span><span class="co">## Residual standard error: 0.8654 on 854 degrees of freedom</span></span>
-<span><span class="co">##   (11 observations deleted due to missingness)</span></span>
-<span><span class="co">## Multiple R-squared:  0.1804, Adjusted R-squared:  0.166 </span></span>
-<span><span class="co">## F-statistic: 12.53 on 15 and 854 DF,  p-value: &lt; 2.2e-16</span></span>
-<span><span class="co">## </span></span>
-<span><span class="co">## [1] "z_delayed_re"</span></span>
-<span><span class="co">## </span></span>
-<span><span class="co">## Call:</span></span>
-<span><span class="co">## lm(formula = myform, data = simdf2)</span></span>
-<span><span class="co">## </span></span>
-<span><span class="co">## Residuals:</span></span>
-<span><span class="co">##     Min      1Q  Median      3Q     Max </span></span>
-<span><span class="co">## -5.1774 -1.1259  0.0476  1.2113  6.2841 </span></span>
-<span><span class="co">## </span></span>
-<span><span class="co">## Coefficients:</span></span>
-<span><span class="co">##                 Estimate Std. Error t value Pr(&gt;|t|)    </span></span>
-<span><span class="co">## (Intercept)    6.329e+00  1.137e+00   5.567 3.48e-08 ***</span></span>
-<span><span class="co">## riagendr2      7.578e-01  1.342e-01   5.648 2.22e-08 ***</span></span>
-<span><span class="co">## ridageyr      -1.319e-01  1.005e-02 -13.122  &lt; 2e-16 ***</span></span>
-<span><span class="co">## race2         -9.818e-02  1.714e-01  -0.573  0.56700    </span></span>
-<span><span class="co">## race3          2.374e-01  1.880e-01   1.263  0.20710    </span></span>
-<span><span class="co">## race4         -1.786e-01  2.450e-01  -0.729  0.46622    </span></span>
-<span><span class="co">## dmdeduc2       6.347e-01  6.115e-02  10.380  &lt; 2e-16 ***</span></span>
-<span><span class="co">## INDFMPIR       2.380e-01  4.573e-02   5.205 2.44e-07 ***</span></span>
-<span><span class="co">## diet1         -2.304e+01  1.422e+01  -1.620  0.10567    </span></span>
-<span><span class="co">## diet2          1.295e+02  4.336e+01   2.987  0.00290 ** </span></span>
-<span><span class="co">## exposures1     1.309e+03  4.010e+02   3.264  0.00114 ** </span></span>
-<span><span class="co">## exposures2     1.895e+03  1.364e+03   1.389  0.16529    </span></span>
-<span><span class="co">## mentalhealth1 -3.117e+03  7.140e+03  -0.437  0.66253    </span></span>
-<span><span class="co">## mentalhealth2 -2.418e+04  1.129e+04  -2.142  0.03247 *  </span></span>
-<span><span class="co">## physical1     -8.482e+02  5.565e+02  -1.524  0.12783    </span></span>
-<span><span class="co">## physical2      3.587e+02  8.828e+02   0.406  0.68461    </span></span>
-<span><span class="co">## ---</span></span>
-<span><span class="co">## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</span></span>
-<span><span class="co">## </span></span>
-<span><span class="co">## Residual standard error: 1.826 on 841 degrees of freedom</span></span>
-<span><span class="co">##   (24 observations deleted due to missingness)</span></span>
-<span><span class="co">## Multiple R-squared:  0.4032, Adjusted R-squared:  0.3925 </span></span>
-<span><span class="co">## F-statistic: 37.87 on 15 and 841 DF,  p-value: &lt; 2.2e-16</span></span>
-<span><span class="co">## </span></span>
-<span><span class="co">## [1] "z_global_re"</span></span>
-<span><span class="co">## </span></span>
-<span><span class="co">## Call:</span></span>
-<span><span class="co">## lm(formula = myform, data = simdf2)</span></span>
-<span><span class="co">## </span></span>
-<span><span class="co">## Residuals:</span></span>
-<span><span class="co">##      Min       1Q   Median       3Q      Max </span></span>
-<span><span class="co">## -2.37447 -0.50892 -0.00999  0.47263  2.72094 </span></span>
-<span><span class="co">## </span></span>
-<span><span class="co">## Coefficients:</span></span>
-<span><span class="co">##                 Estimate Std. Error t value Pr(&gt;|t|)    </span></span>
-<span><span class="co">## (Intercept)    2.149e+00  4.636e-01   4.636 4.11e-06 ***</span></span>
-<span><span class="co">## riagendr2      3.592e-01  5.445e-02   6.598 7.25e-11 ***</span></span>
-<span><span class="co">## ridageyr      -5.108e-02  4.087e-03 -12.497  &lt; 2e-16 ***</span></span>
-<span><span class="co">## race2          3.405e-02  6.978e-02   0.488  0.62573    </span></span>
-<span><span class="co">## race3          1.520e-01  7.715e-02   1.970  0.04918 *  </span></span>
-<span><span class="co">## race4         -6.623e-02  9.810e-02  -0.675  0.49977    </span></span>
-<span><span class="co">## dmdeduc2       2.800e-01  2.481e-02  11.284  &lt; 2e-16 ***</span></span>
-<span><span class="co">## INDFMPIR       1.291e-01  1.866e-02   6.916 9.05e-12 ***</span></span>
-<span><span class="co">## diet1         -1.439e-01  5.434e+00  -0.026  0.97887    </span></span>
-<span><span class="co">## diet2          2.708e+01  1.751e+01   1.547  0.12228    </span></span>
-<span><span class="co">## exposures1     6.280e+02  1.634e+02   3.844  0.00013 ***</span></span>
-<span><span class="co">## exposures2     1.911e+02  5.562e+02   0.344  0.73121    </span></span>
-<span><span class="co">## mentalhealth1 -5.847e+03  2.913e+03  -2.007  0.04505 *  </span></span>
-<span><span class="co">## mentalhealth2 -3.004e+03  4.567e+03  -0.658  0.51094    </span></span>
-<span><span class="co">## physical1     -3.550e+02  2.272e+02  -1.563  0.11851    </span></span>
-<span><span class="co">## physical2      1.834e+02  3.606e+02   0.509  0.61119    </span></span>
-<span><span class="co">## ---</span></span>
-<span><span class="co">## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</span></span>
-<span><span class="co">## </span></span>
-<span><span class="co">## Residual standard error: 0.7547 on 865 degrees of freedom</span></span>
-<span><span class="co">## Multiple R-squared:  0.4363, Adjusted R-squared:  0.4265 </span></span>
-<span><span class="co">## F-statistic: 44.63 on 15 and 865 DF,  p-value: &lt; 2.2e-16</span></span>
-<span><span class="co">## </span></span>
-<span><span class="co">## [1] "z_digit_re"</span></span></code></pre>
-<div class="sourceCode" id="cb46"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co">#######################</span></span>
-<span><span class="kw">for</span> <span class="op">(</span> <span class="va">k</span> <span class="kw">in</span> <span class="va">knm</span> <span class="op">)</span> <span class="op">{</span></span>
-<span>  <span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">k</span><span class="op">)</span></span>
-<span>  <span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span> <span class="fu"><a href="https://rdrr.io/pkg/ANTsR/man/interpret_simlr_vector2.html" class="external-link">interpret_simlr_vector2</a></span><span class="op">(</span> <span class="va">resultNH</span><span class="op">$</span><span class="va">v</span><span class="op">[[</span><span class="va">k</span><span class="op">]</span><span class="op">]</span>, <span class="fl">1</span>, n2show<span class="op">=</span><span class="fl">3</span>, shortnames<span class="op">=</span><span class="cn">F</span> <span class="op">)</span> <span class="op">)</span></span>
-<span>  <span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span> <span class="fu"><a href="https://rdrr.io/pkg/ANTsR/man/interpret_simlr_vector2.html" class="external-link">interpret_simlr_vector2</a></span><span class="op">(</span> <span class="va">resultNH</span><span class="op">$</span><span class="va">v</span><span class="op">[[</span><span class="va">k</span><span class="op">]</span><span class="op">]</span>, <span class="fl">2</span>, n2show<span class="op">=</span><span class="fl">3</span>, shortnames<span class="op">=</span><span class="cn">F</span> <span class="op">)</span> <span class="op">)</span></span>
-<span><span class="op">}</span></span></code></pre></div>
-<pre><code><span><span class="co">## [1] "demog"</span></span>
-<span><span class="co">## riagendr_2   ridageyr     race_3 </span></span>
-<span><span class="co">##  1.0000000  0.4109584  0.2204189 </span></span>
-<span><span class="co">##   ridageyr riagendr_2     race_4 </span></span>
-<span><span class="co">##  1.0000000  0.6724695  0.2203442 </span></span>
+<pre><code><span><span class="co">##                    Estimate   Std. Error   t value     Pr(&gt;|t|)</span></span>
+<span><span class="co">## diet1          2.872693e+04 9.101821e+03  3.156174 1.616923e-03</span></span>
+<span><span class="co">## exposures1    -1.354318e+10 7.287623e+09 -1.858381 6.322850e-02</span></span>
+<span><span class="co">## mentalhealth1 -2.550555e+04 2.795154e+03 -9.124918 1.405695e-19</span></span>
+<span><span class="co">## physical1      2.581258e+06 6.508983e+05  3.965686 7.517176e-05</span></span>
+<span><span class="co">## [1] 7.605136e-23</span></span>
+<span><span class="co">## [1] "z_digit_re"</span></span>
 <span><span class="co">## [1] "diet"</span></span>
-<span><span class="co">##  DR1TNUMF  DR1TATOC    DR1TVK </span></span>
-<span><span class="co">## 1.0000000 0.3688905 0.2942727 </span></span>
-<span><span class="co">##    DR1TFF  DR1TPOTA  DR1TFIBE </span></span>
-<span><span class="co">## 1.0000000 0.9134355 0.7407898 </span></span>
-<span><span class="co">## [1] "exposures"</span></span>
-<span><span class="co">##    LBXBSE    LBXBGE    LBXBGM </span></span>
-<span><span class="co">## 1.0000000 0.6675472 0.4732279 </span></span>
-<span><span class="co">##      LBXBPB      LBXBCD      LBXBGM </span></span>
-<span><span class="co">## 1.000000000 0.806211555 0.004841074 </span></span>
-<span><span class="co">## [1] "mentalhealth"</span></span>
-<span><span class="co">##    SLQ060    DPQ050    DPQ040 </span></span>
-<span><span class="co">## 1.0000000 0.5131529 0.2112624 </span></span>
-<span><span class="co">##    DPQ040    DPQ080    DPQ060 </span></span>
-<span><span class="co">## 1.0000000 0.3184115 0.2362217 </span></span>
-<span><span class="co">## [1] "physical"</span></span>
-<span><span class="co">##   BMXARML    BMXLEG     BMXHT </span></span>
-<span><span class="co">## 1.0000000 0.9696233 0.8311600 </span></span>
-<span><span class="co">##   BMXSAD2   BMXSAD1    BMXBMI </span></span>
-<span><span class="co">## 1.0000000 0.9721219 0.5821944</span></span></code></pre>
-<div class="sourceCode" id="cb48"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co">##########################################################################################</span></span>
+<span><span class="co">##  DR1TALCO  DR1TCAFF  DR1TMOIS </span></span>
+<span><span class="co">## 1.0000000 0.9705797 0.9111442</span></span></code></pre>
+<p><img src="simlr_nhanes_files/figure-html/nhanessimlrstat-1.png" width="700"></p>
+<pre><code><span><span class="co">## [1] "exposures"</span></span>
+<span><span class="co">##    LBXVCB    LBXVTE    LBXV06 </span></span>
+<span><span class="co">## 1.0000000 0.8224730 0.2562445</span></span></code></pre>
+<p><img src="simlr_nhanes_files/figure-html/nhanessimlrstat-2.png" width="700"></p>
+<pre><code><span><span class="co">## [1] "mentalhealth"</span></span>
+<span><span class="co">##       DPQ080       DPQ070       DPQ050 </span></span>
+<span><span class="co">## 1.000000e+00 5.385390e-01 5.174881e-06</span></span></code></pre>
+<p><img src="simlr_nhanes_files/figure-html/nhanessimlrstat-3.png" width="700"></p>
+<pre><code><span><span class="co">## [1] "physical"</span></span>
+<span><span class="co">##           BMXWT           BMXHT BPXPULS_Regular </span></span>
+<span><span class="co">##       1.0000000       0.4884987       0.4002257</span></span></code></pre>
+<p><img src="simlr_nhanes_files/figure-html/nhanessimlrstat-4.png" width="700"></p>
+<pre><code><span><span class="co">##                    Estimate   Std. Error   t value     Pr(&gt;|t|)</span></span>
+<span><span class="co">## diet2          8.620111e+06    1858402.6  4.638452 3.685018e-06</span></span>
+<span><span class="co">## exposures2    -1.011156e+10 3314343472.7 -3.050848 2.305131e-03</span></span>
+<span><span class="co">## mentalhealth2 -3.155817e+08   47091855.8 -6.701407 2.524463e-11</span></span>
+<span><span class="co">## physical2      9.695452e+05     712327.2  1.361095 1.736022e-01</span></span>
+<span><span class="co">## [1] 2.467896e-15</span></span>
+<span><span class="co">## [1] "z_digit_re"</span></span>
+<span><span class="co">## [1] "diet"</span></span>
+<span><span class="co">##      DR1TP182      DR1TSFAT DR1TWS_Spring </span></span>
+<span><span class="co">##     1.0000000     0.9704370     0.8402352</span></span></code></pre>
+<p><img src="simlr_nhanes_files/figure-html/nhanessimlrstat-5.png" width="700"></p>
+<pre><code><span><span class="co">## [1] "exposures"</span></span>
+<span><span class="co">##    LBXVFN    LBXBCD  LBDBCDSI </span></span>
+<span><span class="co">## 1.0000000 0.9484425 0.9454202</span></span></code></pre>
+<p><img src="simlr_nhanes_files/figure-html/nhanessimlrstat-6.png" width="700"></p>
+<pre><code><span><span class="co">## [1] "mentalhealth"</span></span>
+<span><span class="co">##     DPQ100     DPQ060     DPQ090 </span></span>
+<span><span class="co">## 1.00000000 0.35883938 0.02875094</span></span></code></pre>
+<p><img src="simlr_nhanes_files/figure-html/nhanessimlrstat-7.png" width="700"></p>
+<pre><code><span><span class="co">## [1] "physical"</span></span>
+<span><span class="co">##     BMXWT   BMXSAD1    BPXSY1 </span></span>
+<span><span class="co">## 1.0000000 0.4237398 0.3679295</span></span></code></pre>
+<p><img src="simlr_nhanes_files/figure-html/nhanessimlrstat-8.png" width="700"></p>
+<pre><code><span><span class="co">##                    Estimate   Std. Error   t value     Pr(&gt;|t|)</span></span>
+<span><span class="co">## diet3          2.583143e+05 6.596647e+04  3.915843 9.241884e-05</span></span>
+<span><span class="co">## exposures3    -1.334611e+10 2.853400e+09 -4.677264 3.056796e-06</span></span>
+<span><span class="co">## mentalhealth3 -3.351359e+09 3.979433e+08 -8.421700 6.063129e-17</span></span>
+<span><span class="co">## physical3      1.404689e+09 4.240175e+08  3.312809 9.363578e-04</span></span>
+<span><span class="co">## [1] 2.925169e-24</span></span>
+<span><span class="co">## [1] "z_digit_re"</span></span>
+<span><span class="co">## [1] "diet"</span></span>
+<span><span class="co">##  DR1TS180  DR1TTHEO  DR1TCARB </span></span>
+<span><span class="co">## 1.0000000 0.4551461 0.3823076</span></span></code></pre>
+<p><img src="simlr_nhanes_files/figure-html/nhanessimlrstat-9.png" width="700"></p>
+<pre><code><span><span class="co">## [1] "exposures"</span></span>
+<span><span class="co">##  LBDBCDSI    LBXBCD    LBXBPB </span></span>
+<span><span class="co">## 1.0000000 0.9958922 0.5937601</span></span></code></pre>
+<p><img src="simlr_nhanes_files/figure-html/nhanessimlrstat-10.png" width="700"></p>
+<pre><code><span><span class="co">## [1] "mentalhealth"</span></span>
+<span><span class="co">##     DPQ080     DPQ010     DPQ090 </span></span>
+<span><span class="co">## 1.00000000 0.08340466 0.01637281</span></span></code></pre>
+<p><img src="simlr_nhanes_files/figure-html/nhanessimlrstat-11.png" width="700"></p>
+<pre><code><span><span class="co">## [1] "physical"</span></span>
+<span><span class="co">##   BMXSAD2    BMXLEG     BMXHT </span></span>
+<span><span class="co">## 1.0000000 0.8070293 0.6818085</span></span></code></pre>
+<p><img src="simlr_nhanes_files/figure-html/nhanessimlrstat-12.png" width="700"></p>
+<pre><code><span><span class="co">##                  Estimate   Std. Error    t value     Pr(&gt;|t|)</span></span>
+<span><span class="co">## diet4             1279458 5.042495e+05  2.5373514 1.122776e-02</span></span>
+<span><span class="co">## exposures4     -809491480 2.197603e+10 -0.0368352 9.706192e-01</span></span>
+<span><span class="co">## mentalhealth4 -4501598327 6.529995e+08 -6.8937237 6.804541e-12</span></span>
+<span><span class="co">## physical4         1364133 4.900837e+05  2.7834694 5.417186e-03</span></span>
+<span><span class="co">## [1] 3.123883e-12</span></span>
+<span><span class="co">## [1] "z_digit_re"</span></span>
+<span><span class="co">## [1] "diet"</span></span>
+<span><span class="co">##  DR1TPFAT  DR1TCHOL  DR1TP182 </span></span>
+<span><span class="co">## 1.0000000 0.9738002 0.8846508</span></span></code></pre>
+<p><img src="simlr_nhanes_files/figure-html/nhanessimlrstat-13.png" width="700"></p>
+<pre><code><span><span class="co">## [1] "exposures"</span></span>
+<span><span class="co">##  LBDBPBSI  LBDIHGSI    LBXIHG </span></span>
+<span><span class="co">## 1.0000000 0.7822016 0.7559483</span></span></code></pre>
+<p><img src="simlr_nhanes_files/figure-html/nhanessimlrstat-14.png" width="700"></p>
+<pre><code><span><span class="co">## [1] "mentalhealth"</span></span>
+<span><span class="co">##     DPQ100     DPQ060     DPQ080 </span></span>
+<span><span class="co">## 1.00000000 0.44005417 0.08119528</span></span></code></pre>
+<p><img src="simlr_nhanes_files/figure-html/nhanessimlrstat-15.png" width="700"></p>
+<pre><code><span><span class="co">## [1] "physical"</span></span>
+<span><span class="co">##   BMXARMC    BMXBMI     BMXWT </span></span>
+<span><span class="co">## 1.0000000 0.9376358 0.6523645</span></span></code></pre>
+<p><img src="simlr_nhanes_files/figure-html/nhanessimlrstat-16.png" width="700"></p>
+<pre><code><span><span class="co">##                    Estimate   Std. Error   t value     Pr(&gt;|t|)</span></span>
+<span><span class="co">## diet5          1.276108e+01 3.538727e+00  3.606122 3.166877e-04</span></span>
+<span><span class="co">## exposures5    -4.301232e+09 9.698622e+08 -4.434890 9.596795e-06</span></span>
+<span><span class="co">## mentalhealth5 -9.916429e+07 1.716897e+07 -5.775785 8.575819e-09</span></span>
+<span><span class="co">## physical5      5.400367e+09 1.666809e+09  3.239943 1.210692e-03</span></span>
+<span><span class="co">## [1] 9.984441e-17</span></span>
+<span><span class="co">## [1] "z_digit_re"</span></span>
+<span><span class="co">## [1] "diet"</span></span>
+<span><span class="co">##  DR1TSODI  DR1TPHOS  DR1TKCAL </span></span>
+<span><span class="co">## 1.0000000 0.4770085 0.4725999</span></span></code></pre>
+<p><img src="simlr_nhanes_files/figure-html/nhanessimlrstat-17.png" width="700"></p>
+<pre><code><span><span class="co">## [1] "exposures"</span></span>
+<span><span class="co">##  LBDBCDSI    LBXBCD    LBXBPB </span></span>
+<span><span class="co">## 1.0000000 0.9937034 0.2555726</span></span></code></pre>
+<p><img src="simlr_nhanes_files/figure-html/nhanessimlrstat-18.png" width="700"></p>
+<pre><code><span><span class="co">## [1] "mentalhealth"</span></span>
+<span><span class="co">##      DPQ060      DPQ020      DPQ100 </span></span>
+<span><span class="co">## 1.000000000 0.445730928 0.003215018</span></span></code></pre>
+<p><img src="simlr_nhanes_files/figure-html/nhanessimlrstat-19.png" width="700"></p>
+<pre><code><span><span class="co">## [1] "physical"</span></span>
+<span><span class="co">##     BMXLEG      BMXWT    BMXARML </span></span>
+<span><span class="co">## 1.00000000 0.10660915 0.08853836</span></span></code></pre>
+<p><img src="simlr_nhanes_files/figure-html/nhanessimlrstat-20.png" width="700"></p>
+<pre><code><span><span class="co">##                    Estimate   Std. Error   t value     Pr(&gt;|t|)</span></span>
+<span><span class="co">## diet6          1.060398e+04 9.475792e+03  1.119060 2.632185e-01</span></span>
+<span><span class="co">## exposures6    -2.121016e+09 4.548748e+08 -4.662856 3.276966e-06</span></span>
+<span><span class="co">## mentalhealth6 -5.903367e+06 1.923765e+06 -3.068653 2.172564e-03</span></span>
+<span><span class="co">## physical6     -1.652918e+09 5.090203e+08 -3.247254 1.180140e-03</span></span>
+<span><span class="co">## [1] 9.54149e-09</span></span>
+<span><span class="co">## [1] "z_digit_re"</span></span>
+<span><span class="co">## [1] "diet"</span></span>
+<span><span class="co">##  DR1TCOPP  DR1TS040   DR1TRET </span></span>
+<span><span class="co">## 1.0000000 0.5834027 0.2969126</span></span></code></pre>
+<p><img src="simlr_nhanes_files/figure-html/nhanessimlrstat-21.png" width="700"></p>
+<pre><code><span><span class="co">## [1] "exposures"</span></span>
+<span><span class="co">##    LBXBCD  LBDBCDSI    LBX2DF </span></span>
+<span><span class="co">## 1.0000000 0.9958432 0.3568357</span></span></code></pre>
+<p><img src="simlr_nhanes_files/figure-html/nhanessimlrstat-22.png" width="700"></p>
+<pre><code><span><span class="co">## [1] "mentalhealth"</span></span>
+<span><span class="co">##      DPQ030      DPQ060      DPQ080 </span></span>
+<span><span class="co">## 1.000000000 0.250739705 0.001209046</span></span></code></pre>
+<p><img src="simlr_nhanes_files/figure-html/nhanessimlrstat-23.png" width="700"></p>
+<pre><code><span><span class="co">## [1] "physical"</span></span>
+<span><span class="co">##         BMXARMC          BPXML1 BPXPULS_Regular </span></span>
+<span><span class="co">##       1.0000000       0.8270684       0.1211476</span></span></code></pre>
+<p><img src="simlr_nhanes_files/figure-html/nhanessimlrstat-24.png" width="700"></p>
+<pre><code><span><span class="co">##                    Estimate   Std. Error   t value     Pr(&gt;|t|)</span></span>
+<span><span class="co">## diet7          2.385341e+06 6.777457e+05  3.519521 4.397905e-04</span></span>
+<span><span class="co">## exposures7     6.674102e+11 5.382555e+11  1.239951 2.151062e-01</span></span>
+<span><span class="co">## mentalhealth7 -6.056613e+09 6.757043e+08 -8.963408 5.890596e-19</span></span>
+<span><span class="co">## physical7      1.840834e+05 3.499808e+04  5.259813 1.560116e-07</span></span>
+<span><span class="co">## [1] 5.697063e-25</span></span>
+<span><span class="co">## [1] "z_digit_re"</span></span>
+<span><span class="co">## [1] "diet"</span></span>
+<span><span class="co">##  DR1TS160  DR1TCHOL  DR1TSELE </span></span>
+<span><span class="co">## 1.0000000 0.9830445 0.9059701</span></span></code></pre>
+<p><img src="simlr_nhanes_files/figure-html/nhanessimlrstat-25.png" width="700"></p>
+<pre><code><span><span class="co">## [1] "exposures"</span></span>
+<span><span class="co">##   LBXVIPB    LBXV2A    LBXVMC </span></span>
+<span><span class="co">## 1.0000000 0.5598344 0.1582093</span></span></code></pre>
+<p><img src="simlr_nhanes_files/figure-html/nhanessimlrstat-26.png" width="700"></p>
+<pre><code><span><span class="co">## [1] "mentalhealth"</span></span>
+<span><span class="co">##    DPQ080    DPQ100    DPQ050 </span></span>
+<span><span class="co">## 1.0000000 0.3000322 0.2341561</span></span></code></pre>
+<p><img src="simlr_nhanes_files/figure-html/nhanessimlrstat-27.png" width="700"></p>
+<pre><code><span><span class="co">## [1] "physical"</span></span>
+<span><span class="co">##     BMXHT    BMXLEG   BMXARML </span></span>
+<span><span class="co">## 1.0000000 0.5752537 0.5158005</span></span></code></pre>
+<p><img src="simlr_nhanes_files/figure-html/nhanessimlrstat-28.png" width="700"></p>
+<pre><code><span><span class="co">##                    Estimate   Std. Error   t value     Pr(&gt;|t|)</span></span>
+<span><span class="co">## diet9          4.089725e+03 4.070036e+03  1.004838 3.150691e-01</span></span>
+<span><span class="co">## exposures9    -3.412979e+08 2.154281e+08 -1.584278 1.132528e-01</span></span>
+<span><span class="co">## mentalhealth9 -5.384857e+09 6.312259e+08 -8.530794 2.435948e-17</span></span>
+<span><span class="co">## physical9      3.158843e+06 2.643658e+06  1.194876 2.322452e-01</span></span>
+<span><span class="co">## [1] 1.478301e-15</span></span>
+<span><span class="co">## [1] "z_digit_re"</span></span>
+<span><span class="co">## [1] "diet"</span></span>
+<span><span class="co">##  DR1TNUMF  DR1TCHOL  DR1TSELE </span></span>
+<span><span class="co">## 1.0000000 0.4056538 0.3907842</span></span></code></pre>
+<p><img src="simlr_nhanes_files/figure-html/nhanessimlrstat-29.png" width="700"></p>
+<pre><code><span><span class="co">## [1] "exposures"</span></span>
+<span><span class="co">##    LBXSCU  LBDSCUSI  LBDBMNSI </span></span>
+<span><span class="co">## 1.0000000 0.9957080 0.4177809</span></span></code></pre>
+<p><img src="simlr_nhanes_files/figure-html/nhanessimlrstat-30.png" width="700"></p>
+<pre><code><span><span class="co">## [1] "mentalhealth"</span></span>
+<span><span class="co">##    DPQ070    DPQ080    DPQ100 </span></span>
+<span><span class="co">## 1.0000000 0.3064859 0.1577040</span></span></code></pre>
+<p><img src="simlr_nhanes_files/figure-html/nhanessimlrstat-31.png" width="700"></p>
+<pre><code><span><span class="co">## [1] "physical"</span></span>
+<span><span class="co">##    BMXBMI   BMXSAD1   BMXSAD2 </span></span>
+<span><span class="co">## 1.0000000 0.7178173 0.5513058</span></span></code></pre>
+<p><img src="simlr_nhanes_files/figure-html/nhanessimlrstat-32.png" width="700"></p>
+<pre><code><span><span class="co">##                     Estimate   Std. Error     t value     Pr(&gt;|t|)</span></span>
+<span><span class="co">## diet10          7.384179e+02 4.260304e+02  1.73325150 8.317018e-02</span></span>
+<span><span class="co">## exposures10    -1.469781e+07 1.853356e+09 -0.00793038 9.936732e-01</span></span>
+<span><span class="co">## mentalhealth10 -2.376689e+08 2.871335e+07 -8.27729683 1.993844e-16</span></span>
+<span><span class="co">## physical10      1.369160e+06 1.304222e+06  1.04978990 2.939128e-01</span></span>
+<span><span class="co">## [1] 1.407364e-14</span></span>
+<span><span class="co">## [1] "z_digit_re"</span></span>
+<span><span class="co">## [1] "diet"</span></span>
+<span><span class="co">##  DR1TCALC    DR1TFA   DR1TVB2 </span></span>
+<span><span class="co">## 1.0000000 0.3573604 0.2539536</span></span></code></pre>
+<p><img src="simlr_nhanes_files/figure-html/nhanessimlrstat-33.png" width="700"></p>
+<pre><code><span><span class="co">## [1] "exposures"</span></span>
+<span><span class="co">##    LBXBGM  LBDTHGSI    LBXTHG </span></span>
+<span><span class="co">## 1.0000000 0.9525770 0.8595439</span></span></code></pre>
+<p><img src="simlr_nhanes_files/figure-html/nhanessimlrstat-34.png" width="700"></p>
+<pre><code><span><span class="co">## [1] "mentalhealth"</span></span>
+<span><span class="co">##      DPQ080      DPQ050      DPQ060 </span></span>
+<span><span class="co">## 1.000000000 0.221907747 0.002352086</span></span></code></pre>
+<p><img src="simlr_nhanes_files/figure-html/nhanessimlrstat-35.png" width="700"></p>
+<pre><code><span><span class="co">## [1] "physical"</span></span>
+<span><span class="co">##  BMXWAIST   BMXARMC    BMXBMI </span></span>
+<span><span class="co">## 1.0000000 0.6123321 0.3687869</span></span></code></pre>
+<p><img src="simlr_nhanes_files/figure-html/nhanessimlrstat-36.png" width="700"></p>
+<pre><code><span><span class="co">##                     Estimate   Std. Error     t value     Pr(&gt;|t|)</span></span>
+<span><span class="co">## diet11          5.698534e+02 2.753171e+04  0.02069807 9.834881e-01</span></span>
+<span><span class="co">## exposures11    -2.901086e+10 6.071193e+09 -4.77844403 1.865393e-06</span></span>
+<span><span class="co">## mentalhealth11 -3.102640e+07 8.750333e+06 -3.54573911 3.984646e-04</span></span>
+<span><span class="co">## physical11      1.117834e+05 6.576860e+05  0.16996470 8.650512e-01</span></span>
+<span><span class="co">## [1] 2.888227e-07</span></span>
+<span><span class="co">## [1] "z_digit_re"</span></span>
+<span><span class="co">## [1] "diet"</span></span>
+<span><span class="co">##    DR1TVC  DR1TS040  DR1TFIBE </span></span>
+<span><span class="co">## 1.0000000 0.6655489 0.6456036</span></span></code></pre>
+<p><img src="simlr_nhanes_files/figure-html/nhanessimlrstat-37.png" width="700"></p>
+<pre><code><span><span class="co">## [1] "exposures"</span></span>
+<span><span class="co">##  LBDBPBSI    LBXBPB    LBXBCD </span></span>
+<span><span class="co">## 1.0000000 0.9890296 0.6206306</span></span></code></pre>
+<p><img src="simlr_nhanes_files/figure-html/nhanessimlrstat-38.png" width="700"></p>
+<pre><code><span><span class="co">## [1] "mentalhealth"</span></span>
+<span><span class="co">##      SLQ060      DPQ040      DPQ090 </span></span>
+<span><span class="co">## 1.000000000 0.445985999 0.001275512</span></span></code></pre>
+<p><img src="simlr_nhanes_files/figure-html/nhanessimlrstat-39.png" width="700"></p>
+<pre><code><span><span class="co">## [1] "physical"</span></span>
+<span><span class="co">##    BMXARMC     BPXML1     BPXDI2 </span></span>
+<span><span class="co">## 1.00000000 0.10107972 0.05338767</span></span></code></pre>
+<p><img src="simlr_nhanes_files/figure-html/nhanessimlrstat-40.png" width="700"></p>
+<pre><code><span><span class="co">##                     Estimate   Std. Error    t value     Pr(&gt;|t|)</span></span>
+<span><span class="co">## diet12          9.401062e+04 2.649862e+04  3.5477549 3.954423e-04</span></span>
+<span><span class="co">## exposures12    -2.047509e+10 4.416156e+09 -4.6364060 3.721356e-06</span></span>
+<span><span class="co">## mentalhealth12 -6.289464e+07 8.935969e+06 -7.0383683 2.481706e-12</span></span>
+<span><span class="co">## physical12     -2.028743e+05 6.240549e+05 -0.3250904 7.451389e-01</span></span>
+<span><span class="co">## [1] 1.227059e-17</span></span>
+<span><span class="co">## [1] "z_digit_re"</span></span>
+<span><span class="co">## [1] "diet"</span></span>
+<span><span class="co">##                DR1TALCO                DR1TMAGN DR1TWS_Community.supply </span></span>
+<span><span class="co">##               1.0000000               0.5722973               0.5223815</span></span></code></pre>
+<p><img src="simlr_nhanes_files/figure-html/nhanessimlrstat-41.png" width="700"></p>
+<pre><code><span><span class="co">## [1] "exposures"</span></span>
+<span><span class="co">##  LBDBCDSI    LBXBCD    LBXVDB </span></span>
+<span><span class="co">## 1.0000000 0.9878016 0.4957165</span></span></code></pre>
+<p><img src="simlr_nhanes_files/figure-html/nhanessimlrstat-42.png" width="700"></p>
+<pre><code><span><span class="co">## [1] "mentalhealth"</span></span>
+<span><span class="co">##     DPQ010     DPQ100     SLQ050 </span></span>
+<span><span class="co">## 1.00000000 0.63346955 0.00382018</span></span></code></pre>
+<p><img src="simlr_nhanes_files/figure-html/nhanessimlrstat-43.png" width="700"></p>
+<pre><code><span><span class="co">## [1] "physical"</span></span>
+<span><span class="co">##   BMXSAD1   BMXSAD2  BMXWAIST </span></span>
+<span><span class="co">## 1.0000000 0.9501323 0.6845514</span></span></code></pre>
+<p><img src="simlr_nhanes_files/figure-html/nhanessimlrstat-44.png" width="700"></p>
+<pre><code><span><span class="co">##                     Estimate   Std. Error     t value     Pr(&gt;|t|)</span></span>
+<span><span class="co">## diet13              94212.97 6.024158e+04  1.56391924 1.179589e-01</span></span>
+<span><span class="co">## exposures13     302228317.28 4.667022e+09  0.06475828 9.483715e-01</span></span>
+<span><span class="co">## mentalhealth13 -222647677.47 2.613010e+07 -8.52073551 2.650800e-17</span></span>
+<span><span class="co">## physical13         768468.24 3.392598e+05  2.26513197 2.358698e-02</span></span>
+<span><span class="co">## [1] 4.251969e-16</span></span>
+<span><span class="co">## [1] "z_digit_re"</span></span>
+<span><span class="co">## [1] "diet"</span></span>
+<span><span class="co">##  DR1TS120  DR1TP184  DR1TS080 </span></span>
+<span><span class="co">## 1.0000000 0.9881430 0.4243682</span></span></code></pre>
+<p><img src="simlr_nhanes_files/figure-html/nhanessimlrstat-45.png" width="700"></p>
+<pre><code><span><span class="co">## [1] "exposures"</span></span>
+<span><span class="co">##    LBXVBZ  LBDSCUSI    LBX2DF </span></span>
+<span><span class="co">## 1.0000000 0.5290172 0.5224601</span></span></code></pre>
+<p><img src="simlr_nhanes_files/figure-html/nhanessimlrstat-46.png" width="700"></p>
+<pre><code><span><span class="co">## [1] "mentalhealth"</span></span>
+<span><span class="co">##      DPQ080      DPQ100      DPQ010 </span></span>
+<span><span class="co">## 1.000000000 0.529410851 0.006474847</span></span></code></pre>
+<p><img src="simlr_nhanes_files/figure-html/nhanessimlrstat-47.png" width="700"></p>
+<pre><code><span><span class="co">## [1] "physical"</span></span>
+<span><span class="co">##   BMXARMC    BMXBMI   BMXSAD1 </span></span>
+<span><span class="co">## 1.0000000 0.4755779 0.1738212</span></span></code></pre>
+<p><img src="simlr_nhanes_files/figure-html/nhanessimlrstat-48.png" width="700"></p>
+<pre><code><span><span class="co">##                   Estimate Std. Error    t value     Pr(&gt;|t|)</span></span>
+<span><span class="co">## diet14            24714722    4935597  5.0074435 5.887055e-07</span></span>
+<span><span class="co">## exposures14     3548786489 5014649337  0.7076839 4.792054e-01</span></span>
+<span><span class="co">## mentalhealth14 -3390337990  444921274 -7.6200851 3.533879e-14</span></span>
+<span><span class="co">## physical14      2749491118 1153805739  2.3829758 1.724515e-02</span></span>
+<span><span class="co">## [1] 8.816321e-18</span></span>
+<span><span class="co">## [1] "z_digit_re"</span></span>
+<span><span class="co">## [1] "diet"</span></span>
+<span><span class="co">##  DR1TALCO  DR1TMAGN  DR1TNUMF </span></span>
+<span><span class="co">## 1.0000000 0.9683565 0.9426186</span></span></code></pre>
+<p><img src="simlr_nhanes_files/figure-html/nhanessimlrstat-49.png" width="700"></p>
+<pre><code><span><span class="co">## [1] "exposures"</span></span>
+<span><span class="co">##    LBXVTE  LBDSSESI    LBXSSE </span></span>
+<span><span class="co">## 1.0000000 0.8518694 0.8457661</span></span></code></pre>
+<p><img src="simlr_nhanes_files/figure-html/nhanessimlrstat-50.png" width="700"></p>
+<pre><code><span><span class="co">## [1] "mentalhealth"</span></span>
+<span><span class="co">##     DPQ080     SLQ050     DPQ040 </span></span>
+<span><span class="co">## 1.00000000 0.53507056 0.03541329</span></span></code></pre>
+<p><img src="simlr_nhanes_files/figure-html/nhanessimlrstat-51.png" width="700"></p>
+<pre><code><span><span class="co">## [1] "physical"</span></span>
+<span><span class="co">##          BMXBMI         BMXARMC BPXPULS_Regular </span></span>
+<span><span class="co">##       1.0000000       0.2762456       0.1541291</span></span></code></pre>
+<p><img src="simlr_nhanes_files/figure-html/nhanessimlrstat-52.png" width="700"></p>
+<pre><code><span><span class="co">##                     Estimate   Std. Error   t value     Pr(&gt;|t|)</span></span>
+<span><span class="co">## diet15          1.314845e+04 9.730601e+03  1.351248 1.767342e-01</span></span>
+<span><span class="co">## exposures15     5.318892e+06 2.055927e+06  2.587102 9.732817e-03</span></span>
+<span><span class="co">## mentalhealth15 -1.017536e+09 2.211978e+08 -4.600118 4.425981e-06</span></span>
+<span><span class="co">## physical15     -1.604315e+09 6.166489e+08 -2.601666 9.330124e-03</span></span>
+<span><span class="co">## [1] 1.197074e-07</span></span>
+<span><span class="co">## [1] "z_digit_re"</span></span>
+<span><span class="co">## [1] "diet"</span></span>
+<span><span class="co">##  DR1TMAGN  DR1TNUMF  DR1TALCO </span></span>
+<span><span class="co">## 1.0000000 0.9496531 0.7517837</span></span></code></pre>
+<p><img src="simlr_nhanes_files/figure-html/nhanessimlrstat-53.png" width="700"></p>
+<pre><code><span><span class="co">## [1] "exposures"</span></span>
+<span><span class="co">##  LBDBSESI    LBXBSE    LBXBGE </span></span>
+<span><span class="co">## 1.0000000 0.9029906 0.6420251</span></span></code></pre>
+<p><img src="simlr_nhanes_files/figure-html/nhanessimlrstat-54.png" width="700"></p>
+<pre><code><span><span class="co">## [1] "mentalhealth"</span></span>
+<span><span class="co">##    DPQ040    DPQ030    DPQ010 </span></span>
+<span><span class="co">## 1.0000000 0.2573740 0.1120082</span></span></code></pre>
+<p><img src="simlr_nhanes_files/figure-html/nhanessimlrstat-55.png" width="700"></p>
+<pre><code><span><span class="co">## [1] "physical"</span></span>
+<span><span class="co">##    BPXSY1    BPXDI1    BPXSY2 </span></span>
+<span><span class="co">## 1.0000000 0.6757993 0.3490460</span></span></code></pre>
+<p><img src="simlr_nhanes_files/figure-html/nhanessimlrstat-56.png" width="700"></p>
+<pre><code><span><span class="co">##                     Estimate   Std. Error   t value     Pr(&gt;|t|)</span></span>
+<span><span class="co">## diet16          1.632785e+05 1.448843e+05  1.126958 2.598650e-01</span></span>
+<span><span class="co">## exposures16    -3.189492e+10 1.526798e+10 -2.089007 3.680461e-02</span></span>
+<span><span class="co">## mentalhealth16 -6.855945e+07 1.569154e+07 -4.369199 1.296198e-05</span></span>
+<span><span class="co">## physical16     -6.859429e+05 3.144541e+05 -2.181377 2.924533e-02</span></span>
+<span><span class="co">## [1] 8.075095e-06</span></span>
+<span><span class="co">## [1] "z_digit_re"</span></span>
+<span><span class="co">## [1] "diet"</span></span>
+<span><span class="co">##  DR1TALCO  DR1TTHEO  DR1TS180 </span></span>
+<span><span class="co">## 1.0000000 0.9796572 0.9755861</span></span></code></pre>
+<p><img src="simlr_nhanes_files/figure-html/nhanessimlrstat-57.png" width="700"></p>
+<pre><code><span><span class="co">## [1] "exposures"</span></span>
+<span><span class="co">##    LBXBPB  LBDBPBSI    LBXV4C </span></span>
+<span><span class="co">## 1.0000000 0.9055280 0.7386177</span></span></code></pre>
+<p><img src="simlr_nhanes_files/figure-html/nhanessimlrstat-58.png" width="700"></p>
+<pre><code><span><span class="co">## [1] "mentalhealth"</span></span>
+<span><span class="co">##     SLQ050     DPQ080     DPQ050 </span></span>
+<span><span class="co">## 1.00000000 0.29833758 0.01282615</span></span></code></pre>
+<p><img src="simlr_nhanes_files/figure-html/nhanessimlrstat-59.png" width="700"></p>
+<pre><code><span><span class="co">## [1] "physical"</span></span>
+<span><span class="co">##    BPXPLS    BMXBMI    BPXML1 </span></span>
+<span><span class="co">## 1.0000000 0.9842341 0.3497796</span></span></code></pre>
+<p><img src="simlr_nhanes_files/figure-html/nhanessimlrstat-60.png" width="700"></p>
+<pre><code><span><span class="co">##                    Estimate   Std. Error    t value     Pr(&gt;|t|)</span></span>
+<span><span class="co">## diet18             36952.58     15721.71  2.3504174 1.882712e-02</span></span>
+<span><span class="co">## exposures18     16432606.19 142818756.24  0.1150592 9.084072e-01</span></span>
+<span><span class="co">## mentalhealth18 -62778284.21   9515631.83 -6.5973847 5.057262e-11</span></span>
+<span><span class="co">## physical18       2568041.65    770691.19  3.3321280 8.739718e-04</span></span>
+<span><span class="co">## [1] 5.7835e-12</span></span>
+<span><span class="co">## [1] "z_digit_re"</span></span>
+<span><span class="co">## [1] "diet"</span></span>
+<span><span class="co">##  DR1TNUMF  DR1TFIBE    DR1TVC </span></span>
+<span><span class="co">## 1.0000000 0.5120932 0.4873270</span></span></code></pre>
+<p><img src="simlr_nhanes_files/figure-html/nhanessimlrstat-61.png" width="700"></p>
+<pre><code><span><span class="co">## [1] "exposures"</span></span>
+<span><span class="co">##   LBDSCUSI     LBXSCU     LBXBCD </span></span>
+<span><span class="co">## 1.00000000 0.99923423 0.01242772</span></span></code></pre>
+<p><img src="simlr_nhanes_files/figure-html/nhanessimlrstat-62.png" width="700"></p>
+<pre><code><span><span class="co">## [1] "mentalhealth"</span></span>
+<span><span class="co">##      DPQ020      DPQ010      DPQ060 </span></span>
+<span><span class="co">## 1.000000000 0.418305543 0.002167218</span></span></code></pre>
+<p><img src="simlr_nhanes_files/figure-html/nhanessimlrstat-63.png" width="700"></p>
+<pre><code><span><span class="co">## [1] "physical"</span></span>
+<span><span class="co">##   BMXARML    BMXBMI     BMXHT </span></span>
+<span><span class="co">## 1.0000000 0.1579495 0.0843773</span></span></code></pre>
+<p><img src="simlr_nhanes_files/figure-html/nhanessimlrstat-64.png" width="700"></p>
+<div class="sourceCode" id="cb113"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co">#######################</span></span>
+<span><span class="co">##########################################################################################</span></span>
 <span><span class="co"># https://wwwn.cdc.gov/nchs/nhanes/search/default.aspx</span></span>
 <span><span class="co"># &gt; interpret_simlr_vector2( resultNH$v[['exposures']], 1, n2show=5, shortnames=F )</span></span>
 <span><span class="co">#   LBXVBZ    LBXVOX    LBXVFN    LBX2DF </span></span>
 <span><span class="co"># benzene, Xylene, furan, Dimethylfuran</span></span>
 <span><span class="co"># 1.0000000 0.3346728 0.1868323 0.0586727 </span></span>
-<span><span class="co">##########################################################################################</span></span>
-<span><span class="co">###</span></span></code></pre></div>
+<span><span class="co">##########################################################################################</span></span></code></pre></div>
 </div>
   </main>
 </div>
