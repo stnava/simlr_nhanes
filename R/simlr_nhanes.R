@@ -373,3 +373,42 @@ max_columns_list <- function(matrix_list) {
   max_cols <- max(sapply(matrices, ncol))
   return(max_cols)
 }
+
+
+
+
+
+#' Remove Perfectly Correlated Columns from a Data Frame
+#'
+#' This function identifies columns in a data frame that are perfectly correlated
+#' (correlation coefficient of 1 or -1) and removes the second instance from each
+#' pair, ensuring that no two columns in the resulting data frame are perfectly correlated.
+#'
+#' @param df A data frame containing numeric columns to be checked for perfect correlation.
+#' @param tolerance float tolerance value
+#'
+#' @return A data frame with redundant perfectly correlated columns removed.
+#'
+#' @examples
+#' df <- data.frame(a = 1:5, b = 1:5, c = 5:1+rnorm(5), d = c(2, 1, 6, 8, 10))
+#' remove_perfectly_correlated(df)
+#'
+#' @export
+remove_perfectly_correlated <- function(df, tolerance=1e-6 ) {
+  # Calculate correlation matrix
+  cor_matrix <- abs(cor(df, use = "pairwise.complete.obs"))
+
+  # Identify perfectly correlated pairs
+  to_remove <- c()
+  for (i in 1:(ncol(cor_matrix) - 1)) {
+    for (j in (i + 1):ncol(cor_matrix)) {
+      if ( abs(cor_matrix[i, j] - 1 ) < tolerance ) {
+        to_remove <- c(to_remove, colnames(df)[j])
+      }
+    }
+  }
+  # Remove duplicate columns
+  df_clean <- df[, !colnames(df) %in% unique(to_remove), drop = FALSE]
+
+  return(df_clean)
+}
