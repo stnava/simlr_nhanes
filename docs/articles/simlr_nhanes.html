@@ -65,6 +65,29 @@
 
     
     
+<div class="section level2">
+<h2 id="introduction">Introduction<a class="anchor" aria-label="anchor" href="#introduction"></a>
+</h2>
+<p>We extract distinct but related types of data from the <a href="https://wwwn.cdc.gov/nchs/nhanes/Default.aspx" class="external-link">NHANES</a>. The
+data types are:</p>
+<ul>
+<li><p>demographics: age, sex, educational attainment;</p></li>
+<li><p>diet: measurements of nutritional status;</p></li>
+<li><p>physical: blood pressure and physical measurements;</p></li>
+<li><p>mental health: outcomes from Patient Health
+Questionnaire-9;</p></li>
+<li><p>environmental exposures: metals and related environmental
+toxins.</p></li>
+</ul>
+<p>These are combined into SiMLR for an unsupervised dimensionality
+reduction. The resulting low-dimensional representations are used for
+joint prediction of cognitive outcomes. Over 400 subjects with these
+measurements are available along with environmental exposures.</p>
+</div>
+<div class="section level2">
+<h2 id="setup">Setup<a class="anchor" aria-label="anchor" href="#setup"></a>
+</h2>
+<p>Load the relevant librarys.</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Load necessary libraries</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://ggplot2.tidyverse.org" class="external-link">ggplot2</a></span><span class="op">)</span></span>
@@ -134,17 +157,12 @@
 <span><span class="co">##     intersect, setdiff, setequal, union</span></span></code></pre>
 <div class="sourceCode" id="cb25"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="st">"nhanescog_2011_2014"</span><span class="op">)</span></span></code></pre></div>
+</div>
 <div class="section level2">
 <h2 id="nhanes-example">NHANES example<a class="anchor" aria-label="anchor" href="#nhanes-example"></a>
 </h2>
-<p>The five publicly available data categories are: - Demographics
-(DEMO) - Dietary (DIET) - Examination (EXAM) - Laboratory (LAB) -
-Questionnaire (Q). The abbreviated forms in parentheses may be
-substituted for the long form in nhanesA commands.</p>
-<p>INDFMPIR: Poverty Income Ratio (0 = no income, higher values = higher
-income relative to poverty threshold). • INDHHIN2: Annual Household
-Income (categorized ranges). • DMDEDUC2: Education Level (for adults 20+
-years). • OCD390G: Employment Status (in occupation questionnaire).</p>
+<p>We download these data on the fly and merge them together using the
+embedded data as well as the <code>nhanesA</code> package.</p>
 <pre><code><span><span class="co">## simpleWarning in download.file(url, tf, mode = "wb", quiet = TRUE): downloaded length 0 != reported length 1245</span></span>
 <span><span class="co">## </span></span>
 <span><span class="co">## </span></span>
@@ -153,6 +171,8 @@ years). • OCD390G: Employment Status (in occupation questionnaire).</p>
 <span><span class="co">##   Male Female </span></span>
 <span><span class="co">##   1469   1545</span></span></code></pre>
 <pre><code><span><span class="co">## character(0)</span></span></code></pre>
+<p>Define the categories of data so that these can be used to identify a
+low-dimensional representation based on the SiMLR objective.</p>
 <div class="sourceCode" id="cb29"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co">####################################</span></span>
 <span><span class="va">colcats</span><span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="st">"Basic"</span>,<span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">ncol</a></span><span class="op">(</span><span class="va">fdata</span><span class="op">)</span><span class="op">)</span></span>
@@ -194,8 +214,9 @@ years). • OCD390G: Employment Status (in occupation questionnaire).</p>
 <span>    <span class="kw">if</span> <span class="op">(</span> <span class="va">k</span> <span class="op"><a href="https://rdrr.io/r/base/match.html" class="external-link">%in%</a></span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">'exposures'</span>,<span class="st">'diet'</span><span class="op">)</span> <span class="op">)</span> <span class="op">{</span></span>
 <span>      <span class="va">nn</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/colnames.html" class="external-link">colnames</a></span><span class="op">(</span><span class="va">temp</span><span class="op">)</span></span>
 <span>      <span class="kw">for</span> <span class="op">(</span>  <span class="va">jj</span> <span class="kw">in</span> <span class="fl">1</span><span class="op">:</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">ncol</a></span><span class="op">(</span><span class="va">temp</span><span class="op">)</span> <span class="op">)</span> <span class="va">temp</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/subtyper/man/truncatehi.html" class="external-link">truncatehi</a></span><span class="op">(</span><span class="va">temp</span>, <span class="va">nn</span><span class="op">[</span><span class="va">jj</span><span class="op">]</span>, t <span class="op">=</span> <span class="fl">10</span>, removeit <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
-<span>      <span class="co"># temp = robustMatrixTransform( temp )</span></span>
+<span><span class="co">#      temp = robustMatrixTransform( temp )</span></span>
 <span>      <span class="fu"><a href="https://rdrr.io/r/base/colnames.html" class="external-link">colnames</a></span><span class="op">(</span><span class="va">temp</span><span class="op">)</span> <span class="op">=</span> <span class="va">nn</span></span>
+<span>      <span class="va">temp</span> <span class="op">=</span> <span class="fu"><a href="../reference/remove_perfectly_correlated.html">remove_perfectly_correlated</a></span><span class="op">(</span> <span class="va">temp</span> <span class="op">)</span></span>
 <span>    <span class="op">}</span></span>
 <span>    <span class="kw">for</span> <span class="op">(</span> <span class="va">j</span> <span class="kw">in</span> <span class="fl">1</span><span class="op">:</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">ncol</a></span><span class="op">(</span><span class="va">temp</span><span class="op">)</span> <span class="op">)</span> <span class="op">{</span></span>
 <span>        <span class="fu"><a href="https://rdrr.io/r/graphics/hist.html" class="external-link">hist</a></span><span class="op">(</span> <span class="va">temp</span><span class="op">[</span>,<span class="va">j</span><span class="op">]</span>, main<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/colnames.html" class="external-link">colnames</a></span><span class="op">(</span><span class="va">temp</span><span class="op">)</span><span class="op">[</span><span class="va">j</span><span class="op">]</span><span class="op">)</span></span>
@@ -248,19 +269,18 @@ years). • OCD390G: Employment Status (in occupation questionnaire).</p>
 <span><span class="co">## [69] "DR1TWS_Spring"                "DR1TWS_Don.t.drink.tap.water"</span></span>
 <span><span class="co">## [71] "DR1TWS_Don.t.know"           </span></span>
 <span><span class="co">## [1] "exposures"</span></span></code></pre>
-<p><img src="simlr_nhanes_files/figure-html/simlrcats-81.png" width="700"><img src="simlr_nhanes_files/figure-html/simlrcats-82.png" width="700"><img src="simlr_nhanes_files/figure-html/simlrcats-83.png" width="700"><img src="simlr_nhanes_files/figure-html/simlrcats-84.png" width="700"><img src="simlr_nhanes_files/figure-html/simlrcats-85.png" width="700"><img src="simlr_nhanes_files/figure-html/simlrcats-86.png" width="700"><img src="simlr_nhanes_files/figure-html/simlrcats-87.png" width="700"><img src="simlr_nhanes_files/figure-html/simlrcats-88.png" width="700"><img src="simlr_nhanes_files/figure-html/simlrcats-89.png" width="700"><img src="simlr_nhanes_files/figure-html/simlrcats-90.png" width="700"><img src="simlr_nhanes_files/figure-html/simlrcats-91.png" width="700"><img src="simlr_nhanes_files/figure-html/simlrcats-92.png" width="700"><img src="simlr_nhanes_files/figure-html/simlrcats-93.png" width="700"><img src="simlr_nhanes_files/figure-html/simlrcats-94.png" width="700"><img src="simlr_nhanes_files/figure-html/simlrcats-95.png" width="700"><img src="simlr_nhanes_files/figure-html/simlrcats-96.png" width="700"><img src="simlr_nhanes_files/figure-html/simlrcats-97.png" width="700"><img src="simlr_nhanes_files/figure-html/simlrcats-98.png" width="700"><img src="simlr_nhanes_files/figure-html/simlrcats-99.png" width="700"><img src="simlr_nhanes_files/figure-html/simlrcats-100.png" width="700"><img src="simlr_nhanes_files/figure-html/simlrcats-101.png" width="700"><img src="simlr_nhanes_files/figure-html/simlrcats-102.png" width="700"><img src="simlr_nhanes_files/figure-html/simlrcats-103.png" width="700"><img src="simlr_nhanes_files/figure-html/simlrcats-104.png" width="700"><img src="simlr_nhanes_files/figure-html/simlrcats-105.png" width="700"><img src="simlr_nhanes_files/figure-html/simlrcats-106.png" width="700"><img src="simlr_nhanes_files/figure-html/simlrcats-107.png" width="700"><img src="simlr_nhanes_files/figure-html/simlrcats-108.png" width="700"><img src="simlr_nhanes_files/figure-html/simlrcats-109.png" width="700"><img src="simlr_nhanes_files/figure-html/simlrcats-110.png" width="700"><img src="simlr_nhanes_files/figure-html/simlrcats-111.png" width="700"><img src="simlr_nhanes_files/figure-html/simlrcats-112.png" width="700"><img src="simlr_nhanes_files/figure-html/simlrcats-113.png" width="700"><img src="simlr_nhanes_files/figure-html/simlrcats-114.png" width="700"><img src="simlr_nhanes_files/figure-html/simlrcats-115.png" width="700"><img src="simlr_nhanes_files/figure-html/simlrcats-116.png" width="700"></p>
-<pre><code><span><span class="co">##  [1] "LBXBPB"   "LBDBPBSI" "LBXBCD"   "LBDBCDSI" "LBXTHG"   "LBDTHGSI"</span></span>
-<span><span class="co">##  [7] "LBXBSE"   "LBDBSESI" "LBXBMN"   "LBDBMNSI" "LBX2DF"   "LBXV06"  </span></span>
-<span><span class="co">## [13] "LBXV2A"   "LBXV3B"   "LBXV4C"   "LBXVBZ"   "LBXVCB"   "LBXVDB"  </span></span>
-<span><span class="co">## [19] "LBXVEB"   "LBXVFN"   "LBXVIPB"  "LBXVMC"   "LBXVOX"   "LBXVTC"  </span></span>
-<span><span class="co">## [25] "LBXVTE"   "LBXVXY"   "LBXSCU"   "LBDSCUSI" "LBXSSE"   "LBDSSESI"</span></span>
-<span><span class="co">## [31] "LBXSZN"   "LBDSZNSI" "LBXIHG"   "LBDIHGSI" "LBXBGE"   "LBXBGM"  </span></span>
+<p><img src="simlr_nhanes_files/figure-html/simlrcats-81.png" width="700"><img src="simlr_nhanes_files/figure-html/simlrcats-82.png" width="700"><img src="simlr_nhanes_files/figure-html/simlrcats-83.png" width="700"><img src="simlr_nhanes_files/figure-html/simlrcats-84.png" width="700"><img src="simlr_nhanes_files/figure-html/simlrcats-85.png" width="700"><img src="simlr_nhanes_files/figure-html/simlrcats-86.png" width="700"><img src="simlr_nhanes_files/figure-html/simlrcats-87.png" width="700"><img src="simlr_nhanes_files/figure-html/simlrcats-88.png" width="700"><img src="simlr_nhanes_files/figure-html/simlrcats-89.png" width="700"><img src="simlr_nhanes_files/figure-html/simlrcats-90.png" width="700"><img src="simlr_nhanes_files/figure-html/simlrcats-91.png" width="700"><img src="simlr_nhanes_files/figure-html/simlrcats-92.png" width="700"><img src="simlr_nhanes_files/figure-html/simlrcats-93.png" width="700"><img src="simlr_nhanes_files/figure-html/simlrcats-94.png" width="700"><img src="simlr_nhanes_files/figure-html/simlrcats-95.png" width="700"><img src="simlr_nhanes_files/figure-html/simlrcats-96.png" width="700"><img src="simlr_nhanes_files/figure-html/simlrcats-97.png" width="700"><img src="simlr_nhanes_files/figure-html/simlrcats-98.png" width="700"><img src="simlr_nhanes_files/figure-html/simlrcats-99.png" width="700"><img src="simlr_nhanes_files/figure-html/simlrcats-100.png" width="700"><img src="simlr_nhanes_files/figure-html/simlrcats-101.png" width="700"><img src="simlr_nhanes_files/figure-html/simlrcats-102.png" width="700"><img src="simlr_nhanes_files/figure-html/simlrcats-103.png" width="700"><img src="simlr_nhanes_files/figure-html/simlrcats-104.png" width="700"><img src="simlr_nhanes_files/figure-html/simlrcats-105.png" width="700"><img src="simlr_nhanes_files/figure-html/simlrcats-106.png" width="700"><img src="simlr_nhanes_files/figure-html/simlrcats-107.png" width="700"><img src="simlr_nhanes_files/figure-html/simlrcats-108.png" width="700"><img src="simlr_nhanes_files/figure-html/simlrcats-109.png" width="700"><img src="simlr_nhanes_files/figure-html/simlrcats-110.png" width="700"></p>
+<pre><code><span><span class="co">##  [1] "LBXBPB"   "LBDBPBSI" "LBXBCD"   "LBXTHG"   "LBDTHGSI" "LBXBSE"  </span></span>
+<span><span class="co">##  [7] "LBDBSESI" "LBXBMN"   "LBX2DF"   "LBXV06"   "LBXV2A"   "LBXV3B"  </span></span>
+<span><span class="co">## [13] "LBXV4C"   "LBXVBZ"   "LBXVCB"   "LBXVDB"   "LBXVEB"   "LBXVFN"  </span></span>
+<span><span class="co">## [19] "LBXVOX"   "LBXVTC"   "LBXVTE"   "LBXVXY"   "LBXSCU"   "LBXSSE"  </span></span>
+<span><span class="co">## [25] "LBDSSESI" "LBXSZN"   "LBXIHG"   "LBDIHGSI" "LBXBGE"   "LBXBGM"  </span></span>
 <span><span class="co">## [1] "mentalhealth"</span></span></code></pre>
-<p><img src="simlr_nhanes_files/figure-html/simlrcats-117.png" width="700"><img src="simlr_nhanes_files/figure-html/simlrcats-118.png" width="700"><img src="simlr_nhanes_files/figure-html/simlrcats-119.png" width="700"><img src="simlr_nhanes_files/figure-html/simlrcats-120.png" width="700"><img src="simlr_nhanes_files/figure-html/simlrcats-121.png" width="700"><img src="simlr_nhanes_files/figure-html/simlrcats-122.png" width="700"><img src="simlr_nhanes_files/figure-html/simlrcats-123.png" width="700"><img src="simlr_nhanes_files/figure-html/simlrcats-124.png" width="700"><img src="simlr_nhanes_files/figure-html/simlrcats-125.png" width="700"><img src="simlr_nhanes_files/figure-html/simlrcats-126.png" width="700"><img src="simlr_nhanes_files/figure-html/simlrcats-127.png" width="700"><img src="simlr_nhanes_files/figure-html/simlrcats-128.png" width="700"></p>
+<p><img src="simlr_nhanes_files/figure-html/simlrcats-111.png" width="700"><img src="simlr_nhanes_files/figure-html/simlrcats-112.png" width="700"><img src="simlr_nhanes_files/figure-html/simlrcats-113.png" width="700"><img src="simlr_nhanes_files/figure-html/simlrcats-114.png" width="700"><img src="simlr_nhanes_files/figure-html/simlrcats-115.png" width="700"><img src="simlr_nhanes_files/figure-html/simlrcats-116.png" width="700"><img src="simlr_nhanes_files/figure-html/simlrcats-117.png" width="700"><img src="simlr_nhanes_files/figure-html/simlrcats-118.png" width="700"><img src="simlr_nhanes_files/figure-html/simlrcats-119.png" width="700"><img src="simlr_nhanes_files/figure-html/simlrcats-120.png" width="700"><img src="simlr_nhanes_files/figure-html/simlrcats-121.png" width="700"><img src="simlr_nhanes_files/figure-html/simlrcats-122.png" width="700"></p>
 <pre><code><span><span class="co">##  [1] "DPQ010" "DPQ020" "DPQ030" "DPQ040" "DPQ050" "DPQ060" "DPQ070" "DPQ080"</span></span>
 <span><span class="co">##  [9] "DPQ090" "DPQ100" "SLQ050" "SLQ060"</span></span>
 <span><span class="co">## [1] "physical"</span></span></code></pre>
-<p><img src="simlr_nhanes_files/figure-html/simlrcats-129.png" width="700"><img src="simlr_nhanes_files/figure-html/simlrcats-130.png" width="700"><img src="simlr_nhanes_files/figure-html/simlrcats-131.png" width="700"><img src="simlr_nhanes_files/figure-html/simlrcats-132.png" width="700"><img src="simlr_nhanes_files/figure-html/simlrcats-133.png" width="700"><img src="simlr_nhanes_files/figure-html/simlrcats-134.png" width="700"><img src="simlr_nhanes_files/figure-html/simlrcats-135.png" width="700"><img src="simlr_nhanes_files/figure-html/simlrcats-136.png" width="700"><img src="simlr_nhanes_files/figure-html/simlrcats-137.png" width="700"><img src="simlr_nhanes_files/figure-html/simlrcats-138.png" width="700"><img src="simlr_nhanes_files/figure-html/simlrcats-139.png" width="700"><img src="simlr_nhanes_files/figure-html/simlrcats-140.png" width="700"><img src="simlr_nhanes_files/figure-html/simlrcats-141.png" width="700"><img src="simlr_nhanes_files/figure-html/simlrcats-142.png" width="700"><img src="simlr_nhanes_files/figure-html/simlrcats-143.png" width="700"><img src="simlr_nhanes_files/figure-html/simlrcats-144.png" width="700"><img src="simlr_nhanes_files/figure-html/simlrcats-145.png" width="700"><img src="simlr_nhanes_files/figure-html/simlrcats-146.png" width="700"><img src="simlr_nhanes_files/figure-html/simlrcats-147.png" width="700"><img src="simlr_nhanes_files/figure-html/simlrcats-148.png" width="700"><img src="simlr_nhanes_files/figure-html/simlrcats-149.png" width="700"></p>
+<p><img src="simlr_nhanes_files/figure-html/simlrcats-123.png" width="700"><img src="simlr_nhanes_files/figure-html/simlrcats-124.png" width="700"><img src="simlr_nhanes_files/figure-html/simlrcats-125.png" width="700"><img src="simlr_nhanes_files/figure-html/simlrcats-126.png" width="700"><img src="simlr_nhanes_files/figure-html/simlrcats-127.png" width="700"><img src="simlr_nhanes_files/figure-html/simlrcats-128.png" width="700"><img src="simlr_nhanes_files/figure-html/simlrcats-129.png" width="700"><img src="simlr_nhanes_files/figure-html/simlrcats-130.png" width="700"><img src="simlr_nhanes_files/figure-html/simlrcats-131.png" width="700"><img src="simlr_nhanes_files/figure-html/simlrcats-132.png" width="700"><img src="simlr_nhanes_files/figure-html/simlrcats-133.png" width="700"><img src="simlr_nhanes_files/figure-html/simlrcats-134.png" width="700"><img src="simlr_nhanes_files/figure-html/simlrcats-135.png" width="700"><img src="simlr_nhanes_files/figure-html/simlrcats-136.png" width="700"><img src="simlr_nhanes_files/figure-html/simlrcats-137.png" width="700"><img src="simlr_nhanes_files/figure-html/simlrcats-138.png" width="700"><img src="simlr_nhanes_files/figure-html/simlrcats-139.png" width="700"><img src="simlr_nhanes_files/figure-html/simlrcats-140.png" width="700"><img src="simlr_nhanes_files/figure-html/simlrcats-141.png" width="700"><img src="simlr_nhanes_files/figure-html/simlrcats-142.png" width="700"><img src="simlr_nhanes_files/figure-html/simlrcats-143.png" width="700"></p>
 <pre><code><span><span class="co">##  [1] "BPXPLS"            "BPXML1"            "BPXSY1"           </span></span>
 <span><span class="co">##  [4] "BPXDI1"            "BPXSY2"            "BPXDI2"           </span></span>
 <span><span class="co">##  [7] "BPXSY3"            "BPXDI3"            "BMXWT"            </span></span>
@@ -271,113 +291,102 @@ years). • OCD390G: Employment Status (in occupation questionnaire).</p>
 <div class="sourceCode" id="cb38"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">nh_list</span><span class="op">)</span><span class="op">=</span><span class="va">knm</span></span>
 <span><span class="co">#####</span></span></code></pre></div>
+<p>Run the methods using reasonable defaults as recommended by prior
+work.</p>
 <div class="sourceCode" id="cb39"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co">################################################################################</span></span>
 <span><span class="co"># regs &lt;- regularizeSimlr(nh_list,fraction=0.15,sigma=rep(1.0,length(nh_list)))</span></span>
-<span><span class="co"># regs &lt;- regularizeSimlr(nh_list)</span></span>
 <span><span class="co">#</span></span>
 <span><span class="va">regs</span><span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="va">wdemog</span><span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/which.html" class="external-link">which</a></span><span class="op">(</span> <span class="va">knm</span> <span class="op">==</span> <span class="st">'demog'</span><span class="op">)</span></span>
 <span><span class="kw">for</span> <span class="op">(</span> <span class="va">wdemog</span> <span class="kw">in</span> <span class="fl">1</span><span class="op">:</span><span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">nh_list</span><span class="op">)</span> <span class="op">)</span> <span class="va">regs</span><span class="op">[[</span> <span class="va">wdemog</span><span class="op">]</span><span class="op">]</span><span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/diag.html" class="external-link">diag</a></span><span class="op">(</span> <span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">ncol</a></span><span class="op">(</span><span class="va">nh_list</span><span class="op">[[</span><span class="va">wdemog</span><span class="op">]</span><span class="op">]</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="co"># regs = regularizeSimlr(nh_list)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span> <span class="va">regs</span> <span class="op">)</span> <span class="op">=</span> <span class="va">knm</span><span class="op">[</span> <span class="op">-</span><span class="fl">1</span> <span class="op">]</span></span>
 <span><span class="va">initu</span><span class="op">=</span><span class="fu"><a href="https://rdrr.io/pkg/ANTsR/man/initializeSimlr.html" class="external-link">initializeSimlr</a></span><span class="op">(</span> <span class="va">nh_list</span>, k<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/Round.html" class="external-link">round</a></span><span class="op">(</span><span class="fu"><a href="../reference/max_columns_list.html">max_columns_list</a></span><span class="op">(</span><span class="va">nh_list</span><span class="op">)</span><span class="op">)</span>, jointReduction<span class="op">=</span><span class="cn">TRUE</span> <span class="op">)</span></span>
-<span><span class="co">#initu=initializeSimlr( nh_list, k=min_columns_list(nh_list), jointReduction=TRUE )</span></span>
-<span><span class="co">#initu=initializeSimlr( nh_list, k=round(min_columns_list(nh_list)*2), jointReduction=TRUE )</span></span>
 <span><span class="co">###########################</span></span>
-<span><span class="kw">if</span> <span class="op">(</span> <span class="op">!</span> <span class="fu"><a href="https://rdrr.io/r/base/exists.html" class="external-link">exists</a></span><span class="op">(</span><span class="st">"resultNH"</span><span class="op">)</span> <span class="op">)</span></span>
+<span><span class="kw">if</span> <span class="op">(</span> <span class="op">!</span> <span class="fu"><a href="https://rdrr.io/r/base/exists.html" class="external-link">exists</a></span><span class="op">(</span><span class="st">"resultNH"</span><span class="op">)</span> <span class="op">)</span> <span class="op">{</span></span>
 <span>  <span class="va">resultNH</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/ANTsR/man/simlr.html" class="external-link">simlr</a></span><span class="op">(</span> <span class="va">nh_list</span>, </span>
-<span>        iterations<span class="op">=</span><span class="fl">200</span>,</span>
+<span>        iterations<span class="op">=</span><span class="fl">100</span>,</span>
 <span>        sparsenessQuantiles<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fl">0.5</span>,<span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">nh_list</span><span class="op">)</span><span class="op">)</span>,</span>
 <span>        positivities<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="st">"positive"</span>,<span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">nh_list</span><span class="op">)</span><span class="op">)</span>, </span>
 <span>        energyType<span class="op">=</span><span class="st">'regression'</span>, mixAlg<span class="op">=</span><span class="st">'ica'</span>,</span>
-<span><span class="co">#        energyType='cca', mixAlg='svd',</span></span>
+<span><span class="co">#        energyType='cca', mixAlg='pca',</span></span>
 <span>        scale<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"centerAndScale"</span>,  <span class="st">"np"</span><span class="op">)</span>,</span>
-<span><span class="co">#        scale=c("robust", "center", "np"),</span></span>
+<span><span class="co">#        scale=c("whiten", "np"),</span></span>
 <span>        constraint<span class="op">=</span><span class="st">"Stiefelx10x10"</span>,</span>
-<span>        initialUMatrix<span class="op">=</span><span class="va">initu</span>, verbose<span class="op">=</span><span class="cn">T</span> <span class="op">)</span></span></code></pre></div>
+<span>        initialUMatrix<span class="op">=</span><span class="va">initu</span>, verbose<span class="op">=</span><span class="cn">T</span> <span class="op">)</span></span>
+<span>  <span class="op">}</span></span></code></pre></div>
 <pre><code><span><span class="co">## [1] "Stiefel" "10"      "10"     </span></span>
 <span><span class="co">## [1] "     &lt;0&gt; BUILD-V &lt;0&gt; BUILD-V &lt;0&gt; BUILD-V &lt;0&gt; BUILD-V &lt;0&gt;    "</span></span>
-<span><span class="co">## [1] "initialDataTerm: 2.4526812991635  &lt;o&gt; mixer: ica  &lt;o&gt; E:  regression"</span></span>
-<span><span class="co">## [1] "Iteration: 1 bestEv: 11.632843140426 bestIt: 1 CE: 11.632843140426 featOrth: 0.107224489165078"</span></span>
-<span><span class="co">## [1] "Iteration: 2 bestEv: 1.41341756887557 bestIt: 2 CE: 1.41341756887557 featOrth: 0.0830016232543334"</span></span>
-<span><span class="co">## [1] "Iteration: 3 bestEv: 0.726055078025419 bestIt: 3 CE: 0.726055078025419 featOrth: 0.0699493196861042"</span></span>
-<span><span class="co">## [1] "Iteration: 4 bestEv: 0.680744348295936 bestIt: 4 CE: 0.680744348295936 featOrth: 0.0652421171608249"</span></span>
-<span><span class="co">## [1] "Iteration: 5 bestEv: 0.656149214494679 bestIt: 5 CE: 0.656149214494679 featOrth: 0.0626574775713"</span></span>
-<span><span class="co">## [1] "Iteration: 6 bestEv: 0.526692107830548 bestIt: 6 CE: 0.526692107830548 featOrth: 0.0517471599214006"</span></span>
-<span><span class="co">## [1] "Iteration: 7 bestEv: 0.311422619639691 bestIt: 7 CE: 0.311422619639691 featOrth: 0.0303488877869551"</span></span>
-<span><span class="co">## [1] "Iteration: 8 bestEv: 0.235627053369358 bestIt: 8 CE: 0.235627053369358 featOrth: 0.0227865860438382"</span></span>
-<span><span class="co">## [1] "Iteration: 9 bestEv: 0.201779871536792 bestIt: 9 CE: 0.201779871536792 featOrth: 0.0194054853273792"</span></span>
-<span><span class="co">## [1] "Iteration: 10 bestEv: 0.149619248789552 bestIt: 10 CE: 0.149619248789552 featOrth: 0.0139530515013351"</span></span>
-<span><span class="co">## [1] "Iteration: 11 bestEv: 0.129657499183096 bestIt: 11 CE: 0.129657499183096 featOrth: 0.0119944024239164"</span></span>
-<span><span class="co">## [1] "Iteration: 12 bestEv: 0.114781068622403 bestIt: 12 CE: 0.114781068622403 featOrth: 0.0105886676535297"</span></span>
-<span><span class="co">## [1] "Iteration: 13 bestEv: 0.10685035977629 bestIt: 13 CE: 0.10685035977629 featOrth: 0.00964345148076851"</span></span>
-<span><span class="co">## [1] "Iteration: 14 bestEv: 0.101969616216826 bestIt: 14 CE: 0.101969616216826 featOrth: 0.00910284244969137"</span></span>
-<span><span class="co">## [1] "Iteration: 15 bestEv: 0.0731448102672446 bestIt: 15 CE: 0.0731448102672446 featOrth: 0.00665045835147721"</span></span>
-<span><span class="co">## [1] "Iteration: 16 bestEv: 0.0621269422158502 bestIt: 16 CE: 0.0621269422158502 featOrth: 0.00559615995457043"</span></span>
-<span><span class="co">## [1] "Iteration: 17 bestEv: 0.0602746320544928 bestIt: 17 CE: 0.0602746320544928 featOrth: 0.00543716058839303"</span></span>
-<span><span class="co">## [1] "Iteration: 18 bestEv: 0.0575756717091261 bestIt: 18 CE: 0.0575756717091261 featOrth: 0.00516020084264136"</span></span>
-<span><span class="co">## [1] "Iteration: 19 bestEv: 0.0545319459295673 bestIt: 19 CE: 0.0545319459295673 featOrth: 0.00482313045439215"</span></span>
-<span><span class="co">## [1] "Iteration: 20 bestEv: 0.0526477904919875 bestIt: 20 CE: 0.0526477904919875 featOrth: 0.00465880503242257"</span></span>
-<span><span class="co">## [1] "Iteration: 21 bestEv: 0.0504464060101036 bestIt: 21 CE: 0.0504464060101036 featOrth: 0.00443001080621483"</span></span>
-<span><span class="co">## [1] "Iteration: 22 bestEv: 0.0490938135794766 bestIt: 22 CE: 0.0490938135794766 featOrth: 0.00417041656527113"</span></span>
-<span><span class="co">## [1] "Iteration: 23 bestEv: 0.03308439393631 bestIt: 23 CE: 0.03308439393631 featOrth: 0.00260146390567348"</span></span>
-<span><span class="co">## [1] "Iteration: 24 bestEv: 0.0303162458893025 bestIt: 24 CE: 0.0303162458893025 featOrth: 0.00240400757639362"</span></span>
-<span><span class="co">## [1] "Iteration: 25 bestEv: 0.0242804782034042 bestIt: 25 CE: 0.0242804782034042 featOrth: 0.00150358040684174"</span></span>
-<span><span class="co">## [1] "Iteration: 26 bestEv: 0.0204306709372017 bestIt: 26 CE: 0.0204306709372017 featOrth: 0.00138557827689218"</span></span>
-<span><span class="co">## [1] "Iteration: 27 bestEv: 0.0159664236220163 bestIt: 27 CE: 0.0159664236220163 featOrth: 0.00101556967198327"</span></span>
-<span><span class="co">## [1] "Iteration: 28 bestEv: 0.014033824459859 bestIt: 28 CE: 0.014033824459859 featOrth: 0.000836478470302503"</span></span>
-<span><span class="co">## [1] "Iteration: 29 bestEv: 0.0127829144870177 bestIt: 29 CE: 0.0127829144870177 featOrth: 0.000708445038767515"</span></span>
-<span><span class="co">## [1] "Iteration: 30 bestEv: 0.0108566877990142 bestIt: 30 CE: 0.0108566877990142 featOrth: 0.000509320167667002"</span></span>
-<span><span class="co">## [1] "Iteration: 31 bestEv: 0.0094191976188196 bestIt: 31 CE: 0.0094191976188196 featOrth: 0.000354756150583391"</span></span>
-<span><span class="co">## [1] "Iteration: 32 bestEv: 0.00875727169786117 bestIt: 32 CE: 0.00875727169786117 featOrth: 0.000310184953850444"</span></span>
-<span><span class="co">## [1] "Iteration: 33 bestEv: 0.00841500997743389 bestIt: 33 CE: 0.00841500997743389 featOrth: 0.00028740534607694"</span></span>
-<span><span class="co">## [1] "Iteration: 34 bestEv: 0.00815373403409121 bestIt: 34 CE: 0.00815373403409121 featOrth: 0.000258144504834333"</span></span>
-<span><span class="co">## [1] "Iteration: 35 bestEv: 0.00783112270369256 bestIt: 35 CE: 0.00783112270369256 featOrth: 0.000233437229591334"</span></span>
-<span><span class="co">## [1] "Iteration: 36 bestEv: 0.00770990773987672 bestIt: 36 CE: 0.00770990773987672 featOrth: 0.000222770287896601"</span></span>
-<span><span class="co">## [1] "Iteration: 37 bestEv: 0.00708242470121158 bestIt: 37 CE: 0.00708242470121158 featOrth: 0.000168091570762943"</span></span>
-<span><span class="co">## [1] "Iteration: 38 bestEv: 0.00679522067361061 bestIt: 38 CE: 0.00679522067361061 featOrth: 0.000135031643301627"</span></span>
-<span><span class="co">## [1] "Iteration: 39 bestEv: 0.00635200020658744 bestIt: 39 CE: 0.00635200020658743 featOrth: 9.6686140468848e-05"</span></span>
-<span><span class="co">## [1] "Iteration: 40 bestEv: 0.00627671959402866 bestIt: 40 CE: 0.00627671959402866 featOrth: 8.8863404843188e-05"</span></span>
-<span><span class="co">## [1] "Iteration: 41 bestEv: 0.00621857367900364 bestIt: 41 CE: 0.00621857367900364 featOrth: 8.01350272427364e-05"</span></span>
-<span><span class="co">## [1] "Iteration: 42 bestEv: 0.00615520237219146 bestIt: 42 CE: 0.00615520237219146 featOrth: 7.77167232305777e-05"</span></span>
-<span><span class="co">## [1] "Iteration: 43 bestEv: 0.00605050387245506 bestIt: 43 CE: 0.00605050387245506 featOrth: 6.92422634220414e-05"</span></span>
-<span><span class="co">## [1] "Iteration: 44 bestEv: 0.0060317237865385 bestIt: 44 CE: 0.0060317237865385 featOrth: 6.92525832956632e-05"</span></span>
-<span><span class="co">## [1] "Iteration: 45 bestEv: 0.00567974760345213 bestIt: 45 CE: 0.00567974760345213 featOrth: 3.77430101115211e-05"</span></span>
-<span><span class="co">## [1] "Iteration: 46 bestEv: 0.00567974760345213 bestIt: 45 CE: 0.0056949217271351 featOrth: 3.66126385243115e-05"</span></span>
-<span><span class="co">## [1] "Iteration: 47 bestEv: 0.00565741894067341 bestIt: 47 CE: 0.00565741894067341 featOrth: 3.46747962366981e-05"</span></span>
-<span><span class="co">## [1] "Iteration: 48 bestEv: 0.00556856145828992 bestIt: 48 CE: 0.00556856145828992 featOrth: 2.87489534070399e-05"</span></span>
-<span><span class="co">## [1] "Iteration: 49 bestEv: 0.00556856145828992 bestIt: 48 CE: 0.00557759381656015 featOrth: 2.77498009753613e-05"</span></span>
-<span><span class="co">## [1] "Iteration: 50 bestEv: 0.00553674148213204 bestIt: 50 CE: 0.00553674148213204 featOrth: 2.55854343936342e-05"</span></span>
-<span><span class="co">## [1] "Iteration: 51 bestEv: 0.00553414519928458 bestIt: 51 CE: 0.00553414519928459 featOrth: 2.45420077962023e-05"</span></span>
-<span><span class="co">## [1] "Iteration: 52 bestEv: 0.00553107287920763 bestIt: 52 CE: 0.00553107287920763 featOrth: 2.42446362893301e-05"</span></span>
-<span><span class="co">## [1] "Iteration: 53 bestEv: 0.00546404774074903 bestIt: 53 CE: 0.00546404774074903 featOrth: 2.16321409947848e-05"</span></span>
-<span><span class="co">## [1] "Iteration: 54 bestEv: 0.00545420487546386 bestIt: 54 CE: 0.00545420487546386 featOrth: 2.02098097041258e-05"</span></span>
-<span><span class="co">## [1] "Iteration: 55 bestEv: 0.00544120072779526 bestIt: 55 CE: 0.00544120072779526 featOrth: 1.97605074915061e-05"</span></span>
-<span><span class="co">## [1] "Iteration: 56 bestEv: 0.00544120072779526 bestIt: 55 CE: 0.00547272293027308 featOrth: 1.93838129253773e-05"</span></span>
-<span><span class="co">## [1] "Iteration: 57 bestEv: 0.00544120072779526 bestIt: 55 CE: 0.00547345890014951 featOrth: 1.9220280835044e-05"</span></span>
-<span><span class="co">## [1] "Iteration: 58 bestEv: 0.00531203878693242 bestIt: 58 CE: 0.00531203878693242 featOrth: 7.1520125172555e-06"</span></span>
-<span><span class="co">## [1] "Iteration: 59 bestEv: 0.00528888707042662 bestIt: 59 CE: 0.00528888707042662 featOrth: 6.38608896195258e-06"</span></span>
-<span><span class="co">## [1] "Iteration: 60 bestEv: 0.00528231587650244 bestIt: 60 CE: 0.00528231587650244 featOrth: 6.31098299263862e-06"</span></span>
-<span><span class="co">## [1] "Iteration: 61 bestEv: 0.00528231587650244 bestIt: 60 CE: 0.00531912440204881 featOrth: 6.14140522593292e-06"</span></span>
-<span><span class="co">## [1] "Iteration: 62 bestEv: 0.00528044835787148 bestIt: 62 CE: 0.00528044835787148 featOrth: 1.28196755941237e-05"</span></span>
-<span><span class="co">## [1] "Iteration: 63 bestEv: 0.00527267230466332 bestIt: 63 CE: 0.00527267230466332 featOrth: 1.26593727148842e-05"</span></span>
-<span><span class="co">## [1] "Iteration: 64 bestEv: 0.00526441910418992 bestIt: 64 CE: 0.00526441910418992 featOrth: 1.16230030312191e-05"</span></span>
-<span><span class="co">## [1] "Iteration: 65 bestEv: 0.00524422638916859 bestIt: 65 CE: 0.00524422638916859 featOrth: 1.09342658953975e-05"</span></span>
-<span><span class="co">## [1] "Iteration: 66 bestEv: 0.00524422638916859 bestIt: 65 CE: 0.00524902674417765 featOrth: 1.02532409384644e-05"</span></span>
-<span><span class="co">## [1] "Iteration: 67 bestEv: 0.00524422638916859 bestIt: 65 CE: 0.00528696902410874 featOrth: 9.86620799202488e-06"</span></span>
-<span><span class="co">## [1] "Iteration: 68 bestEv: 0.00521016029892053 bestIt: 68 CE: 0.00521016029892054 featOrth: 9.66622052584771e-06"</span></span>
-<span><span class="co">## [1] "Iteration: 69 bestEv: 0.00521016029892053 bestIt: 68 CE: 0.00521202274978337 featOrth: 8.95536091218278e-06"</span></span>
-<span><span class="co">## [1] "Iteration: 70 bestEv: 0.00520628833652356 bestIt: 70 CE: 0.00520628833652356 featOrth: 8.81240016569304e-06"</span></span>
-<span><span class="co">## [1] "Iteration: 71 bestEv: 0.00520628833652356 bestIt: 70 CE: 0.00522500227492788 featOrth: 8.49641107042028e-06"</span></span>
-<span><span class="co">## [1] "Iteration: 72 bestEv: 0.00518021490119007 bestIt: 72 CE: 0.00518021490119008 featOrth: 8.31149731305363e-06"</span></span>
-<span><span class="co">## [1] "Iteration: 73 bestEv: 0.00518021490119007 bestIt: 72 CE: 0.00521808597103481 featOrth: 8.02691534418994e-06"</span></span>
-<span><span class="co">## [1] "Iteration: 74 bestEv: 0.00518021490119007 bestIt: 72 CE: 0.00519932148551097 featOrth: 7.93532183513045e-06"</span></span>
-<span><span class="co">## [1] "Iteration: 75 bestEv: 0.00518021490119007 bestIt: 72 CE: 0.00518814052868668 featOrth: 7.68474839872065e-06"</span></span>
-<span><span class="co">## [1] "Iteration: 76 bestEv: 0.00518021490119007 bestIt: 72 CE: 0.00523499942120006 featOrth: 7.67995543674357e-06"</span></span>
-<span><span class="co">## [1] "Iteration: 77 bestEv: 0.00518021490119007 bestIt: 72 CE: 0.00519736481057559 featOrth: 7.60621670301569e-06"</span></span>
-<span><span class="co">## [1] "Iteration: 78 bestEv: 0.00518021490119007 bestIt: 72 CE: 0.00519100032063393 featOrth: 6.60637995258058e-06"</span></span></code></pre>
+<span><span class="co">## [1] "initialDataTerm: 2.51017494350807  &lt;o&gt; mixer: ica  &lt;o&gt; E:  regression"</span></span>
+<span><span class="co">## [1] "Iteration: 1 bestEv: 14.1720223919346 bestIt: 1 CE: 14.1720223919346 featOrth: 0.0997937029176957"</span></span>
+<span><span class="co">## [1] "Iteration: 2 bestEv: 1.94843283352136 bestIt: 2 CE: 1.94843283352136 featOrth: 0.0688726338075352"</span></span>
+<span><span class="co">## [1] "Iteration: 3 bestEv: 0.638654439879271 bestIt: 3 CE: 0.638654439879271 featOrth: 0.0618242914512352"</span></span>
+<span><span class="co">## [1] "Iteration: 4 bestEv: 0.524940285261373 bestIt: 4 CE: 0.524940285261373 featOrth: 0.0515910117513421"</span></span>
+<span><span class="co">## [1] "Iteration: 5 bestEv: 0.497488786674734 bestIt: 5 CE: 0.497488786674734 featOrth: 0.0492611700955596"</span></span>
+<span><span class="co">## [1] "Iteration: 6 bestEv: 0.430614805604086 bestIt: 6 CE: 0.430614805604086 featOrth: 0.0426325329192561"</span></span>
+<span><span class="co">## [1] "Iteration: 7 bestEv: 0.428168486828324 bestIt: 7 CE: 0.428168486828324 featOrth: 0.0402476322614494"</span></span>
+<span><span class="co">## [1] "Iteration: 8 bestEv: 0.397828526803514 bestIt: 8 CE: 0.397828526803514 featOrth: 0.0377313221055792"</span></span>
+<span><span class="co">## [1] "Iteration: 9 bestEv: 0.385449195905981 bestIt: 9 CE: 0.385449195905981 featOrth: 0.0360408158437857"</span></span>
+<span><span class="co">## [1] "Iteration: 10 bestEv: 0.375260830119813 bestIt: 10 CE: 0.375260830119813 featOrth: 0.0355057282242329"</span></span>
+<span><span class="co">## [1] "Iteration: 11 bestEv: 0.368106021283093 bestIt: 11 CE: 0.368106021283093 featOrth: 0.0347843752848464"</span></span>
+<span><span class="co">## [1] "Iteration: 12 bestEv: 0.333983002641932 bestIt: 12 CE: 0.333983002641932 featOrth: 0.0326606483316205"</span></span>
+<span><span class="co">## [1] "Iteration: 13 bestEv: 0.331071987892403 bestIt: 13 CE: 0.331071987892403 featOrth: 0.0324532354722316"</span></span>
+<span><span class="co">## [1] "Iteration: 14 bestEv: 0.331071987892403 bestIt: 13 CE: 0.336139964002688 featOrth: 0.0317291774235265"</span></span>
+<span><span class="co">## [1] "Iteration: 15 bestEv: 0.331071987892403 bestIt: 13 CE: 0.33445230975592 featOrth: 0.0315009923765108"</span></span>
+<span><span class="co">## [1] "Iteration: 16 bestEv: 0.331071987892403 bestIt: 13 CE: 0.33209804422964 featOrth: 0.0312584583240931"</span></span>
+<span><span class="co">## [1] "Iteration: 17 bestEv: 0.331054865522649 bestIt: 17 CE: 0.331054865522649 featOrth: 0.0311688910675321"</span></span>
+<span><span class="co">## [1] "Iteration: 18 bestEv: 0.330820603851131 bestIt: 18 CE: 0.330820603851131 featOrth: 0.0311390096404302"</span></span>
+<span><span class="co">## [1] "Iteration: 19 bestEv: 0.307315004890572 bestIt: 19 CE: 0.307315004890572 featOrth: 0.0301511796426144"</span></span>
+<span><span class="co">## [1] "Iteration: 20 bestEv: 0.30474350956543 bestIt: 20 CE: 0.30474350956543 featOrth: 0.0298966195439327"</span></span>
+<span><span class="co">## [1] "Iteration: 21 bestEv: 0.304274036901479 bestIt: 21 CE: 0.304274036901479 featOrth: 0.0298455231985655"</span></span>
+<span><span class="co">## [1] "Iteration: 22 bestEv: 0.29270761270825 bestIt: 22 CE: 0.29270761270825 featOrth: 0.0273559297990821"</span></span>
+<span><span class="co">## [1] "Iteration: 23 bestEv: 0.289759259172705 bestIt: 23 CE: 0.289759259172705 featOrth: 0.0270671985444614"</span></span>
+<span><span class="co">## [1] "Iteration: 24 bestEv: 0.275575493151391 bestIt: 24 CE: 0.275575493151391 featOrth: 0.0270019546267767"</span></span>
+<span><span class="co">## [1] "Iteration: 25 bestEv: 0.275575493151391 bestIt: 24 CE: 0.288583684500593 featOrth: 0.0269780831071685"</span></span>
+<span><span class="co">## [1] "Iteration: 26 bestEv: 0.275575493151391 bestIt: 24 CE: 0.288374062256534 featOrth: 0.0269608657268016"</span></span>
+<span><span class="co">## [1] "Iteration: 27 bestEv: 0.275575493151391 bestIt: 24 CE: 0.288058648759467 featOrth: 0.0269283621198341"</span></span>
+<span><span class="co">## [1] "Iteration: 28 bestEv: 0.275575493151391 bestIt: 24 CE: 0.287816401720803 featOrth: 0.0269049862983755"</span></span>
+<span><span class="co">## [1] "Iteration: 29 bestEv: 0.275575493151391 bestIt: 24 CE: 0.287590417149125 featOrth: 0.0268898230855148"</span></span>
+<span><span class="co">## [1] "Iteration: 30 bestEv: 0.27405003616992 bestIt: 30 CE: 0.27405003616992 featOrth: 0.0268760425610211"</span></span>
+<span><span class="co">## [1] "Iteration: 31 bestEv: 0.27405003616992 bestIt: 30 CE: 0.28738746134481 featOrth: 0.0268691762953614"</span></span>
+<span><span class="co">## [1] "Iteration: 32 bestEv: 0.27405003616992 bestIt: 30 CE: 0.287293145195785 featOrth: 0.0268568825188998"</span></span>
+<span><span class="co">## [1] "Iteration: 33 bestEv: 0.273808034840371 bestIt: 33 CE: 0.273808034840371 featOrth: 0.0268514089811346"</span></span>
+<span><span class="co">## [1] "Iteration: 34 bestEv: 0.273808034840371 bestIt: 33 CE: 0.282942998181403 featOrth: 0.0268364935296805"</span></span>
+<span><span class="co">## [1] "Iteration: 35 bestEv: 0.273539729631552 bestIt: 35 CE: 0.273539729631552 featOrth: 0.0268327630076216"</span></span>
+<span><span class="co">## [1] "Iteration: 36 bestEv: 0.273479301814332 bestIt: 36 CE: 0.273479301814332 featOrth: 0.0268245071036943"</span></span>
+<span><span class="co">## [1] "Iteration: 37 bestEv: 0.273371430938955 bestIt: 37 CE: 0.273371430938955 featOrth: 0.0268179412792021"</span></span>
+<span><span class="co">## [1] "Iteration: 38 bestEv: 0.273344180475613 bestIt: 38 CE: 0.273344180475613 featOrth: 0.026813177575336"</span></span>
+<span><span class="co">## [1] "Iteration: 39 bestEv: 0.273249786798694 bestIt: 39 CE: 0.273249786798694 featOrth: 0.0268057892093142"</span></span>
+<span><span class="co">## [1] "Iteration: 40 bestEv: 0.273157376448472 bestIt: 40 CE: 0.273157376448472 featOrth: 0.0268012863432112"</span></span>
+<span><span class="co">## [1] "Iteration: 41 bestEv: 0.273157376448472 bestIt: 40 CE: 0.286540429930871 featOrth: 0.0267978415162117"</span></span>
+<span><span class="co">## [1] "Iteration: 42 bestEv: 0.273157376448472 bestIt: 40 CE: 0.284605552446613 featOrth: 0.0266358510404241"</span></span>
+<span><span class="co">## [1] "Iteration: 43 bestEv: 0.271000736529978 bestIt: 43 CE: 0.271000736529978 featOrth: 0.0266153499739604"</span></span>
+<span><span class="co">## [1] "Iteration: 44 bestEv: 0.271000736529978 bestIt: 43 CE: 0.284124006779817 featOrth: 0.0265888081956054"</span></span>
+<span><span class="co">## [1] "Iteration: 45 bestEv: 0.271000736529978 bestIt: 43 CE: 0.283872305004984 featOrth: 0.0265624785883458"</span></span>
+<span><span class="co">## [1] "Iteration: 46 bestEv: 0.270399229137192 bestIt: 46 CE: 0.270399229137192 featOrth: 0.0265548246097578"</span></span>
+<span><span class="co">## [1] "Iteration: 47 bestEv: 0.270399229137192 bestIt: 46 CE: 0.283703500480097 featOrth: 0.0265484145845429"</span></span>
+<span><span class="co">## [1] "Iteration: 48 bestEv: 0.268687741074546 bestIt: 48 CE: 0.268687741074546 featOrth: 0.0263844251974592"</span></span>
+<span><span class="co">## [1] "Iteration: 49 bestEv: 0.268687741074546 bestIt: 48 CE: 0.28204931789611 featOrth: 0.02637988906298"</span></span>
+<span><span class="co">## [1] "Iteration: 50 bestEv: 0.26861813432118 bestIt: 50 CE: 0.26861813432118 featOrth: 0.0263777544620968"</span></span>
+<span><span class="co">## [1] "Iteration: 51 bestEv: 0.268531622185068 bestIt: 51 CE: 0.268531622185068 featOrth: 0.0263699953168462"</span></span>
+<span><span class="co">## [1] "Iteration: 52 bestEv: 0.268531622185068 bestIt: 51 CE: 0.268535114245451 featOrth: 0.0263700082596763"</span></span>
+<span><span class="co">## [1] "Iteration: 53 bestEv: 0.265943479001955 bestIt: 53 CE: 0.265943479001955 featOrth: 0.0247712401433158"</span></span>
+<span><span class="co">## [1] "Iteration: 54 bestEv: 0.252539513493158 bestIt: 54 CE: 0.252539513493158 featOrth: 0.0247696334311141"</span></span>
+<span><span class="co">## [1] "Iteration: 55 bestEv: 0.252519863071793 bestIt: 55 CE: 0.252519863071793 featOrth: 0.024767812352475"</span></span>
+<span><span class="co">## [1] "Iteration: 56 bestEv: 0.252514565909042 bestIt: 56 CE: 0.252514565909042 featOrth: 0.0247671337363971"</span></span>
+<span><span class="co">## [1] "Iteration: 57 bestEv: 0.252514565909042 bestIt: 56 CE: 0.265914753196789 featOrth: 0.0247657846387183"</span></span>
+<span><span class="co">## [1] "Iteration: 58 bestEv: 0.252514565909042 bestIt: 56 CE: 0.265893284638223 featOrth: 0.0247651334290972"</span></span>
+<span><span class="co">## [1] "Iteration: 59 bestEv: 0.252476301630547 bestIt: 59 CE: 0.252476301630547 featOrth: 0.0247646931027629"</span></span>
+<span><span class="co">## [1] "Iteration: 60 bestEv: 0.252476301630547 bestIt: 59 CE: 0.252495246437406 featOrth: 0.0247645466809951"</span></span>
+<span><span class="co">## [1] "Iteration: 61 bestEv: 0.252476301630547 bestIt: 59 CE: 0.265887913404921 featOrth: 0.0247645258558319"</span></span>
+<span><span class="co">## [1] "Iteration: 62 bestEv: 0.252476301630547 bestIt: 59 CE: 0.265877284298643 featOrth: 0.0247642765003555"</span></span>
+<span><span class="co">## [1] "Iteration: 63 bestEv: 0.252476301630547 bestIt: 59 CE: 0.265882413572749 featOrth: 0.024763408097006"</span></span>
+<span><span class="co">## [1] "Iteration: 64 bestEv: 0.252476301630547 bestIt: 59 CE: 0.265865262849639 featOrth: 0.0247614733422332"</span></span>
+<span><span class="co">## [1] "Iteration: 65 bestEv: 0.252476301630547 bestIt: 59 CE: 0.265878904765705 featOrth: 0.0247614438596925"</span></span></code></pre>
 <div class="sourceCode" id="cb41"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co">#####################################################</span></span></code></pre></div>
+<p>Apply the learned representations to the data matrices.</p>
 <div class="sourceCode" id="cb42"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># drwwrd</span></span>
 <span><span class="va">projlist</span><span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="op">)</span></span>
@@ -406,23 +415,27 @@ years). • OCD390G: Employment Status (in occupation questionnaire).</p>
 <span>  <span class="op">}</span></span>
 <span><span class="co">#################################</span></span>
 <span><span class="va">covars</span><span class="op">=</span><span class="st">" ~ riagendr + ridageyr + race + dmdeduc2 + INDFMPIR + "</span></span>
-<span><span class="va">covars</span><span class="op">=</span><span class="st">" ~ riagendr + ridageyr + race + dmdeduc2 +  "</span></span>
+<span><span class="va">covars</span><span class="op">=</span><span class="st">" ~ riagendr + ridageyr + dmdeduc2 +  "</span> <span class="co"># race adjusted scores</span></span>
+<span><span class="va">basep</span><span class="op">=</span><span class="fl">0.01</span></span>
+<span><span class="co"># basep=1e-12</span></span>
+<span><span class="co"># rooter</span></span>
+<span><span class="kw">if</span> <span class="op">(</span> <span class="op">!</span> <span class="fu"><a href="https://rdrr.io/r/base/exists.html" class="external-link">exists</a></span><span class="op">(</span><span class="st">"cogind"</span> <span class="op">)</span> <span class="op">)</span> <span class="va">cogind</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">cognames</span><span class="op">)</span></span>
 <span><span class="co">#############################</span></span>
 <span><span class="kw">for</span> <span class="op">(</span> <span class="va">kk</span> <span class="kw">in</span> <span class="fl">1</span><span class="op">:</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">ncol</a></span><span class="op">(</span><span class="va">initu</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span>
-<span>  <span class="va">bform</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span> <span class="va">cognames</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">cognames</span><span class="op">)</span><span class="op">]</span>, <span class="va">covars</span>, <span class="st">"1"</span> <span class="op">)</span></span>
-<span>  <span class="va">myform</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span> <span class="va">cognames</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">cognames</span><span class="op">)</span><span class="op">]</span>, <span class="va">covars</span>,<span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">projlist</span><span class="op">)</span>,<span class="va">kk</span><span class="op">)</span>, collapse<span class="op">=</span><span class="st">'+'</span><span class="op">)</span><span class="op">)</span></span>
-<span>  <span class="va">tempdf</span> <span class="op">=</span> <span class="va">simdf2</span><span class="op">[</span><span class="va">mycc</span>,<span class="op">]</span></span>
+<span>  <span class="va">bform</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span> <span class="va">cognames</span><span class="op">[</span><span class="va">cogind</span><span class="op">]</span>, <span class="va">covars</span>, <span class="st">"1"</span> <span class="op">)</span></span>
+<span>  <span class="va">myform</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span> <span class="va">cognames</span><span class="op">[</span><span class="va">cogind</span><span class="op">]</span>, <span class="va">covars</span>,<span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">projlist</span><span class="op">)</span>,<span class="va">kk</span><span class="op">)</span>, collapse<span class="op">=</span><span class="st">'+'</span><span class="op">)</span><span class="op">)</span></span>
+<span>  <span class="kw">if</span> <span class="op">(</span> <span class="va">basep</span> <span class="op">&gt;=</span> <span class="fl">0.001</span> <span class="op">)</span> <span class="va">tempdf</span> <span class="op">=</span> <span class="va">simdf2</span><span class="op">[</span><span class="va">mycc</span>,<span class="op">]</span> <span class="kw">else</span> <span class="va">tempdf</span> <span class="op">=</span> <span class="va">simdf2</span><span class="op">[</span>,<span class="op">]</span></span>
 <span>  <span class="va">bmdl</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/lm.html" class="external-link">lm</a></span><span class="op">(</span> <span class="va">bform</span>, data<span class="op">=</span><span class="va">tempdf</span> <span class="op">)</span></span>
 <span>  <span class="va">mdl</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/lm.html" class="external-link">lm</a></span><span class="op">(</span> <span class="va">myform</span>, data<span class="op">=</span><span class="va">tempdf</span> <span class="op">)</span></span>
 <span><span class="co">#  if (doimp) mdl = lm( myform, data=tempdf, weights=tempdf$wtint2yr ) else mdl = lm( myform, data=tempdf, weights=tempdf$wtint2yr  )</span></span>
 <span>  <span class="va">myanv</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/anova.html" class="external-link">anova</a></span><span class="op">(</span> <span class="va">bmdl</span>, <span class="va">mdl</span> <span class="op">)</span></span>
-<span>  <span class="kw">if</span> <span class="op">(</span> <span class="va">myanv</span><span class="op">$</span><span class="va">Pr</span><span class="op">[</span><span class="fl">2</span><span class="op">]</span> <span class="op">&lt;</span> <span class="fl">0.01</span><span class="op">/</span><span class="va">mysimk</span> <span class="op">)</span> <span class="op">{</span></span>
+<span>  <span class="kw">if</span> <span class="op">(</span> <span class="va">myanv</span><span class="op">$</span><span class="va">Pr</span><span class="op">[</span><span class="fl">2</span><span class="op">]</span> <span class="op">&lt;</span> <span class="va">basep</span><span class="op">/</span><span class="va">mysimk</span> <span class="op">)</span> <span class="op">{</span></span>
 <span>    <span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="st">"*** result begin ***********************************\n"</span><span class="op">)</span></span>
 <span>    <span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="st">"individual coefficients"</span><span class="op">)</span></span>
 <span>    <span class="va">tailcoffs</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">tail</a></span><span class="op">(</span> <span class="fu"><a href="https://rdrr.io/r/stats/coef.html" class="external-link">coefficients</a></span><span class="op">(</span> <span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span> <span class="va">mdl</span> <span class="op">)</span> <span class="op">)</span>, <span class="fl">4</span> <span class="op">)</span></span>
 <span>    <span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span> <span class="va">tailcoffs</span> <span class="op">)</span></span>
 <span>    <span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste</a></span><span class="op">(</span><span class="st">"multivar-ANOVA p-value"</span>, <span class="fu">insight</span><span class="fu">::</span><span class="fu"><a href="https://easystats.github.io/insight/reference/format_p.html" class="external-link">format_p</a></span><span class="op">(</span><span class="va">myanv</span><span class="op">$</span><span class="va">Pr</span><span class="op">[</span><span class="fl">2</span><span class="op">]</span>,digits<span class="op">=</span><span class="fl">4</span><span class="op">)</span> <span class="op">)</span> <span class="op">)</span></span>
-<span>    <span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span> <span class="va">cognames</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">cognames</span><span class="op">)</span><span class="op">]</span><span class="op">)</span></span>
+<span>    <span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span> <span class="va">cognames</span><span class="op">[</span><span class="va">cogind</span><span class="op">]</span><span class="op">)</span></span>
 <span>    <span class="kw">for</span> <span class="op">(</span> <span class="va">k</span> <span class="kw">in</span> <span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">projlist</span><span class="op">)</span> <span class="op">)</span> <span class="op">{</span></span>
 <span>      <span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste</a></span><span class="op">(</span><span class="st">"Simlr weights"</span>, <span class="va">k</span> <span class="op">)</span> <span class="op">)</span></span>
 <span>      <span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span> <span class="fu"><a href="https://rdrr.io/pkg/ANTsR/man/interpret_simlr_vector2.html" class="external-link">interpret_simlr_vector2</a></span><span class="op">(</span> <span class="va">resultNH</span><span class="op">$</span><span class="va">v</span><span class="op">[[</span><span class="va">k</span><span class="op">]</span><span class="op">]</span>, <span class="va">kk</span>, n2show<span class="op">=</span><span class="fl">3</span>, shortnames<span class="op">=</span><span class="cn">F</span> <span class="op">)</span> <span class="op">)</span></span>
@@ -435,899 +448,1034 @@ years). • OCD390G: Employment Status (in occupation questionnaire).</p>
 <span><span class="op">}</span></span></code></pre></div>
 <pre><code><span><span class="co">## *** result begin ***********************************</span></span>
 <span><span class="co">## [1] "individual coefficients"</span></span>
-<span><span class="co">##                    Estimate  Std. Error   t value     Pr(&gt;|t|)</span></span>
-<span><span class="co">## diet1              5658.731    1951.831  2.899190 3.923845e-03</span></span>
-<span><span class="co">## exposures1     -1504039.873  958780.339 -1.568701 1.174189e-01</span></span>
-<span><span class="co">## mentalhealth1 -14862369.528 3590812.523 -4.138999 4.163445e-05</span></span>
-<span><span class="co">## physical1       -471051.038  283000.894 -1.664486 9.670989e-02</span></span>
-<span><span class="co">## [1] "multivar-ANOVA p-value p = 6.2842e-06"</span></span>
+<span><span class="co">##                    Estimate   Std. Error   t value     Pr(&gt;|t|)</span></span>
+<span><span class="co">## diet1          2.084777e+02 5.585041e+01  3.732787 2.134196e-04</span></span>
+<span><span class="co">## exposures1     6.353857e+05 7.677524e+05  0.827592 4.083364e-01</span></span>
+<span><span class="co">## mentalhealth1 -1.076923e+07 2.697311e+06 -3.992581 7.621099e-05</span></span>
+<span><span class="co">## physical1      1.146752e+07 8.231462e+06  1.393133 1.642612e-01</span></span>
+<span><span class="co">## [1] "multivar-ANOVA p-value p = 3.8193e-07"</span></span>
 <span><span class="co">## [1] "z_digit_re"</span></span>
 <span><span class="co">## [1] "Simlr weights diet"</span></span>
-<span><span class="co">##  DR1TKCAL   DR1TCHL  DR1TMOIS </span></span>
-<span><span class="co">## 1.0000000 0.8314706 0.6535281</span></span></code></pre>
+<span><span class="co">##  DR1TMOIS  DR1TPROT  DR1TSODI </span></span>
+<span><span class="co">## 1.0000000 0.9325442 0.9009289</span></span></code></pre>
 <p><img src="simlr_nhanes_files/figure-html/nhanessimlrstat-1.png" width="700"></p>
 <pre><code><span><span class="co">## [1] "Simlr weights exposures"</span></span>
-<span><span class="co">##    LBXBCD  LBDBCDSI    LBXVFN </span></span>
-<span><span class="co">## 1.0000000 0.9990513 0.6056328</span></span></code></pre>
+<span><span class="co">##    LBXBMN    LBXVFN    LBXV2A </span></span>
+<span><span class="co">## 1.0000000 0.5259348 0.4407065</span></span></code></pre>
 <p><img src="simlr_nhanes_files/figure-html/nhanessimlrstat-2.png" width="700"></p>
 <pre><code><span><span class="co">## [1] "Simlr weights mentalhealth"</span></span>
-<span><span class="co">##    SLQ060    DPQ040    DPQ050 </span></span>
-<span><span class="co">## 1.0000000 0.7956954 0.5677734</span></span></code></pre>
+<span><span class="co">##    DPQ020    DPQ050    DPQ040 </span></span>
+<span><span class="co">## 1.0000000 0.6803791 0.5103406</span></span></code></pre>
 <p><img src="simlr_nhanes_files/figure-html/nhanessimlrstat-3.png" width="700"></p>
 <pre><code><span><span class="co">## [1] "Simlr weights physical"</span></span>
-<span><span class="co">##   BMXARMC    BPXML1    BPXDI1 </span></span>
-<span><span class="co">## 1.0000000 0.7916641 0.4230814</span></span></code></pre>
+<span><span class="co">##   BMXARML    BMXLEG     BMXWT </span></span>
+<span><span class="co">## 1.0000000 0.8640124 0.8518553</span></span></code></pre>
 <p><img src="simlr_nhanes_files/figure-html/nhanessimlrstat-4.png" width="700"></p>
 <pre><code><span><span class="co">## *** result end ***********************************</span></span>
 <span><span class="co">## </span></span>
 <span><span class="co">## *** result begin ***********************************</span></span>
 <span><span class="co">## [1] "individual coefficients"</span></span>
-<span><span class="co">##                   Estimate  Std. Error   t value     Pr(&gt;|t|)</span></span>
-<span><span class="co">## diet4             13984.96    3320.021  4.212312 3.053534e-05</span></span>
-<span><span class="co">## exposures4     -4301503.50 3092270.227 -1.391050 1.648960e-01</span></span>
-<span><span class="co">## mentalhealth4 -13731595.71 6324069.900 -2.171323 3.042747e-02</span></span>
-<span><span class="co">## physical4       -254152.95  151097.110 -1.682050 9.325128e-02</span></span>
-<span><span class="co">## [1] "multivar-ANOVA p-value p = 1.7296e-05"</span></span>
+<span><span class="co">##                    Estimate   Std. Error    t value     Pr(&gt;|t|)</span></span>
+<span><span class="co">## diet2          5.390687e+02 1.422671e+02  3.7891300 0.0001715434</span></span>
+<span><span class="co">## exposures2     1.352205e+05 1.629956e+05  0.8295961 0.4072031535</span></span>
+<span><span class="co">## mentalhealth2 -4.776592e+06 1.431160e+06 -3.3375669 0.0009146646</span></span>
+<span><span class="co">## physical2     -2.951730e+07 1.715242e+07 -1.7208830 0.0859533712</span></span>
+<span><span class="co">## [1] "multivar-ANOVA p-value p = 1.2248e-06"</span></span>
 <span><span class="co">## [1] "z_digit_re"</span></span>
 <span><span class="co">## [1] "Simlr weights diet"</span></span>
-<span><span class="co">##  DR1TALCO  DR1TM161  DR1TACAR </span></span>
-<span><span class="co">## 1.0000000 0.6750142 0.6346510</span></span></code></pre>
+<span><span class="co">##  DR1TMFAT  DR1TM201  DR1TP182 </span></span>
+<span><span class="co">## 1.0000000 0.9689730 0.9424808</span></span></code></pre>
 <p><img src="simlr_nhanes_files/figure-html/nhanessimlrstat-5.png" width="700"></p>
 <pre><code><span><span class="co">## [1] "Simlr weights exposures"</span></span>
-<span><span class="co">##    LBXVEB    LBXVXY    LBX2DF </span></span>
-<span><span class="co">## 1.0000000 0.9441978 0.9053026</span></span></code></pre>
+<span><span class="co">##    LBXBGM  LBDTHGSI    LBXTHG </span></span>
+<span><span class="co">## 1.0000000 0.9594913 0.9573589</span></span></code></pre>
 <p><img src="simlr_nhanes_files/figure-html/nhanessimlrstat-6.png" width="700"></p>
 <pre><code><span><span class="co">## [1] "Simlr weights mentalhealth"</span></span>
-<span><span class="co">##   SLQ060   DPQ030   DPQ100 </span></span>
-<span><span class="co">## 1.000000 0.553537 0.308660</span></span></code></pre>
+<span><span class="co">##    SLQ060    DPQ010    DPQ040 </span></span>
+<span><span class="co">## 1.0000000 0.2400937 0.1988204</span></span></code></pre>
 <p><img src="simlr_nhanes_files/figure-html/nhanessimlrstat-7.png" width="700"></p>
 <pre><code><span><span class="co">## [1] "Simlr weights physical"</span></span>
-<span><span class="co">##    BPXSY3    BPXSY2    BPXSY1 </span></span>
-<span><span class="co">## 1.0000000 0.7728430 0.7361841</span></span></code></pre>
+<span><span class="co">##    BMXBMI    BPXSY3    BPXDI3 </span></span>
+<span><span class="co">## 1.0000000 0.8114585 0.6777227</span></span></code></pre>
 <p><img src="simlr_nhanes_files/figure-html/nhanessimlrstat-8.png" width="700"></p>
 <pre><code><span><span class="co">## *** result end ***********************************</span></span>
 <span><span class="co">## </span></span>
 <span><span class="co">## *** result begin ***********************************</span></span>
 <span><span class="co">## [1] "individual coefficients"</span></span>
-<span><span class="co">##                    Estimate  Std. Error     t value     Pr(&gt;|t|)</span></span>
-<span><span class="co">## diet5             41716.720    11934.52  3.49546575 0.0005200463</span></span>
-<span><span class="co">## exposures5     -1993661.758   972483.53 -2.05007251 0.0409349965</span></span>
-<span><span class="co">## mentalhealth5 -53322498.956 13586540.69 -3.92465604 0.0001004088</span></span>
-<span><span class="co">## physical5         -7790.798    89678.00 -0.08687524 0.9308092365</span></span>
-<span><span class="co">## [1] "multivar-ANOVA p-value p = 1.6058e-06"</span></span>
+<span><span class="co">##                    Estimate   Std. Error   t value     Pr(&gt;|t|)</span></span>
+<span><span class="co">## diet4              1170.948     568.3725  2.060178 0.0399508870</span></span>
+<span><span class="co">## exposures4       141575.992  111455.9630  1.270242 0.2046492079</span></span>
+<span><span class="co">## mentalhealth4 -14676321.615 3771511.5225 -3.891363 0.0001146137</span></span>
+<span><span class="co">## physical4      -2350385.671 1346502.4989 -1.745549 0.0815658976</span></span>
+<span><span class="co">## [1] "multivar-ANOVA p-value p = 3.7255e-05"</span></span>
 <span><span class="co">## [1] "z_digit_re"</span></span>
 <span><span class="co">## [1] "Simlr weights diet"</span></span>
-<span><span class="co">##  DR1TFIBE  DR1TFOLA    DR1TFF </span></span>
-<span><span class="co">## 1.0000000 0.9836311 0.9496749</span></span></code></pre>
+<span><span class="co">##  DR1TB12A  DR1TATOA  DR1TALCO </span></span>
+<span><span class="co">## 1.0000000 0.9592518 0.9361474</span></span></code></pre>
 <p><img src="simlr_nhanes_files/figure-html/nhanessimlrstat-9.png" width="700"></p>
 <pre><code><span><span class="co">## [1] "Simlr weights exposures"</span></span>
-<span><span class="co">##    LBXBPB  LBDBPBSI    LBXVBZ </span></span>
-<span><span class="co">## 1.0000000 0.9974176 0.5689621</span></span></code></pre>
+<span><span class="co">##  LBDBSESI    LBXBSE    LBXV3B </span></span>
+<span><span class="co">## 1.0000000 0.9992273 0.8370495</span></span></code></pre>
 <p><img src="simlr_nhanes_files/figure-html/nhanessimlrstat-10.png" width="700"></p>
 <pre><code><span><span class="co">## [1] "Simlr weights mentalhealth"</span></span>
-<span><span class="co">##    DPQ060    DPQ070    DPQ090 </span></span>
-<span><span class="co">## 1.0000000 0.9329616 0.6590151</span></span></code></pre>
+<span><span class="co">##    SLQ060    DPQ050    DPQ040 </span></span>
+<span><span class="co">## 1.0000000 0.4237296 0.3087827</span></span></code></pre>
 <p><img src="simlr_nhanes_files/figure-html/nhanessimlrstat-11.png" width="700"></p>
 <pre><code><span><span class="co">## [1] "Simlr weights physical"</span></span>
-<span><span class="co">##   BMXSAD1   BMXSAD2   BMXARMC </span></span>
-<span><span class="co">## 1.0000000 0.9433565 0.8660067</span></span></code></pre>
+<span><span class="co">##    BPXML1    BPXSY2   BMXSAD1 </span></span>
+<span><span class="co">## 1.0000000 0.4592230 0.2974505</span></span></code></pre>
 <p><img src="simlr_nhanes_files/figure-html/nhanessimlrstat-12.png" width="700"></p>
 <pre><code><span><span class="co">## *** result end ***********************************</span></span>
 <span><span class="co">## </span></span>
 <span><span class="co">## *** result begin ***********************************</span></span>
 <span><span class="co">## [1] "individual coefficients"</span></span>
-<span><span class="co">##                   Estimate  Std. Error    t value     Pr(&gt;|t|)</span></span>
-<span><span class="co">## diet6             14128.31    5142.579  2.7473198 0.0062491370</span></span>
-<span><span class="co">## exposures6      1247326.32 1638100.160  0.7614469 0.4467881415</span></span>
-<span><span class="co">## mentalhealth6 -13543730.91 3816594.314 -3.5486431 0.0004278344</span></span>
-<span><span class="co">## physical6       -362328.33  222741.354 -1.6266774 0.1045040814</span></span>
-<span><span class="co">## [1] "multivar-ANOVA p-value p = 5.2179e-05"</span></span>
+<span><span class="co">##                    Estimate   Std. Error   t value     Pr(&gt;|t|)</span></span>
+<span><span class="co">## diet7              384.8579 9.728273e+01  3.956076 0.0000883833</span></span>
+<span><span class="co">## exposures7     1202967.3347 8.906803e+05  1.350616 0.1774911766</span></span>
+<span><span class="co">## mentalhealth7 -1537540.6835 6.942775e+05 -2.214591 0.0272840375</span></span>
+<span><span class="co">## physical7      2928390.3949 1.652244e+06  1.772371 0.0770034879</span></span>
+<span><span class="co">## [1] "multivar-ANOVA p-value p = 3.3269e-05"</span></span>
 <span><span class="co">## [1] "z_digit_re"</span></span>
 <span><span class="co">## [1] "Simlr weights diet"</span></span>
-<span><span class="co">##  DR1TSELE  DR1TNIAC  DR1TPROT </span></span>
-<span><span class="co">## 1.0000000 0.8115805 0.7982655</span></span></code></pre>
+<span><span class="co">##  DR1TACAR  DR1TCRYP  DR1TFIBE </span></span>
+<span><span class="co">## 1.0000000 0.8856388 0.8552610</span></span></code></pre>
 <p><img src="simlr_nhanes_files/figure-html/nhanessimlrstat-13.png" width="700"></p>
 <pre><code><span><span class="co">## [1] "Simlr weights exposures"</span></span>
-<span><span class="co">##    LBXBGE    LBXVFN    LBX2DF </span></span>
-<span><span class="co">## 1.0000000 0.9763202 0.6160948</span></span></code></pre>
+<span><span class="co">##    LBXSSE  LBDSSESI    LBXBSE </span></span>
+<span><span class="co">## 1.0000000 0.9943789 0.5115414</span></span></code></pre>
 <p><img src="simlr_nhanes_files/figure-html/nhanessimlrstat-14.png" width="700"></p>
 <pre><code><span><span class="co">## [1] "Simlr weights mentalhealth"</span></span>
-<span><span class="co">##    DPQ050    SLQ060    DPQ010 </span></span>
-<span><span class="co">## 1.0000000 0.6270857 0.2624276</span></span></code></pre>
+<span><span class="co">##    SLQ060    SLQ050    DPQ100 </span></span>
+<span><span class="co">## 1.0000000 0.2891646 0.1164478</span></span></code></pre>
 <p><img src="simlr_nhanes_files/figure-html/nhanessimlrstat-15.png" width="700"></p>
 <pre><code><span><span class="co">## [1] "Simlr weights physical"</span></span>
-<span><span class="co">##    BMXLEG    BPXPLS     BMXHT </span></span>
-<span><span class="co">## 1.0000000 0.7951302 0.5524676</span></span></code></pre>
+<span><span class="co">##     BMXHT    BMXLEG   BMXARML </span></span>
+<span><span class="co">## 1.0000000 0.6895449 0.6797044</span></span></code></pre>
 <p><img src="simlr_nhanes_files/figure-html/nhanessimlrstat-16.png" width="700"></p>
 <pre><code><span><span class="co">## *** result end ***********************************</span></span>
 <span><span class="co">## </span></span>
 <span><span class="co">## *** result begin ***********************************</span></span>
 <span><span class="co">## [1] "individual coefficients"</span></span>
-<span><span class="co">##                   Estimate  Std. Error   t value    Pr(&gt;|t|)</span></span>
-<span><span class="co">## diet7             12362.41    4185.375  2.953717 0.003303865</span></span>
-<span><span class="co">## exposures7      -203942.46  108201.009 -1.884848 0.060093073</span></span>
-<span><span class="co">## mentalhealth7 -14645435.48 4496105.427 -3.257360 0.001209412</span></span>
-<span><span class="co">## physical7         59647.94   45212.719  1.319273 0.187747087</span></span>
-<span><span class="co">## [1] "multivar-ANOVA p-value p = 5.4751e-05"</span></span>
+<span><span class="co">##                     Estimate   Std. Error    t value     Pr(&gt;|t|)</span></span>
+<span><span class="co">## diet10              433.6215 1.205862e+02  3.5959470 0.0003586631</span></span>
+<span><span class="co">## exposures10       51303.6959 9.551881e+04  0.5371057 0.5914577384</span></span>
+<span><span class="co">## mentalhealth10 -3542435.5191 1.075478e+06 -3.2938232 0.0010656443</span></span>
+<span><span class="co">## physical10      8507876.4918 1.203235e+07  0.7070836 0.4798772758</span></span>
+<span><span class="co">## [1] "multivar-ANOVA p-value p = 3.3787e-05"</span></span>
 <span><span class="co">## [1] "z_digit_re"</span></span>
 <span><span class="co">## [1] "Simlr weights diet"</span></span>
-<span><span class="co">##  DR1TMAGN  DR1TKCAL  DR1TPHOS </span></span>
-<span><span class="co">## 1.0000000 0.9349735 0.8482522</span></span></code></pre>
+<span><span class="co">##  DR1TCAFF  DR1TVARA   DR1TVB2 </span></span>
+<span><span class="co">## 1.0000000 0.8561069 0.8220359</span></span></code></pre>
 <p><img src="simlr_nhanes_files/figure-html/nhanessimlrstat-17.png" width="700"></p>
 <pre><code><span><span class="co">## [1] "Simlr weights exposures"</span></span>
-<span><span class="co">##    LBXVFN    LBX2DF    LBXIHG </span></span>
-<span><span class="co">## 1.0000000 0.9391979 0.2064284</span></span></code></pre>
+<span><span class="co">##    LBXVFN    LBX2DF    LBXSSE </span></span>
+<span><span class="co">## 1.0000000 0.9571696 0.8008686</span></span></code></pre>
 <p><img src="simlr_nhanes_files/figure-html/nhanessimlrstat-18.png" width="700"></p>
 <pre><code><span><span class="co">## [1] "Simlr weights mentalhealth"</span></span>
-<span><span class="co">##    SLQ060    SLQ050    DPQ100 </span></span>
-<span><span class="co">## 1.0000000 0.3105636 0.1808684</span></span></code></pre>
+<span><span class="co">##    SLQ060    DPQ010    SLQ050 </span></span>
+<span><span class="co">## 1.0000000 0.3095514 0.2806451</span></span></code></pre>
 <p><img src="simlr_nhanes_files/figure-html/nhanessimlrstat-19.png" width="700"></p>
 <pre><code><span><span class="co">## [1] "Simlr weights physical"</span></span>
-<span><span class="co">##     BMXHT    BMXLEG   BMXARML </span></span>
-<span><span class="co">## 1.0000000 0.7564303 0.7326079</span></span></code></pre>
+<span><span class="co">##    BMXBMI   BMXSAD1   BMXSAD2 </span></span>
+<span><span class="co">## 1.0000000 0.9442514 0.9133866</span></span></code></pre>
 <p><img src="simlr_nhanes_files/figure-html/nhanessimlrstat-20.png" width="700"></p>
 <pre><code><span><span class="co">## *** result end ***********************************</span></span>
 <span><span class="co">## </span></span>
 <span><span class="co">## *** result begin ***********************************</span></span>
 <span><span class="co">## [1] "individual coefficients"</span></span>
-<span><span class="co">##                   Estimate   Std. Error    t value     Pr(&gt;|t|)</span></span>
-<span><span class="co">## diet8             26080.08     9569.849  2.7252346 0.0066755216</span></span>
-<span><span class="co">## exposures8      -128816.67   592558.486 -0.2173906 0.8280022312</span></span>
-<span><span class="co">## mentalhealth8 -41554132.16 12169770.268 -3.4145371 0.0006966431</span></span>
-<span><span class="co">## physical8         75770.29    41976.786  1.8050523 0.0717333099</span></span>
-<span><span class="co">## [1] "multivar-ANOVA p-value p = 5.0294e-05"</span></span>
+<span><span class="co">##                     Estimate   Std. Error    t value     Pr(&gt;|t|)</span></span>
+<span><span class="co">## diet11              649.8302     261.9873  2.4803881 1.348539e-02</span></span>
+<span><span class="co">## exposures11       25644.6507  103964.8785  0.2466665 8.052778e-01</span></span>
+<span><span class="co">## mentalhealth11 -2933343.8545  712409.6420 -4.1174960 4.550777e-05</span></span>
+<span><span class="co">## physical11      -937607.2185 2254030.5226 -0.4159692 6.776291e-01</span></span>
+<span><span class="co">## [1] "multivar-ANOVA p-value p = 5.4252e-05"</span></span>
 <span><span class="co">## [1] "z_digit_re"</span></span>
 <span><span class="co">## [1] "Simlr weights diet"</span></span>
-<span><span class="co">##  DR1TPOTA  DR1TPHOS   DR1TVB2 </span></span>
-<span><span class="co">## 1.0000000 0.7438993 0.7372155</span></span></code></pre>
+<span><span class="co">##  DR1TZINC  DR1TSELE  DR1TPROT </span></span>
+<span><span class="co">## 1.0000000 0.9575517 0.9395957</span></span></code></pre>
 <p><img src="simlr_nhanes_files/figure-html/nhanessimlrstat-21.png" width="700"></p>
 <pre><code><span><span class="co">## [1] "Simlr weights exposures"</span></span>
-<span><span class="co">##    LBXV4C    LBXVFN    LBXVDB </span></span>
-<span><span class="co">## 1.0000000 0.8732392 0.7865158</span></span></code></pre>
+<span><span class="co">##  LBDTHGSI    LBXTHG    LBXBGM </span></span>
+<span><span class="co">## 1.0000000 0.9997743 0.9937863</span></span></code></pre>
 <p><img src="simlr_nhanes_files/figure-html/nhanessimlrstat-22.png" width="700"></p>
 <pre><code><span><span class="co">## [1] "Simlr weights mentalhealth"</span></span>
-<span><span class="co">##    DPQ010    DPQ060    DPQ050 </span></span>
-<span><span class="co">## 1.0000000 0.9183747 0.6881751</span></span></code></pre>
+<span><span class="co">##    DPQ040    DPQ010    DPQ050 </span></span>
+<span><span class="co">## 1.0000000 0.7370697 0.7296091</span></span></code></pre>
 <p><img src="simlr_nhanes_files/figure-html/nhanessimlrstat-23.png" width="700"></p>
 <pre><code><span><span class="co">## [1] "Simlr weights physical"</span></span>
-<span><span class="co">##     BMXHT   BMXARML    BMXLEG </span></span>
-<span><span class="co">## 1.0000000 0.6837426 0.4030095</span></span></code></pre>
+<span><span class="co">##   BMXARMC    BPXPLS     BMXWT </span></span>
+<span><span class="co">## 1.0000000 0.9979656 0.3955360</span></span></code></pre>
 <p><img src="simlr_nhanes_files/figure-html/nhanessimlrstat-24.png" width="700"></p>
 <pre><code><span><span class="co">## *** result end ***********************************</span></span>
 <span><span class="co">## </span></span>
 <span><span class="co">## *** result begin ***********************************</span></span>
 <span><span class="co">## [1] "individual coefficients"</span></span>
-<span><span class="co">##                    Estimate  Std. Error    t value     Pr(&gt;|t|)</span></span>
-<span><span class="co">## diet10             22605.49    6680.671  3.3837158 0.0007775337</span></span>
-<span><span class="co">## exposures10       882378.12  628900.840  1.4030481 0.1612905576</span></span>
-<span><span class="co">## mentalhealth10 -11118372.06 2852895.277 -3.8972240 0.0001120665</span></span>
-<span><span class="co">## physical10         19569.06  110036.073  0.1778422 0.8589267511</span></span>
-<span><span class="co">## [1] "multivar-ANOVA p-value p = 2.7116e-06"</span></span>
+<span><span class="co">##                     Estimate   Std. Error   t value     Pr(&gt;|t|)</span></span>
+<span><span class="co">## diet12              773.8149     227.5737  3.400282 0.0007326220</span></span>
+<span><span class="co">## exposures12      301465.0163  214606.9784  1.404731 0.1607851712</span></span>
+<span><span class="co">## mentalhealth12 -8882727.5441 2649405.3823 -3.352725 0.0008671658</span></span>
+<span><span class="co">## physical12     -2176737.2085 1145321.2354 -1.900547 0.0579944630</span></span>
+<span><span class="co">## [1] "multivar-ANOVA p-value p = 2.0054e-06"</span></span>
 <span><span class="co">## [1] "z_digit_re"</span></span>
 <span><span class="co">## [1] "Simlr weights diet"</span></span>
-<span><span class="co">##  DR1TFDFE  DR1TIRON  DR1TCRYP </span></span>
-<span><span class="co">## 1.0000000 0.8950286 0.8359941</span></span></code></pre>
+<span><span class="co">##  DR1TCAFF  DR1TFIBE  DR1TMAGN </span></span>
+<span><span class="co">## 1.0000000 0.7611522 0.7573892</span></span></code></pre>
 <p><img src="simlr_nhanes_files/figure-html/nhanessimlrstat-25.png" width="700"></p>
 <pre><code><span><span class="co">## [1] "Simlr weights exposures"</span></span>
-<span><span class="co">##    LBXV4C    LBXSSE  LBDSSESI </span></span>
-<span><span class="co">## 1.0000000 0.8552465 0.8362947</span></span></code></pre>
+<span><span class="co">##    LBX2DF  LBDBSESI    LBXBSE </span></span>
+<span><span class="co">## 1.0000000 0.6462743 0.6419574</span></span></code></pre>
 <p><img src="simlr_nhanes_files/figure-html/nhanessimlrstat-26.png" width="700"></p>
 <pre><code><span><span class="co">## [1] "Simlr weights mentalhealth"</span></span>
-<span><span class="co">##    DPQ050    SLQ060    DPQ060 </span></span>
-<span><span class="co">## 1.0000000 0.8582684 0.4265234</span></span></code></pre>
+<span><span class="co">##    SLQ060    DPQ050    DPQ020 </span></span>
+<span><span class="co">## 1.0000000 0.9129330 0.5617838</span></span></code></pre>
 <p><img src="simlr_nhanes_files/figure-html/nhanessimlrstat-27.png" width="700"></p>
 <pre><code><span><span class="co">## [1] "Simlr weights physical"</span></span>
-<span><span class="co">##   BMXARMC     BMXHT    BPXDI1 </span></span>
-<span><span class="co">## 1.0000000 0.9943803 0.8877398</span></span></code></pre>
+<span><span class="co">##    BPXPLS    BPXML1    BPXSY3 </span></span>
+<span><span class="co">## 1.0000000 0.5438065 0.2722697</span></span></code></pre>
 <p><img src="simlr_nhanes_files/figure-html/nhanessimlrstat-28.png" width="700"></p>
 <pre><code><span><span class="co">## *** result end ***********************************</span></span>
 <span><span class="co">## </span></span>
 <span><span class="co">## *** result begin ***********************************</span></span>
 <span><span class="co">## [1] "individual coefficients"</span></span>
-<span><span class="co">##                    Estimate  Std. Error   t value     Pr(&gt;|t|)</span></span>
-<span><span class="co">## diet11             11634.93    2674.137  4.350911 1.678279e-05</span></span>
-<span><span class="co">## exposures11     -9087413.94 2985502.552 -3.043847 2.472303e-03</span></span>
-<span><span class="co">## mentalhealth11 -25238977.05 8237239.547 -3.064009 2.314803e-03</span></span>
-<span><span class="co">## physical11       -233276.95  164349.979 -1.419391 1.564757e-01</span></span>
-<span><span class="co">## [1] "multivar-ANOVA p-value p = 6.5702e-08"</span></span>
+<span><span class="co">##                     Estimate   Std. Error    t value     Pr(&gt;|t|)</span></span>
+<span><span class="co">## diet13              609.2152     219.8631  2.7708845 0.0058199120</span></span>
+<span><span class="co">## exposures13    -6019458.2267 4778491.4607 -1.2596984 0.2084253520</span></span>
+<span><span class="co">## mentalhealth13 -3594548.0392  961807.1976 -3.7372854 0.0002097507</span></span>
+<span><span class="co">## physical13      2670169.1320 3212448.9944  0.8311942 0.4063008300</span></span>
+<span><span class="co">## [1] "multivar-ANOVA p-value p = 3.1298e-05"</span></span>
 <span><span class="co">## [1] "z_digit_re"</span></span>
 <span><span class="co">## [1] "Simlr weights diet"</span></span>
-<span><span class="co">##  DR1TP226  DR1TP205  DR1TP225 </span></span>
-<span><span class="co">## 1.0000000 0.9288274 0.6624684</span></span></code></pre>
+<span><span class="co">##  DR1TVB12  DR1TMOIS  DR1TIRON </span></span>
+<span><span class="co">## 1.0000000 0.9639306 0.9123256</span></span></code></pre>
 <p><img src="simlr_nhanes_files/figure-html/nhanessimlrstat-29.png" width="700"></p>
 <pre><code><span><span class="co">## [1] "Simlr weights exposures"</span></span>
-<span><span class="co">##    LBXVBZ    LBX2DF    LBXVFN </span></span>
-<span><span class="co">## 1.0000000 0.7937262 0.7381375</span></span></code></pre>
+<span><span class="co">##    LBXV3B    LBXVTE  LBDBPBSI </span></span>
+<span><span class="co">## 1.0000000 0.7603309 0.6808227</span></span></code></pre>
 <p><img src="simlr_nhanes_files/figure-html/nhanessimlrstat-30.png" width="700"></p>
 <pre><code><span><span class="co">## [1] "Simlr weights mentalhealth"</span></span>
-<span><span class="co">##    SLQ050    SLQ060    DPQ040 </span></span>
-<span><span class="co">## 1.0000000 0.8466510 0.7615932</span></span></code></pre>
+<span><span class="co">##    DPQ010    DPQ020    DPQ080 </span></span>
+<span><span class="co">## 1.0000000 0.8909926 0.8866655</span></span></code></pre>
 <p><img src="simlr_nhanes_files/figure-html/nhanessimlrstat-31.png" width="700"></p>
 <pre><code><span><span class="co">## [1] "Simlr weights physical"</span></span>
-<span><span class="co">##   BMXARMC    BMXBMI   BMXSAD1 </span></span>
-<span><span class="co">## 1.0000000 0.8986172 0.7455224</span></span></code></pre>
+<span><span class="co">##     BMXHT   BMXARML     BMXWT </span></span>
+<span><span class="co">## 1.0000000 0.7585095 0.6611244</span></span></code></pre>
 <p><img src="simlr_nhanes_files/figure-html/nhanessimlrstat-32.png" width="700"></p>
 <pre><code><span><span class="co">## *** result end ***********************************</span></span>
 <span><span class="co">## </span></span>
 <span><span class="co">## *** result begin ***********************************</span></span>
 <span><span class="co">## [1] "individual coefficients"</span></span>
 <span><span class="co">##                     Estimate   Std. Error   t value     Pr(&gt;|t|)</span></span>
-<span><span class="co">## diet12              7956.562     2025.871  3.927477 9.927755e-05</span></span>
-<span><span class="co">## exposures12     -1574499.505   594405.059 -2.648866 8.359617e-03</span></span>
-<span><span class="co">## mentalhealth12 -32923180.986 11848124.919 -2.778767 5.684410e-03</span></span>
-<span><span class="co">## physical12       -406763.402   249561.094 -1.629915 1.038176e-01</span></span>
-<span><span class="co">## [1] "multivar-ANOVA p-value p = 1.8719e-06"</span></span>
+<span><span class="co">## diet14          3.159036e+02 1.125066e+02  2.807868 5.201955e-03</span></span>
+<span><span class="co">## exposures14     5.264098e+05 3.672714e+05  1.433299 1.524606e-01</span></span>
+<span><span class="co">## mentalhealth14 -8.780457e+06 2.078273e+06 -4.224881 2.890573e-05</span></span>
+<span><span class="co">## physical14     -7.821012e+07 5.162918e+07 -1.514843 1.305079e-01</span></span>
+<span><span class="co">## [1] "multivar-ANOVA p-value p = 1.8413e-06"</span></span>
 <span><span class="co">## [1] "z_digit_re"</span></span>
 <span><span class="co">## [1] "Simlr weights diet"</span></span>
-<span><span class="co">##  DR1TNUMF    DR1TFF  DR1TMAGN </span></span>
-<span><span class="co">## 1.0000000 0.9893669 0.4912995</span></span></code></pre>
+<span><span class="co">##  DR1TPROT  DR1TACAR  DR1TCALC </span></span>
+<span><span class="co">## 1.0000000 0.9919309 0.9865034</span></span></code></pre>
 <p><img src="simlr_nhanes_files/figure-html/nhanessimlrstat-33.png" width="700"></p>
 <pre><code><span><span class="co">## [1] "Simlr weights exposures"</span></span>
-<span><span class="co">##    LBXBPB  LBDBPBSI  LBDBCDSI </span></span>
-<span><span class="co">## 1.0000000 0.9983934 0.3488281</span></span></code></pre>
+<span><span class="co">##    LBXV06    LBXVEB    LBXBSE </span></span>
+<span><span class="co">## 1.0000000 0.5364403 0.4372662</span></span></code></pre>
 <p><img src="simlr_nhanes_files/figure-html/nhanessimlrstat-34.png" width="700"></p>
 <pre><code><span><span class="co">## [1] "Simlr weights mentalhealth"</span></span>
-<span><span class="co">##    SLQ050    DPQ050    DPQ030 </span></span>
-<span><span class="co">## 1.0000000 0.7339495 0.7192033</span></span></code></pre>
+<span><span class="co">##    DPQ070    DPQ020    DPQ080 </span></span>
+<span><span class="co">## 1.0000000 0.9223092 0.7993927</span></span></code></pre>
 <p><img src="simlr_nhanes_files/figure-html/nhanessimlrstat-35.png" width="700"></p>
 <pre><code><span><span class="co">## [1] "Simlr weights physical"</span></span>
-<span><span class="co">##   BMXARMC    BPXML1    BPXSY2 </span></span>
-<span><span class="co">## 1.0000000 0.4724881 0.3248536</span></span></code></pre>
+<span><span class="co">## BPXPTY_Brachial          BPXML1          BMXBMI </span></span>
+<span><span class="co">##       1.0000000       0.3772007       0.3642257</span></span></code></pre>
 <p><img src="simlr_nhanes_files/figure-html/nhanessimlrstat-36.png" width="700"></p>
 <pre><code><span><span class="co">## *** result end ***********************************</span></span>
 <span><span class="co">## </span></span>
 <span><span class="co">## *** result begin ***********************************</span></span>
 <span><span class="co">## [1] "individual coefficients"</span></span>
-<span><span class="co">##                    Estimate Std. Error    t value     Pr(&gt;|t|)</span></span>
-<span><span class="co">## diet13             22438.31    6644.69  3.3768781 7.966271e-04</span></span>
-<span><span class="co">## exposures13        39421.43   79512.12  0.4957915 6.202830e-01</span></span>
-<span><span class="co">## mentalhealth13 -28095308.19 6601867.22 -4.2556609 2.536637e-05</span></span>
-<span><span class="co">## physical13        131175.30   60440.80  2.1703105 3.050451e-02</span></span>
-<span><span class="co">## [1] "multivar-ANOVA p-value p = 3.4885e-07"</span></span>
+<span><span class="co">##                     Estimate   Std. Error    t value    Pr(&gt;|t|)</span></span>
+<span><span class="co">## diet17              511.5846     173.7649  2.9441197 0.003404920</span></span>
+<span><span class="co">## exposures17      -77794.1610  545246.0461 -0.1426772 0.886608448</span></span>
+<span><span class="co">## mentalhealth17 -3245511.2388 1182709.2345 -2.7441328 0.006307494</span></span>
+<span><span class="co">## physical17     -8103128.7458 4576574.2538 -1.7705664 0.077303812</span></span>
+<span><span class="co">## [1] "multivar-ANOVA p-value p = 0.0001"</span></span>
 <span><span class="co">## [1] "z_digit_re"</span></span>
 <span><span class="co">## [1] "Simlr weights diet"</span></span>
-<span><span class="co">##  DR1TSFAT  DR1TTFAT  DR1TS180 </span></span>
-<span><span class="co">## 1.0000000 0.9657044 0.9163303</span></span></code></pre>
+<span><span class="co">##    DR1TVC  DR1TMAGN  DR1TPOTA </span></span>
+<span><span class="co">## 1.0000000 0.8241960 0.7715346</span></span></code></pre>
 <p><img src="simlr_nhanes_files/figure-html/nhanessimlrstat-37.png" width="700"></p>
 <pre><code><span><span class="co">## [1] "Simlr weights exposures"</span></span>
-<span><span class="co">##    LBXBPB  LBDBPBSI  LBDSSESI </span></span>
-<span><span class="co">## 1.0000000 0.9976957 0.9384230</span></span></code></pre>
+<span><span class="co">##    LBXVBZ    LBXBCD    LBXVFN </span></span>
+<span><span class="co">## 1.0000000 0.9465769 0.8236069</span></span></code></pre>
 <p><img src="simlr_nhanes_files/figure-html/nhanessimlrstat-38.png" width="700"></p>
 <pre><code><span><span class="co">## [1] "Simlr weights mentalhealth"</span></span>
-<span><span class="co">##    DPQ090    DPQ100    DPQ070 </span></span>
-<span><span class="co">## 1.0000000 0.6127431 0.4234549</span></span></code></pre>
+<span><span class="co">##    DPQ010    DPQ100    SLQ050 </span></span>
+<span><span class="co">## 1.0000000 0.5162123 0.1441040</span></span></code></pre>
 <p><img src="simlr_nhanes_files/figure-html/nhanessimlrstat-39.png" width="700"></p>
 <pre><code><span><span class="co">## [1] "Simlr weights physical"</span></span>
-<span><span class="co">##    BMXHT  BMXARML   BMXLEG </span></span>
-<span><span class="co">## 1.000000 0.702657 0.680067</span></span></code></pre>
+<span><span class="co">##    BPXPLS    BPXSY3    BPXSY2 </span></span>
+<span><span class="co">## 1.0000000 0.3363820 0.2787351</span></span></code></pre>
 <p><img src="simlr_nhanes_files/figure-html/nhanessimlrstat-40.png" width="700"></p>
 <pre><code><span><span class="co">## *** result end ***********************************</span></span>
 <span><span class="co">## </span></span>
 <span><span class="co">## *** result begin ***********************************</span></span>
 <span><span class="co">## [1] "individual coefficients"</span></span>
-<span><span class="co">##                    Estimate   Std. Error    t value     Pr(&gt;|t|)</span></span>
-<span><span class="co">## diet14             17314.53     5247.764  3.2994109 0.0010456646</span></span>
-<span><span class="co">## exposures14       213891.92   141597.013  1.5105680 0.1315988381</span></span>
-<span><span class="co">## mentalhealth14 -38591219.84 11283073.553 -3.4202755 0.0006824776</span></span>
-<span><span class="co">## physical14       -156022.04   251322.687 -0.6208036 0.5350424372</span></span>
-<span><span class="co">## [1] "multivar-ANOVA p-value p = 3.5272e-05"</span></span>
+<span><span class="co">##                     Estimate   Std. Error    t value     Pr(&gt;|t|)</span></span>
+<span><span class="co">## diet18               275.712 9.333582e+01  2.9539781 0.0033000253</span></span>
+<span><span class="co">## exposures18    -10886954.138 1.133509e+07 -0.9604651 0.3373324230</span></span>
+<span><span class="co">## mentalhealth18  -3657653.508 9.670037e+05 -3.7824606 0.0001760615</span></span>
+<span><span class="co">## physical18       4409967.539 1.046364e+07  0.4214562 0.6736214469</span></span>
+<span><span class="co">## [1] "multivar-ANOVA p-value p = 4.0354e-05"</span></span>
 <span><span class="co">## [1] "z_digit_re"</span></span>
 <span><span class="co">## [1] "Simlr weights diet"</span></span>
-<span><span class="co">## DR1TWS_Community.supply                DR1TATOA                DR1TM201 </span></span>
-<span><span class="co">##               1.0000000               0.8353631               0.8184819</span></span></code></pre>
+<span><span class="co">##  DR1TCAFF   DR1TVB2  DR1TCALC </span></span>
+<span><span class="co">## 1.0000000 0.6656482 0.6502483</span></span></code></pre>
 <p><img src="simlr_nhanes_files/figure-html/nhanessimlrstat-41.png" width="700"></p>
 <pre><code><span><span class="co">## [1] "Simlr weights exposures"</span></span>
-<span><span class="co">##    LBXTHG  LBDTHGSI    LBXBGM </span></span>
-<span><span class="co">## 1.0000000 0.9980041 0.9705953</span></span></code></pre>
+<span><span class="co">##    LBXBCD    LBXVXY    LBXVEB </span></span>
+<span><span class="co">## 1.0000000 0.8603879 0.7497717</span></span></code></pre>
 <p><img src="simlr_nhanes_files/figure-html/nhanessimlrstat-42.png" width="700"></p>
 <pre><code><span><span class="co">## [1] "Simlr weights mentalhealth"</span></span>
-<span><span class="co">##    DPQ040    DPQ090    SLQ050 </span></span>
-<span><span class="co">## 1.0000000 0.6635668 0.5818304</span></span></code></pre>
+<span><span class="co">##    DPQ080    DPQ070    DPQ050 </span></span>
+<span><span class="co">## 1.0000000 0.4533581 0.2085048</span></span></code></pre>
 <p><img src="simlr_nhanes_files/figure-html/nhanessimlrstat-43.png" width="700"></p>
 <pre><code><span><span class="co">## [1] "Simlr weights physical"</span></span>
-<span><span class="co">##    BPXDI1    BPXDI2    BPXDI3 </span></span>
-<span><span class="co">## 1.0000000 0.9118578 0.8469746</span></span></code></pre>
+<span><span class="co">##   BMXARML     BMXHT     BMXWT </span></span>
+<span><span class="co">## 1.0000000 0.9650196 0.7407070</span></span></code></pre>
 <p><img src="simlr_nhanes_files/figure-html/nhanessimlrstat-44.png" width="700"></p>
 <pre><code><span><span class="co">## *** result end ***********************************</span></span>
 <span><span class="co">## </span></span>
 <span><span class="co">## *** result begin ***********************************</span></span>
 <span><span class="co">## [1] "individual coefficients"</span></span>
-<span><span class="co">##                    Estimate Std. Error   t value    Pr(&gt;|t|)</span></span>
-<span><span class="co">## diet15             42202.96   14508.44  2.908856 0.003806741</span></span>
-<span><span class="co">## exposures15      1113694.01  878628.30  1.267537 0.205617339</span></span>
-<span><span class="co">## mentalhealth15 -27205243.98 7321108.45 -3.716001 0.000227824</span></span>
-<span><span class="co">## physical15       -438215.50  329820.52 -1.328648 0.184635861</span></span>
-<span><span class="co">## [1] "multivar-ANOVA p-value p = 2.9731e-05"</span></span>
+<span><span class="co">##                     Estimate   Std. Error    t value     Pr(&gt;|t|)</span></span>
+<span><span class="co">## diet22              439.4203 1.197281e+02  3.6701507 0.0002712059</span></span>
+<span><span class="co">## exposures22     4038168.5143 1.178725e+07  0.3425877 0.7320672001</span></span>
+<span><span class="co">## mentalhealth22 -4993273.3177 1.513260e+06 -3.2996807 0.0010441654</span></span>
+<span><span class="co">## physical22      4600060.8480 2.821162e+06  1.6305554 0.1036776721</span></span>
+<span><span class="co">## [1] "multivar-ANOVA p-value p = 2.3128e-05"</span></span>
 <span><span class="co">## [1] "z_digit_re"</span></span>
 <span><span class="co">## [1] "Simlr weights diet"</span></span>
-<span><span class="co">##      DR1TS180      DR1TCOPP DR1TWS_Spring </span></span>
-<span><span class="co">##     1.0000000     0.9889770     0.9368417</span></span></code></pre>
+<span><span class="co">## DR1TWS_Don.t.drink.tap.water                     DR1TVARA </span></span>
+<span><span class="co">##                    1.0000000                    0.7819798 </span></span>
+<span><span class="co">##                     DR1TCALC </span></span>
+<span><span class="co">##                    0.6779389</span></span></code></pre>
 <p><img src="simlr_nhanes_files/figure-html/nhanessimlrstat-45.png" width="700"></p>
 <pre><code><span><span class="co">## [1] "Simlr weights exposures"</span></span>
-<span><span class="co">##  LBDSSESI    LBXSSE    LBXSZN </span></span>
-<span><span class="co">## 1.0000000 0.9922618 0.6897170</span></span></code></pre>
+<span><span class="co">##    LBXVFN    LBXVXY    LBXVEB </span></span>
+<span><span class="co">## 1.0000000 0.8744749 0.7939664</span></span></code></pre>
 <p><img src="simlr_nhanes_files/figure-html/nhanessimlrstat-46.png" width="700"></p>
 <pre><code><span><span class="co">## [1] "Simlr weights mentalhealth"</span></span>
-<span><span class="co">##    SLQ060    DPQ050    DPQ080 </span></span>
-<span><span class="co">## 1.0000000 0.8425186 0.5544957</span></span></code></pre>
+<span><span class="co">##    DPQ090    SLQ060    DPQ060 </span></span>
+<span><span class="co">## 1.0000000 0.7983581 0.2244878</span></span></code></pre>
 <p><img src="simlr_nhanes_files/figure-html/nhanessimlrstat-47.png" width="700"></p>
 <pre><code><span><span class="co">## [1] "Simlr weights physical"</span></span>
-<span><span class="co">##     BMXHT    BPXDI1    BPXML1 </span></span>
-<span><span class="co">## 1.0000000 0.8928383 0.8764694</span></span></code></pre>
+<span><span class="co">##    BMXLEG     BMXHT    BMXBMI </span></span>
+<span><span class="co">## 1.0000000 0.9526412 0.1937365</span></span></code></pre>
 <p><img src="simlr_nhanes_files/figure-html/nhanessimlrstat-48.png" width="700"></p>
 <pre><code><span><span class="co">## *** result end ***********************************</span></span>
 <span><span class="co">## </span></span>
 <span><span class="co">## *** result begin ***********************************</span></span>
 <span><span class="co">## [1] "individual coefficients"</span></span>
-<span><span class="co">##                   Estimate  Std. Error   t value     Pr(&gt;|t|)</span></span>
-<span><span class="co">## diet16            24922.09    7199.086  3.461840 0.0005876178</span></span>
-<span><span class="co">## exposures16     -745860.50 1191213.462 -0.626135 0.5315431218</span></span>
-<span><span class="co">## mentalhealth16 -5949828.81 1670782.586 -3.561103 0.0004085650</span></span>
-<span><span class="co">## physical16        71946.99   51340.099  1.401380 0.1617882160</span></span>
-<span><span class="co">## [1] "multivar-ANOVA p-value p = 1.3036e-05"</span></span>
+<span><span class="co">##                     Estimate   Std. Error    t value     Pr(&gt;|t|)</span></span>
+<span><span class="co">## diet23              225.3143 7.049555e+01  3.1961492 0.0014899207</span></span>
+<span><span class="co">## exposures23      118191.0791 2.678803e+05  0.4412086 0.6592720327</span></span>
+<span><span class="co">## mentalhealth23 -3321654.0240 9.565286e+05 -3.4726132 0.0005647865</span></span>
+<span><span class="co">## physical23      1286621.3808 1.132772e+07  0.1135817 0.9096196285</span></span>
+<span><span class="co">## [1] "multivar-ANOVA p-value p = 3.9071e-05"</span></span>
 <span><span class="co">## [1] "z_digit_re"</span></span>
 <span><span class="co">## [1] "Simlr weights diet"</span></span>
-<span><span class="co">##  DR1TVB12  DR1TMOIS    DR1TVD </span></span>
-<span><span class="co">## 1.0000000 0.9346569 0.9305833</span></span></code></pre>
+<span><span class="co">##    DR1TVC   DR1TVB1   DR1TVB6 </span></span>
+<span><span class="co">## 1.0000000 0.7756255 0.6887479</span></span></code></pre>
 <p><img src="simlr_nhanes_files/figure-html/nhanessimlrstat-49.png" width="700"></p>
 <pre><code><span><span class="co">## [1] "Simlr weights exposures"</span></span>
-<span><span class="co">##    LBXBPB  LBDBPBSI    LBXVBZ </span></span>
-<span><span class="co">## 1.0000000 0.9947265 0.7368068</span></span></code></pre>
+<span><span class="co">##    LBXBGM  LBDTHGSI    LBXTHG </span></span>
+<span><span class="co">## 1.0000000 0.9092152 0.9088345</span></span></code></pre>
 <p><img src="simlr_nhanes_files/figure-html/nhanessimlrstat-50.png" width="700"></p>
 <pre><code><span><span class="co">## [1] "Simlr weights mentalhealth"</span></span>
-<span><span class="co">##    DPQ050    DPQ080    DPQ060 </span></span>
-<span><span class="co">## 1.0000000 0.1387438 0.1271901</span></span></code></pre>
+<span><span class="co">##    DPQ060    DPQ010    DPQ020 </span></span>
+<span><span class="co">## 1.0000000 0.8052218 0.4786574</span></span></code></pre>
 <p><img src="simlr_nhanes_files/figure-html/nhanessimlrstat-51.png" width="700"></p>
 <pre><code><span><span class="co">## [1] "Simlr weights physical"</span></span>
-<span><span class="co">##     BMXHT   BMXARML    BMXLEG </span></span>
-<span><span class="co">## 1.0000000 0.5510456 0.4911139</span></span></code></pre>
+<span><span class="co">##            BPXPLS            BMXBMI BPXPULS_Irregular </span></span>
+<span><span class="co">##         1.0000000         0.9848642         0.6330299</span></span></code></pre>
 <p><img src="simlr_nhanes_files/figure-html/nhanessimlrstat-52.png" width="700"></p>
 <pre><code><span><span class="co">## *** result end ***********************************</span></span>
 <span><span class="co">## </span></span>
 <span><span class="co">## *** result begin ***********************************</span></span>
 <span><span class="co">## [1] "individual coefficients"</span></span>
-<span><span class="co">##                     Estimate  Std. Error    t value     Pr(&gt;|t|)</span></span>
-<span><span class="co">## diet17              8292.645    2464.011  3.3655061 0.0008293516</span></span>
-<span><span class="co">## exposures17       -70169.600  263546.012 -0.2662518 0.7901669721</span></span>
-<span><span class="co">## mentalhealth17 -21868754.642 5581509.530 -3.9180717 0.0001030973</span></span>
-<span><span class="co">## physical17         53160.408   42709.307  1.2447031 0.2138873047</span></span>
-<span><span class="co">## [1] "multivar-ANOVA p-value p = 5.7342e-06"</span></span>
+<span><span class="co">##                     Estimate   Std. Error    t value     Pr(&gt;|t|)</span></span>
+<span><span class="co">## diet25              424.2575     144.7898  2.9301611 0.0035586549</span></span>
+<span><span class="co">## exposures25     2259188.4361 2175446.7640  1.0384940 0.2995928865</span></span>
+<span><span class="co">## mentalhealth25 -5057371.1360 1524996.1475 -3.3163173 0.0009853332</span></span>
+<span><span class="co">## physical25      1522677.8427 2163167.1387  0.7039113 0.4818488681</span></span>
+<span><span class="co">## [1] "multivar-ANOVA p-value p = 9.9553e-05"</span></span>
 <span><span class="co">## [1] "z_digit_re"</span></span>
 <span><span class="co">## [1] "Simlr weights diet"</span></span>
-<span><span class="co">##    DR1TVK  DR1TP183  DR1TNUMF </span></span>
-<span><span class="co">## 1.0000000 0.7504031 0.6860530</span></span></code></pre>
+<span><span class="co">##    DR1TFF  DR1TMAGN  DR1TALCO </span></span>
+<span><span class="co">## 1.0000000 0.9835777 0.9576532</span></span></code></pre>
 <p><img src="simlr_nhanes_files/figure-html/nhanessimlrstat-53.png" width="700"></p>
 <pre><code><span><span class="co">## [1] "Simlr weights exposures"</span></span>
-<span><span class="co">##  LBDTHGSI    LBXTHG    LBXBMN </span></span>
-<span><span class="co">## 1.0000000 0.9928205 0.9679733</span></span></code></pre>
+<span><span class="co">##  LBDBPBSI    LBXBPB    LBX2DF </span></span>
+<span><span class="co">## 1.0000000 0.9954247 0.9245335</span></span></code></pre>
 <p><img src="simlr_nhanes_files/figure-html/nhanessimlrstat-54.png" width="700"></p>
 <pre><code><span><span class="co">## [1] "Simlr weights mentalhealth"</span></span>
-<span><span class="co">##    DPQ020    SLQ050    DPQ050 </span></span>
-<span><span class="co">## 1.0000000 0.6978926 0.6912160</span></span></code></pre>
+<span><span class="co">##    DPQ080    SLQ060    DPQ010 </span></span>
+<span><span class="co">## 1.0000000 0.7794922 0.5672456</span></span></code></pre>
 <p><img src="simlr_nhanes_files/figure-html/nhanessimlrstat-55.png" width="700"></p>
 <pre><code><span><span class="co">## [1] "Simlr weights physical"</span></span>
-<span><span class="co">##   BMXARML     BMXWT    BMXLEG </span></span>
-<span><span class="co">## 1.0000000 0.5676231 0.4673722</span></span></code></pre>
+<span><span class="co">##     BMXWT   BMXARMC  BMXWAIST </span></span>
+<span><span class="co">## 1.0000000 0.9986844 0.8387049</span></span></code></pre>
 <p><img src="simlr_nhanes_files/figure-html/nhanessimlrstat-56.png" width="700"></p>
 <pre><code><span><span class="co">## *** result end ***********************************</span></span>
 <span><span class="co">## </span></span>
 <span><span class="co">## *** result begin ***********************************</span></span>
 <span><span class="co">## [1] "individual coefficients"</span></span>
-<span><span class="co">##                     Estimate  Std. Error    t value     Pr(&gt;|t|)</span></span>
-<span><span class="co">## diet23              8706.301    3330.077  2.6144446 0.0092364144</span></span>
-<span><span class="co">## exposures23      -650519.335 1725059.875 -0.3770996 0.7062769854</span></span>
-<span><span class="co">## mentalhealth23 -26487490.491 7272371.464 -3.6422081 0.0003016898</span></span>
-<span><span class="co">## physical23       -309475.957  242392.120 -1.2767575 0.2023448596</span></span>
-<span><span class="co">## [1] "multivar-ANOVA p-value p = 0.0001"</span></span>
+<span><span class="co">##                     Estimate   Std. Error    t value     Pr(&gt;|t|)</span></span>
+<span><span class="co">## diet26              295.0777 8.076964e+01  3.6533249 0.0002890710</span></span>
+<span><span class="co">## exposures26      383723.8604 3.458496e+05  1.1095107 0.2677972568</span></span>
+<span><span class="co">## mentalhealth26 -8238641.1913 2.145338e+06 -3.8402525 0.0001403722</span></span>
+<span><span class="co">## physical26      3174364.1126 4.007865e+06  0.7920336 0.4287547192</span></span>
+<span><span class="co">## [1] "multivar-ANOVA p-value p = 2.7994e-06"</span></span>
 <span><span class="co">## [1] "z_digit_re"</span></span>
 <span><span class="co">## [1] "Simlr weights diet"</span></span>
-<span><span class="co">##  DR1TKCAL  DR1TMOIS  DR1TSODI </span></span>
-<span><span class="co">## 1.0000000 0.8307180 0.7080005</span></span></code></pre>
+<span><span class="co">##  DR1TVARA  DR1TBCAR  DR1TP183 </span></span>
+<span><span class="co">## 1.0000000 0.8862726 0.8860236</span></span></code></pre>
 <p><img src="simlr_nhanes_files/figure-html/nhanessimlrstat-57.png" width="700"></p>
 <pre><code><span><span class="co">## [1] "Simlr weights exposures"</span></span>
-<span><span class="co">##    LBXV4C    LBXVBZ    LBXV3B </span></span>
-<span><span class="co">## 1.0000000 0.3418897 0.3412678</span></span></code></pre>
+<span><span class="co">##    LBXBCD    LBXBGE    LBXTHG </span></span>
+<span><span class="co">## 1.0000000 0.7172419 0.4606238</span></span></code></pre>
 <p><img src="simlr_nhanes_files/figure-html/nhanessimlrstat-58.png" width="700"></p>
 <pre><code><span><span class="co">## [1] "Simlr weights mentalhealth"</span></span>
-<span><span class="co">##    DPQ020    DPQ100    SLQ050 </span></span>
-<span><span class="co">## 1.0000000 0.7499420 0.5148917</span></span></code></pre>
+<span><span class="co">##    DPQ060    DPQ050    SLQ060 </span></span>
+<span><span class="co">## 1.0000000 0.9499917 0.9142276</span></span></code></pre>
 <p><img src="simlr_nhanes_files/figure-html/nhanessimlrstat-59.png" width="700"></p>
 <pre><code><span><span class="co">## [1] "Simlr weights physical"</span></span>
-<span><span class="co">##    BPXDI1    BMXLEG    BPXDI3 </span></span>
-<span><span class="co">## 1.0000000 0.7677274 0.4948716</span></span></code></pre>
+<span><span class="co">##    BMXBMI  BMXWAIST   BMXSAD2 </span></span>
+<span><span class="co">## 1.0000000 0.8224457 0.8223149</span></span></code></pre>
 <p><img src="simlr_nhanes_files/figure-html/nhanessimlrstat-60.png" width="700"></p>
 <pre><code><span><span class="co">## *** result end ***********************************</span></span>
 <span><span class="co">## </span></span>
 <span><span class="co">## *** result begin ***********************************</span></span>
 <span><span class="co">## [1] "individual coefficients"</span></span>
-<span><span class="co">##                   Estimate  Std. Error     t value     Pr(&gt;|t|)</span></span>
-<span><span class="co">## diet24            31159.32    9086.563  3.42916478 0.0006610633</span></span>
-<span><span class="co">## exposures24     -100889.83  200810.472 -0.50241318 0.6156221266</span></span>
-<span><span class="co">## mentalhealth24 -5624202.50 1525409.555 -3.68701145 0.0002545388</span></span>
-<span><span class="co">## physical24       -15264.25  205591.291 -0.07424562 0.9408478624</span></span>
-<span><span class="co">## [1] "multivar-ANOVA p-value p = 7.3501e-06"</span></span>
+<span><span class="co">##                    Estimate   Std. Error    t value     Pr(&gt;|t|)</span></span>
+<span><span class="co">## diet28             1033.544     413.9579  2.4967368 1.288756e-02</span></span>
+<span><span class="co">## exposures28     2435227.761 2106730.0525  1.1559278 2.483186e-01</span></span>
+<span><span class="co">## mentalhealth28 -7707571.839 1897916.5856 -4.0610699 5.753772e-05</span></span>
+<span><span class="co">## physical28      -800657.374 5266203.9461 -0.1520369 8.792254e-01</span></span>
+<span><span class="co">## [1] "multivar-ANOVA p-value p = 3.1638e-05"</span></span>
 <span><span class="co">## [1] "z_digit_re"</span></span>
 <span><span class="co">## [1] "Simlr weights diet"</span></span>
-<span><span class="co">##  DR1TACAR  DR1TPROT    DR1TVD </span></span>
-<span><span class="co">## 1.0000000 0.7367944 0.6227920</span></span></code></pre>
+<span><span class="co">##  DR1TMAGN   DR1TVB1    DR1TVC </span></span>
+<span><span class="co">## 1.0000000 0.9153066 0.7920317</span></span></code></pre>
 <p><img src="simlr_nhanes_files/figure-html/nhanessimlrstat-61.png" width="700"></p>
 <pre><code><span><span class="co">## [1] "Simlr weights exposures"</span></span>
-<span><span class="co">##  LBDSCUSI    LBXSCU    LBXVEB </span></span>
-<span><span class="co">## 1.0000000 0.9998863 0.4379222</span></span></code></pre>
+<span><span class="co">##  LBDBPBSI    LBXBPB    LBXBGE </span></span>
+<span><span class="co">## 1.0000000 0.9835403 0.7828549</span></span></code></pre>
 <p><img src="simlr_nhanes_files/figure-html/nhanessimlrstat-62.png" width="700"></p>
 <pre><code><span><span class="co">## [1] "Simlr weights mentalhealth"</span></span>
-<span><span class="co">##    DPQ010    DPQ020    DPQ080 </span></span>
-<span><span class="co">## 1.0000000 0.8661388 0.5068729</span></span></code></pre>
+<span><span class="co">##    DPQ060    DPQ040    DPQ020 </span></span>
+<span><span class="co">## 1.0000000 0.5767137 0.5759865</span></span></code></pre>
 <p><img src="simlr_nhanes_files/figure-html/nhanessimlrstat-63.png" width="700"></p>
 <pre><code><span><span class="co">## [1] "Simlr weights physical"</span></span>
-<span><span class="co">##    BMXBMI  BMXWAIST   BMXARMC </span></span>
-<span><span class="co">## 1.0000000 0.5895075 0.5775265</span></span></code></pre>
+<span><span class="co">##     BMXWT   BMXARMC   BMXSAD2 </span></span>
+<span><span class="co">## 1.0000000 0.7760479 0.5231017</span></span></code></pre>
 <p><img src="simlr_nhanes_files/figure-html/nhanessimlrstat-64.png" width="700"></p>
 <pre><code><span><span class="co">## *** result end ***********************************</span></span>
 <span><span class="co">## </span></span>
 <span><span class="co">## *** result begin ***********************************</span></span>
 <span><span class="co">## [1] "individual coefficients"</span></span>
-<span><span class="co">##                    Estimate  Std. Error    t value     Pr(&gt;|t|)</span></span>
-<span><span class="co">## diet25             15057.20    5206.431  2.8920379 4.012597e-03</span></span>
-<span><span class="co">## exposures25      1006774.80  815019.128  1.2352775 2.173703e-01</span></span>
-<span><span class="co">## mentalhealth25 -41509902.87 9580842.106 -4.3325944 1.818108e-05</span></span>
-<span><span class="co">## physical25         43094.09   46975.255  0.9173785 3.594346e-01</span></span>
-<span><span class="co">## [1] "multivar-ANOVA p-value p = 3.9462e-06"</span></span>
+<span><span class="co">##                     Estimate   Std. Error   t value    Pr(&gt;|t|)</span></span>
+<span><span class="co">## diet30              1734.522     529.4569  3.276041 0.001133388</span></span>
+<span><span class="co">## exposures30       774168.044  386675.5796  2.002113 0.045866981</span></span>
+<span><span class="co">## mentalhealth30  -3991134.102 1419099.7617 -2.812441 0.005129833</span></span>
+<span><span class="co">## physical30     -14889858.280 7892470.3542 -1.886590 0.059853330</span></span>
+<span><span class="co">## [1] "multivar-ANOVA p-value p = 1.0417e-05"</span></span>
 <span><span class="co">## [1] "z_digit_re"</span></span>
 <span><span class="co">## [1] "Simlr weights diet"</span></span>
-<span><span class="co">##  DR1TCALC   DR1TVB2  DR1TCAFF </span></span>
-<span><span class="co">## 1.0000000 0.7722410 0.7496688</span></span></code></pre>
+<span><span class="co">##  DR1TB12A  DR1TATOA  DR1TIRON </span></span>
+<span><span class="co">## 1.0000000 0.9499233 0.8507155</span></span></code></pre>
 <p><img src="simlr_nhanes_files/figure-html/nhanessimlrstat-65.png" width="700"></p>
 <pre><code><span><span class="co">## [1] "Simlr weights exposures"</span></span>
-<span><span class="co">##    LBX2DF    LBXVFN    LBXV3B </span></span>
-<span><span class="co">## 1.0000000 0.9394866 0.3057775</span></span></code></pre>
+<span><span class="co">##    LBXBCD  LBDBSESI    LBXBSE </span></span>
+<span><span class="co">## 1.0000000 0.5660244 0.5580889</span></span></code></pre>
 <p><img src="simlr_nhanes_files/figure-html/nhanessimlrstat-66.png" width="700"></p>
 <pre><code><span><span class="co">## [1] "Simlr weights mentalhealth"</span></span>
-<span><span class="co">##    DPQ020    DPQ040    DPQ090 </span></span>
-<span><span class="co">## 1.0000000 0.9190801 0.6898892</span></span></code></pre>
+<span><span class="co">##    DPQ020    DPQ080    DPQ030 </span></span>
+<span><span class="co">## 1.0000000 0.9289549 0.8637748</span></span></code></pre>
 <p><img src="simlr_nhanes_files/figure-html/nhanessimlrstat-67.png" width="700"></p>
 <pre><code><span><span class="co">## [1] "Simlr weights physical"</span></span>
-<span><span class="co">##   BMXARML     BMXWT  BMXWAIST </span></span>
-<span><span class="co">## 1.0000000 0.9763796 0.8786868</span></span></code></pre>
+<span><span class="co">##    BPXML1    BPXSY1   BMXSAD1 </span></span>
+<span><span class="co">## 1.0000000 0.8199230 0.7414586</span></span></code></pre>
 <p><img src="simlr_nhanes_files/figure-html/nhanessimlrstat-68.png" width="700"></p>
 <pre><code><span><span class="co">## *** result end ***********************************</span></span>
 <span><span class="co">## </span></span>
 <span><span class="co">## *** result begin ***********************************</span></span>
 <span><span class="co">## [1] "individual coefficients"</span></span>
-<span><span class="co">##                    Estimate  Std. Error   t value     Pr(&gt;|t|)</span></span>
-<span><span class="co">## diet26             11860.97    6245.846  1.899017 5.820009e-02</span></span>
-<span><span class="co">## exposures26      1388316.68  734581.365  1.889943 5.940662e-02</span></span>
-<span><span class="co">## mentalhealth26 -13080496.43 3118161.449 -4.194939 3.287679e-05</span></span>
-<span><span class="co">## physical26        186710.73  107414.594  1.738225 8.285368e-02</span></span>
-<span><span class="co">## [1] "multivar-ANOVA p-value p = 7.1337e-06"</span></span>
+<span><span class="co">##                     Estimate   Std. Error    t value     Pr(&gt;|t|)</span></span>
+<span><span class="co">## diet31              991.0641     261.0814  3.7959965 0.0001670062</span></span>
+<span><span class="co">## exposures31       40585.1663  106009.0786  0.3828461 0.7020130291</span></span>
+<span><span class="co">## mentalhealth31 -4212894.6572 1078073.7795 -3.9077981 0.0001073297</span></span>
+<span><span class="co">## physical31     -2379078.1197 3591854.2445 -0.6623537 0.5080806231</span></span>
+<span><span class="co">## [1] "multivar-ANOVA p-value p = 1.8259e-06"</span></span>
 <span><span class="co">## [1] "z_digit_re"</span></span>
 <span><span class="co">## [1] "Simlr weights diet"</span></span>
-<span><span class="co">##  DR1TCRYP  DR1TACAR  DR1TZINC </span></span>
-<span><span class="co">## 1.0000000 0.8866386 0.8247932</span></span></code></pre>
+<span><span class="co">##                DR1TNUMF                  DR1TFF DR1TWS_Community.supply </span></span>
+<span><span class="co">##               1.0000000               0.8969864               0.7898186</span></span></code></pre>
 <p><img src="simlr_nhanes_files/figure-html/nhanessimlrstat-69.png" width="700"></p>
 <pre><code><span><span class="co">## [1] "Simlr weights exposures"</span></span>
-<span><span class="co">##    LBXVFN  LBDBSESI    LBXBSE </span></span>
-<span><span class="co">## 1.0000000 0.9727839 0.9675194</span></span></code></pre>
+<span><span class="co">##  LBDTHGSI    LBXTHG    LBXBGM </span></span>
+<span><span class="co">## 1.0000000 0.9982673 0.9301799</span></span></code></pre>
 <p><img src="simlr_nhanes_files/figure-html/nhanessimlrstat-70.png" width="700"></p>
 <pre><code><span><span class="co">## [1] "Simlr weights mentalhealth"</span></span>
-<span><span class="co">##    DPQ020    DPQ070    DPQ100 </span></span>
-<span><span class="co">## 1.0000000 0.6654650 0.3651896</span></span></code></pre>
+<span><span class="co">##    SLQ050    DPQ050    DPQ040 </span></span>
+<span><span class="co">## 1.0000000 0.7993398 0.7073818</span></span></code></pre>
 <p><img src="simlr_nhanes_files/figure-html/nhanessimlrstat-71.png" width="700"></p>
 <pre><code><span><span class="co">## [1] "Simlr weights physical"</span></span>
-<span><span class="co">##     BMXHT    BMXLEG   BMXARML </span></span>
-<span><span class="co">## 1.0000000 0.8646821 0.6817383</span></span></code></pre>
+<span><span class="co">##     BMXWT    BPXML1    BPXSY3 </span></span>
+<span><span class="co">## 1.0000000 0.6127105 0.3633163</span></span></code></pre>
 <p><img src="simlr_nhanes_files/figure-html/nhanessimlrstat-72.png" width="700"></p>
 <pre><code><span><span class="co">## *** result end ***********************************</span></span>
 <span><span class="co">## </span></span>
 <span><span class="co">## *** result begin ***********************************</span></span>
 <span><span class="co">## [1] "individual coefficients"</span></span>
-<span><span class="co">##                    Estimate  Std. Error   t value    Pr(&gt;|t|)</span></span>
-<span><span class="co">## diet27             20078.82    7351.329  2.731318 0.006555524</span></span>
-<span><span class="co">## exposures27     -1602188.62 1413146.657 -1.133774 0.257491755</span></span>
-<span><span class="co">## mentalhealth27 -17929033.76 5820920.776 -3.080103 0.002195759</span></span>
-<span><span class="co">## physical27      -1200779.85  729644.815 -1.645705 0.100521270</span></span>
-<span><span class="co">## [1] "multivar-ANOVA p-value p = 9.3908e-05"</span></span>
+<span><span class="co">##                     Estimate   Std. Error   t value     Pr(&gt;|t|)</span></span>
+<span><span class="co">## diet34          4.903733e+02 1.540418e+02  3.183378 1.555708e-03</span></span>
+<span><span class="co">## exposures34    -1.359111e+06 1.354673e+06 -1.003276 3.162621e-01</span></span>
+<span><span class="co">## mentalhealth34 -1.338361e+07 3.309552e+06 -4.043933 6.175288e-05</span></span>
+<span><span class="co">## physical34     -2.354482e+07 1.573956e+07 -1.495900 1.353745e-01</span></span>
+<span><span class="co">## [1] "multivar-ANOVA p-value p = 4.9952e-06"</span></span>
 <span><span class="co">## [1] "z_digit_re"</span></span>
 <span><span class="co">## [1] "Simlr weights diet"</span></span>
-<span><span class="co">##   DR1TVB1  DR1TMAGN  DR1TPOTA </span></span>
-<span><span class="co">## 1.0000000 0.6666388 0.6662963</span></span></code></pre>
+<span><span class="co">##  DR1TCALC  DR1TPOTA    DR1TVD </span></span>
+<span><span class="co">## 1.0000000 0.9569425 0.8077670</span></span></code></pre>
 <p><img src="simlr_nhanes_files/figure-html/nhanessimlrstat-73.png" width="700"></p>
 <pre><code><span><span class="co">## [1] "Simlr weights exposures"</span></span>
-<span><span class="co">##  LBDBCDSI    LBXBCD    LBXVDB </span></span>
-<span><span class="co">## 1.0000000 0.9998352 0.6171677</span></span></code></pre>
+<span><span class="co">##    LBXBPB  LBDBPBSI    LBXVBZ </span></span>
+<span><span class="co">## 1.0000000 0.9997662 0.6803928</span></span></code></pre>
 <p><img src="simlr_nhanes_files/figure-html/nhanessimlrstat-74.png" width="700"></p>
 <pre><code><span><span class="co">## [1] "Simlr weights mentalhealth"</span></span>
-<span><span class="co">##    DPQ010    DPQ080    DPQ030 </span></span>
-<span><span class="co">## 1.0000000 0.8960181 0.6841866</span></span></code></pre>
+<span><span class="co">##    DPQ050    DPQ090    DPQ060 </span></span>
+<span><span class="co">## 1.0000000 0.5757498 0.4523480</span></span></code></pre>
 <p><img src="simlr_nhanes_files/figure-html/nhanessimlrstat-75.png" width="700"></p>
 <pre><code><span><span class="co">## [1] "Simlr weights physical"</span></span>
-<span><span class="co">##        BMXBMI       BMXARMC BPXPTY_Radial </span></span>
-<span><span class="co">##     1.0000000     0.5580583     0.3740720</span></span></code></pre>
+<span><span class="co">##    BMXLEG    BPXSY2    BPXPLS </span></span>
+<span><span class="co">## 1.0000000 0.9021579 0.6347575</span></span></code></pre>
 <p><img src="simlr_nhanes_files/figure-html/nhanessimlrstat-76.png" width="700"></p>
 <pre><code><span><span class="co">## *** result end ***********************************</span></span>
 <span><span class="co">## </span></span>
 <span><span class="co">## *** result begin ***********************************</span></span>
 <span><span class="co">## [1] "individual coefficients"</span></span>
-<span><span class="co">##                    Estimate  Std. Error    t value     Pr(&gt;|t|)</span></span>
-<span><span class="co">## diet28             29163.63    13967.57  2.0879524 3.736261e-02</span></span>
-<span><span class="co">## exposures28      -115966.64   859423.11 -0.1349354 8.927231e-01</span></span>
-<span><span class="co">## mentalhealth28 -68948597.33 15386668.41 -4.4810608 9.427512e-06</span></span>
-<span><span class="co">## physical28        403720.33   237520.89  1.6997256 8.987206e-02</span></span>
-<span><span class="co">## [1] "multivar-ANOVA p-value p = 2.1201e-05"</span></span>
+<span><span class="co">##                     Estimate   Std. Error   t value     Pr(&gt;|t|)</span></span>
+<span><span class="co">## diet36              490.7633     129.7551  3.782228 0.0001762208</span></span>
+<span><span class="co">## exposures36      141981.9014   95916.2809  1.480269 0.1394950561</span></span>
+<span><span class="co">## mentalhealth36 -6939385.2524 2699634.3842 -2.570491 0.0104731540</span></span>
+<span><span class="co">## physical36     -5951446.9508 3060296.3950 -1.944729 0.0524247431</span></span>
+<span><span class="co">## [1] "multivar-ANOVA p-value p = 9.5105e-06"</span></span>
 <span><span class="co">## [1] "z_digit_re"</span></span>
 <span><span class="co">## [1] "Simlr weights diet"</span></span>
-<span><span class="co">##  DR1TATOA   DR1TRET  DR1TCALC </span></span>
-<span><span class="co">## 1.0000000 0.7807807 0.6697912</span></span></code></pre>
+<span><span class="co">##  DR1TPROT  DR1TPHOS  DR1TP225 </span></span>
+<span><span class="co">## 1.0000000 0.8495743 0.8078020</span></span></code></pre>
 <p><img src="simlr_nhanes_files/figure-html/nhanessimlrstat-77.png" width="700"></p>
 <pre><code><span><span class="co">## [1] "Simlr weights exposures"</span></span>
-<span><span class="co">##    LBXSSE  LBDSSESI  LBDSCUSI </span></span>
-<span><span class="co">## 1.0000000 0.9969139 0.9943378</span></span></code></pre>
+<span><span class="co">##    LBXBSE  LBDBSESI  LBDSSESI </span></span>
+<span><span class="co">## 1.0000000 0.9956869 0.7085741</span></span></code></pre>
 <p><img src="simlr_nhanes_files/figure-html/nhanessimlrstat-78.png" width="700"></p>
 <pre><code><span><span class="co">## [1] "Simlr weights mentalhealth"</span></span>
-<span><span class="co">##    DPQ060    DPQ070    DPQ040 </span></span>
-<span><span class="co">## 1.0000000 0.8441499 0.7190075</span></span></code></pre>
+<span><span class="co">##    SLQ050    SLQ060    DPQ040 </span></span>
+<span><span class="co">## 1.0000000 0.6620314 0.5082893</span></span></code></pre>
 <p><img src="simlr_nhanes_files/figure-html/nhanessimlrstat-79.png" width="700"></p>
 <pre><code><span><span class="co">## [1] "Simlr weights physical"</span></span>
-<span><span class="co">##    BMXLEG   BMXARML    BMXBMI </span></span>
-<span><span class="co">## 1.0000000 0.3051979 0.1795793</span></span></code></pre>
+<span><span class="co">##    BPXML1    BPXSY1    BPXSY2 </span></span>
+<span><span class="co">## 1.0000000 0.9092991 0.9054499</span></span></code></pre>
 <p><img src="simlr_nhanes_files/figure-html/nhanessimlrstat-80.png" width="700"></p>
 <pre><code><span><span class="co">## *** result end ***********************************</span></span>
 <span><span class="co">## </span></span>
 <span><span class="co">## *** result begin ***********************************</span></span>
 <span><span class="co">## [1] "individual coefficients"</span></span>
-<span><span class="co">##                    Estimate  Std. Error    t value     Pr(&gt;|t|)</span></span>
-<span><span class="co">## diet29             43402.66    12184.87  3.5620129 0.0004071901</span></span>
-<span><span class="co">## exposures29        46468.89    98218.57  0.4731172 0.6363584817</span></span>
-<span><span class="co">## mentalhealth29 -52834922.33 14092053.84 -3.7492705 0.0002004234</span></span>
-<span><span class="co">## physical29        271789.62   194077.07  1.4004210 0.1620748622</span></span>
-<span><span class="co">## [1] "multivar-ANOVA p-value p = 2.2119e-06"</span></span>
+<span><span class="co">##                     Estimate   Std. Error   t value     Pr(&gt;|t|)</span></span>
+<span><span class="co">## diet37              706.7338     243.3736  2.903905 0.0038651163</span></span>
+<span><span class="co">## exposures37      899397.0162 1836864.8497  0.489637 0.6246272771</span></span>
+<span><span class="co">## mentalhealth37 -7549624.0595 2194824.8804 -3.439739 0.0006360399</span></span>
+<span><span class="co">## physical37     -1183765.3189  734899.5703 -1.610785 0.1079215500</span></span>
+<span><span class="co">## [1] "multivar-ANOVA p-value p = 6.5708e-05"</span></span>
 <span><span class="co">## [1] "z_digit_re"</span></span>
 <span><span class="co">## [1] "Simlr weights diet"</span></span>
-<span><span class="co">##  DR1TATOC  DR1TMFAT  DR1TM181 </span></span>
-<span><span class="co">## 1.0000000 0.9859985 0.9733743</span></span></code></pre>
+<span><span class="co">##   DR1TVB2  DR1TPOTA  DR1TCOPP </span></span>
+<span><span class="co">## 1.0000000 0.7372991 0.7145682</span></span></code></pre>
 <p><img src="simlr_nhanes_files/figure-html/nhanessimlrstat-81.png" width="700"></p>
 <pre><code><span><span class="co">## [1] "Simlr weights exposures"</span></span>
-<span><span class="co">##    LBXBPB  LBDBPBSI  LBDTHGSI </span></span>
-<span><span class="co">## 1.0000000 0.9989221 0.9356059</span></span></code></pre>
+<span><span class="co">##    LBXV2A    LBXV3B    LBXVFN </span></span>
+<span><span class="co">## 1.0000000 0.8140768 0.7411735</span></span></code></pre>
 <p><img src="simlr_nhanes_files/figure-html/nhanessimlrstat-82.png" width="700"></p>
 <pre><code><span><span class="co">## [1] "Simlr weights mentalhealth"</span></span>
-<span><span class="co">##    DPQ020    DPQ060    DPQ100 </span></span>
-<span><span class="co">## 1.0000000 0.6883318 0.6594665</span></span></code></pre>
+<span><span class="co">##    SLQ060    DPQ040    SLQ050 </span></span>
+<span><span class="co">## 1.0000000 0.2980092 0.2578879</span></span></code></pre>
 <p><img src="simlr_nhanes_files/figure-html/nhanessimlrstat-83.png" width="700"></p>
 <pre><code><span><span class="co">## [1] "Simlr weights physical"</span></span>
-<span><span class="co">##     BMXHT     BMXWT   BMXARML </span></span>
-<span><span class="co">## 1.0000000 0.9554136 0.6165484</span></span></code></pre>
+<span><span class="co">##   BMXARMC    BPXSY3    BPXSY2 </span></span>
+<span><span class="co">## 1.0000000 0.8127011 0.7023257</span></span></code></pre>
 <p><img src="simlr_nhanes_files/figure-html/nhanessimlrstat-84.png" width="700"></p>
 <pre><code><span><span class="co">## *** result end ***********************************</span></span>
 <span><span class="co">## </span></span>
 <span><span class="co">## *** result begin ***********************************</span></span>
 <span><span class="co">## [1] "individual coefficients"</span></span>
-<span><span class="co">##                     Estimate   Std. Error    t value    Pr(&gt;|t|)</span></span>
-<span><span class="co">## diet37              8019.192     3214.925  2.4943638 0.012975223</span></span>
-<span><span class="co">## exposures37       422600.197   294830.590  1.4333662 0.152446082</span></span>
-<span><span class="co">## mentalhealth37 -67719007.760 18228694.607 -3.7149675 0.000228729</span></span>
-<span><span class="co">## physical37        208183.030   352738.663  0.5901906 0.555358489</span></span>
-<span><span class="co">## [1] "multivar-ANOVA p-value p = 9.2269e-05"</span></span>
+<span><span class="co">##                     Estimate   Std. Error     t value     Pr(&gt;|t|)</span></span>
+<span><span class="co">## diet38              163.2612 4.873439e+01  3.35002099 8.754671e-04</span></span>
+<span><span class="co">## exposures38      -60443.9988 7.353387e+05 -0.08219886 9.345248e-01</span></span>
+<span><span class="co">## mentalhealth38 -3593504.8283 9.013145e+05 -3.98695976 7.797574e-05</span></span>
+<span><span class="co">## physical38      6858921.6822 2.654902e+07  0.25834929 7.962544e-01</span></span>
+<span><span class="co">## [1] "multivar-ANOVA p-value p = 1.1398e-05"</span></span>
 <span><span class="co">## [1] "z_digit_re"</span></span>
 <span><span class="co">## [1] "Simlr weights diet"</span></span>
-<span><span class="co">##   DR1TVB1  DR1TNIAC  DR1TPROT </span></span>
-<span><span class="co">## 1.0000000 0.7970152 0.7388342</span></span></code></pre>
+<span><span class="co">##    DR1TLZ    DR1TVK  DR1TP204 </span></span>
+<span><span class="co">## 1.0000000 0.9286492 0.8016690</span></span></code></pre>
 <p><img src="simlr_nhanes_files/figure-html/nhanessimlrstat-85.png" width="700"></p>
 <pre><code><span><span class="co">## [1] "Simlr weights exposures"</span></span>
-<span><span class="co">##    LBXBGM  LBDTHGSI    LBXTHG </span></span>
-<span><span class="co">## 1.0000000 0.8802081 0.8799465</span></span></code></pre>
+<span><span class="co">##    LBXBCD    LBX2DF    LBXBPB </span></span>
+<span><span class="co">## 1.0000000 0.5135337 0.4640583</span></span></code></pre>
 <p><img src="simlr_nhanes_files/figure-html/nhanessimlrstat-86.png" width="700"></p>
 <pre><code><span><span class="co">## [1] "Simlr weights mentalhealth"</span></span>
-<span><span class="co">##    DPQ100    SLQ060    DPQ060 </span></span>
-<span><span class="co">## 1.0000000 0.6554810 0.4184691</span></span></code></pre>
+<span><span class="co">##    DPQ050    DPQ040    SLQ060 </span></span>
+<span><span class="co">## 1.0000000 0.6001996 0.4819445</span></span></code></pre>
 <p><img src="simlr_nhanes_files/figure-html/nhanessimlrstat-87.png" width="700"></p>
 <pre><code><span><span class="co">## [1] "Simlr weights physical"</span></span>
-<span><span class="co">##    BMXBMI  BMXWAIST   BMXSAD1 </span></span>
-<span><span class="co">## 1.0000000 0.6204248 0.5710356</span></span></code></pre>
+<span><span class="co">##   BMXARMC    BPXDI3    BMXLEG </span></span>
+<span><span class="co">## 1.0000000 0.8984944 0.6812669</span></span></code></pre>
 <p><img src="simlr_nhanes_files/figure-html/nhanessimlrstat-88.png" width="700"></p>
 <pre><code><span><span class="co">## *** result end ***********************************</span></span>
 <span><span class="co">## </span></span>
 <span><span class="co">## *** result begin ***********************************</span></span>
 <span><span class="co">## [1] "individual coefficients"</span></span>
-<span><span class="co">##                    Estimate Std. Error    t value    Pr(&gt;|t|)</span></span>
-<span><span class="co">## diet40             62587.96   30798.16  2.0321982 0.042719083</span></span>
-<span><span class="co">## exposures40      2057387.76 1254587.94  1.6398912 0.101725051</span></span>
-<span><span class="co">## mentalhealth40 -32254604.51 8712962.64 -3.7019101 0.000240461</span></span>
-<span><span class="co">## physical40        -14451.10  126837.32 -0.1139342 0.909340688</span></span>
-<span><span class="co">## [1] "multivar-ANOVA p-value p = 0.0001"</span></span>
+<span><span class="co">##                     Estimate   Std. Error   t value     Pr(&gt;|t|)</span></span>
+<span><span class="co">## diet40              392.1956 9.523375e+01  4.118242 4.536608e-05</span></span>
+<span><span class="co">## exposures40     1464758.1705 1.249784e+06  1.172009 2.418081e-01</span></span>
+<span><span class="co">## mentalhealth40 -6713068.3769 2.541134e+06 -2.641760 8.532337e-03</span></span>
+<span><span class="co">## physical40      -814607.5065 4.298147e+05 -1.895253 5.869388e-02</span></span>
+<span><span class="co">## [1] "multivar-ANOVA p-value p = 4.2034e-06"</span></span>
 <span><span class="co">## [1] "z_digit_re"</span></span>
 <span><span class="co">## [1] "Simlr weights diet"</span></span>
-<span><span class="co">## DR1TWS_Well.or.rain.cistern                     DR1TVB2 </span></span>
-<span><span class="co">##                   1.0000000                   0.8774131 </span></span>
-<span><span class="co">##                      DR1TFA </span></span>
-<span><span class="co">##                   0.7118426</span></span></code></pre>
+<span><span class="co">##  DR1TCALC  DR1TMAGN  DR1TPOTA </span></span>
+<span><span class="co">## 1.0000000 0.9069363 0.7965832</span></span></code></pre>
 <p><img src="simlr_nhanes_files/figure-html/nhanessimlrstat-89.png" width="700"></p>
 <pre><code><span><span class="co">## [1] "Simlr weights exposures"</span></span>
-<span><span class="co">##    LBXBSE  LBDBSESI    LBXSCU </span></span>
-<span><span class="co">## 1.0000000 0.9960308 0.8127260</span></span></code></pre>
+<span><span class="co">##    LBXVTC    LBX2DF    LBXBCD </span></span>
+<span><span class="co">## 1.0000000 0.6231757 0.6223453</span></span></code></pre>
 <p><img src="simlr_nhanes_files/figure-html/nhanessimlrstat-90.png" width="700"></p>
 <pre><code><span><span class="co">## [1] "Simlr weights mentalhealth"</span></span>
-<span><span class="co">##    DPQ060    DPQ020    DPQ090 </span></span>
-<span><span class="co">## 1.0000000 0.5685674 0.3275399</span></span></code></pre>
+<span><span class="co">##    DPQ080    DPQ090    DPQ030 </span></span>
+<span><span class="co">## 1.0000000 0.5128294 0.4291490</span></span></code></pre>
 <p><img src="simlr_nhanes_files/figure-html/nhanessimlrstat-91.png" width="700"></p>
 <pre><code><span><span class="co">## [1] "Simlr weights physical"</span></span>
-<span><span class="co">##    BMXLEG   BMXARML     BMXHT </span></span>
-<span><span class="co">## 1.0000000 0.5335417 0.5141891</span></span></code></pre>
+<span><span class="co">##    BPXSY3   BMXARML    BPXSY2 </span></span>
+<span><span class="co">## 1.0000000 0.9253358 0.8772461</span></span></code></pre>
 <p><img src="simlr_nhanes_files/figure-html/nhanessimlrstat-92.png" width="700"></p>
 <pre><code><span><span class="co">## *** result end ***********************************</span></span>
 <span><span class="co">## </span></span>
 <span><span class="co">## *** result begin ***********************************</span></span>
 <span><span class="co">## [1] "individual coefficients"</span></span>
-<span><span class="co">##                     Estimate   Std. Error    t value     Pr(&gt;|t|)</span></span>
-<span><span class="co">## diet41              7929.772     2364.051  3.3543146 0.0008627744</span></span>
-<span><span class="co">## exposures41       194083.530   221282.765  0.8770838 0.3809080755</span></span>
-<span><span class="co">## mentalhealth41 -44811299.560 11454835.961 -3.9119984 0.0001056375</span></span>
-<span><span class="co">## physical41       -307381.279   152413.674 -2.0167566 0.0443130598</span></span>
-<span><span class="co">## [1] "multivar-ANOVA p-value p = 8.9041e-07"</span></span>
+<span><span class="co">##                     Estimate   Std. Error   t value     Pr(&gt;|t|)</span></span>
+<span><span class="co">## diet41              138.5619 8.104395e+01  1.709714 0.0880021376</span></span>
+<span><span class="co">## exposures41      220934.7880 1.239393e+05  1.782604 0.0753188532</span></span>
+<span><span class="co">## mentalhealth41 -4709559.9992 1.209924e+06 -3.892442 0.0001141218</span></span>
+<span><span class="co">## physical41      6199528.7308 5.612865e+06  1.104521 0.2699521562</span></span>
+<span><span class="co">## [1] "multivar-ANOVA p-value p = 9.9604e-05"</span></span>
 <span><span class="co">## [1] "z_digit_re"</span></span>
 <span><span class="co">## [1] "Simlr weights diet"</span></span>
-<span><span class="co">##  DR1TFIBE    DR1TFF  DR1TMAGN </span></span>
-<span><span class="co">## 1.0000000 0.9598193 0.8720198</span></span></code></pre>
+<span><span class="co">##                    DR1TCAFF DR1TWS_Well.or.rain.cistern </span></span>
+<span><span class="co">##                   1.0000000                   0.9879683 </span></span>
+<span><span class="co">##                     DR1TVB2 </span></span>
+<span><span class="co">##                   0.8153577</span></span></code></pre>
 <p><img src="simlr_nhanes_files/figure-html/nhanessimlrstat-93.png" width="700"></p>
 <pre><code><span><span class="co">## [1] "Simlr weights exposures"</span></span>
-<span><span class="co">##    LBXBGM  LBDTHGSI    LBXTHG </span></span>
-<span><span class="co">## 1.0000000 0.9872729 0.9833473</span></span></code></pre>
+<span><span class="co">##  LBDTHGSI    LBXTHG    LBXBGM </span></span>
+<span><span class="co">## 1.0000000 0.9994966 0.9370844</span></span></code></pre>
 <p><img src="simlr_nhanes_files/figure-html/nhanessimlrstat-94.png" width="700"></p>
 <pre><code><span><span class="co">## [1] "Simlr weights mentalhealth"</span></span>
-<span><span class="co">##    SLQ050    DPQ070    DPQ040 </span></span>
-<span><span class="co">## 1.0000000 0.6981604 0.4235574</span></span></code></pre>
+<span><span class="co">##    DPQ040    DPQ060    SLQ060 </span></span>
+<span><span class="co">## 1.0000000 0.8746972 0.4787399</span></span></code></pre>
 <p><img src="simlr_nhanes_files/figure-html/nhanessimlrstat-95.png" width="700"></p>
 <pre><code><span><span class="co">## [1] "Simlr weights physical"</span></span>
-<span><span class="co">##    BPXPLS    BPXML1    BPXSY1 </span></span>
-<span><span class="co">## 1.0000000 0.6762415 0.2593378</span></span></code></pre>
+<span><span class="co">##     BMXHT   BMXARML    BMXLEG </span></span>
+<span><span class="co">## 1.0000000 0.2313118 0.2193417</span></span></code></pre>
 <p><img src="simlr_nhanes_files/figure-html/nhanessimlrstat-96.png" width="700"></p>
 <pre><code><span><span class="co">## *** result end ***********************************</span></span>
 <span><span class="co">## </span></span>
 <span><span class="co">## *** result begin ***********************************</span></span>
 <span><span class="co">## [1] "individual coefficients"</span></span>
-<span><span class="co">##                     Estimate  Std. Error    t value     Pr(&gt;|t|)</span></span>
-<span><span class="co">## diet44              9516.024    3989.664  2.3851690 0.0174833579</span></span>
-<span><span class="co">## exposures44     -1700390.753  929000.988 -1.8303433 0.0678583917</span></span>
-<span><span class="co">## mentalhealth44 -17939831.463 4664889.873 -3.8457138 0.0001374983</span></span>
-<span><span class="co">## physical44       -336618.735  543834.965 -0.6189722 0.5362471771</span></span>
-<span><span class="co">## [1] "multivar-ANOVA p-value p = 4.1228e-05"</span></span>
+<span><span class="co">##                   Estimate   Std. Error     t value     Pr(&gt;|t|)</span></span>
+<span><span class="co">## diet42             552.038     149.7538  3.68630297 0.0002550372</span></span>
+<span><span class="co">## exposures42      47345.831 1034281.1238  0.04577656 0.9635084706</span></span>
+<span><span class="co">## mentalhealth42   -1484.549     534.4868 -2.77752286 0.0057043241</span></span>
+<span><span class="co">## physical42     -981636.917  938034.6780 -1.04648255 0.2958951220</span></span>
+<span><span class="co">## [1] "multivar-ANOVA p-value p = 6.7405e-05"</span></span>
 <span><span class="co">## [1] "z_digit_re"</span></span>
 <span><span class="co">## [1] "Simlr weights diet"</span></span>
-<span><span class="co">##  DR1TSELE  DR1TKCAL  DR1TNIAC </span></span>
-<span><span class="co">## 1.0000000 0.8527638 0.7423660</span></span></code></pre>
+<span><span class="co">## DR1TWS_Spring      DR1TP225      DR1TCAFF </span></span>
+<span><span class="co">##     1.0000000     0.8900809     0.8040516</span></span></code></pre>
 <p><img src="simlr_nhanes_files/figure-html/nhanessimlrstat-97.png" width="700"></p>
 <pre><code><span><span class="co">## [1] "Simlr weights exposures"</span></span>
-<span><span class="co">##    LBXBCD  LBDBCDSI    LBX2DF </span></span>
-<span><span class="co">## 1.0000000 0.9998581 0.8983154</span></span></code></pre>
+<span><span class="co">##    LBXBGM    LBXTHG  LBDTHGSI </span></span>
+<span><span class="co">## 1.0000000 0.8655881 0.8649545</span></span></code></pre>
 <p><img src="simlr_nhanes_files/figure-html/nhanessimlrstat-98.png" width="700"></p>
 <pre><code><span><span class="co">## [1] "Simlr weights mentalhealth"</span></span>
-<span><span class="co">##    DPQ060    DPQ010    DPQ080 </span></span>
-<span><span class="co">## 1.0000000 0.4381945 0.3273324</span></span></code></pre>
+<span><span class="co">##    DPQ010    SLQ050    DPQ040 </span></span>
+<span><span class="co">## 1.0000000 0.9690362 0.8591096</span></span></code></pre>
 <p><img src="simlr_nhanes_files/figure-html/nhanessimlrstat-99.png" width="700"></p>
 <pre><code><span><span class="co">## [1] "Simlr weights physical"</span></span>
-<span><span class="co">##             BMXHT BPXPULS_Irregular           BMXARML </span></span>
-<span><span class="co">##         1.0000000         0.9935246         0.9048828</span></span></code></pre>
+<span><span class="co">##     BMXHT   BMXARML    BPXSY3 </span></span>
+<span><span class="co">## 1.0000000 0.9120062 0.5938212</span></span></code></pre>
 <p><img src="simlr_nhanes_files/figure-html/nhanessimlrstat-100.png" width="700"></p>
 <pre><code><span><span class="co">## *** result end ***********************************</span></span>
 <span><span class="co">## </span></span>
 <span><span class="co">## *** result begin ***********************************</span></span>
 <span><span class="co">## [1] "individual coefficients"</span></span>
-<span><span class="co">##                     Estimate   Std. Error     t value     Pr(&gt;|t|)</span></span>
-<span><span class="co">## diet50          1.079001e+01 3.939488e+00  2.73893742 6.407986e-03</span></span>
-<span><span class="co">## exposures50    -7.934581e+05 1.060278e+06 -0.74834938 4.546395e-01</span></span>
-<span><span class="co">## mentalhealth50 -2.404053e+07 5.713037e+06 -4.20801252 3.109952e-05</span></span>
-<span><span class="co">## physical50      7.613882e+02 9.777545e+04  0.00778711 9.937903e-01</span></span>
-<span><span class="co">## [1] "multivar-ANOVA p-value p = 3.8482e-05"</span></span>
+<span><span class="co">##                     Estimate   Std. Error    t value     Pr(&gt;|t|)</span></span>
+<span><span class="co">## diet46          7.710219e+01      28.6597  2.6902651 7.402748e-03</span></span>
+<span><span class="co">## exposures46     5.099787e+05 1109145.1924  0.4597944 6.458839e-01</span></span>
+<span><span class="co">## mentalhealth46 -1.676923e+07 4111268.2650 -4.0788453 5.345508e-05</span></span>
+<span><span class="co">## physical46     -8.640745e+06 4048207.1104 -2.1344622 3.333998e-02</span></span>
+<span><span class="co">## [1] "multivar-ANOVA p-value p = 7.6863e-06"</span></span>
 <span><span class="co">## [1] "z_digit_re"</span></span>
 <span><span class="co">## [1] "Simlr weights diet"</span></span>
-<span><span class="co">##  DR1TNUMF  DR1TM181  DR1TMFAT </span></span>
-<span><span class="co">## 1.0000000 0.3115350 0.2962143</span></span></code></pre>
+<span><span class="co">##  DR1TKCAL  DR1TPROT  DR1TNIAC </span></span>
+<span><span class="co">## 1.0000000 0.8589942 0.8554878</span></span></code></pre>
 <p><img src="simlr_nhanes_files/figure-html/nhanessimlrstat-101.png" width="700"></p>
 <pre><code><span><span class="co">## [1] "Simlr weights exposures"</span></span>
-<span><span class="co">##    LBXV3B    LBXVOX    LBXVDB </span></span>
-<span><span class="co">## 1.0000000 0.4534491 0.3481708</span></span></code></pre>
+<span><span class="co">##  LBDSSESI    LBXSSE  LBDIHGSI </span></span>
+<span><span class="co">## 1.0000000 0.9729116 0.4942745</span></span></code></pre>
 <p><img src="simlr_nhanes_files/figure-html/nhanessimlrstat-102.png" width="700"></p>
 <pre><code><span><span class="co">## [1] "Simlr weights mentalhealth"</span></span>
-<span><span class="co">##    SLQ060    DPQ050    DPQ040 </span></span>
-<span><span class="co">## 1.0000000 0.6094200 0.3447683</span></span></code></pre>
+<span><span class="co">##    DPQ070    DPQ050    DPQ100 </span></span>
+<span><span class="co">## 1.0000000 0.6871187 0.5377580</span></span></code></pre>
 <p><img src="simlr_nhanes_files/figure-html/nhanessimlrstat-103.png" width="700"></p>
 <pre><code><span><span class="co">## [1] "Simlr weights physical"</span></span>
-<span><span class="co">##    BPXDI3   BMXARMC     BMXHT </span></span>
-<span><span class="co">## 1.0000000 0.6956541 0.6720827</span></span></code></pre>
+<span><span class="co">##    BPXDI2    BPXSY1    BPXPLS </span></span>
+<span><span class="co">## 1.0000000 0.3221193 0.2930094</span></span></code></pre>
 <p><img src="simlr_nhanes_files/figure-html/nhanessimlrstat-104.png" width="700"></p>
 <pre><code><span><span class="co">## *** result end ***********************************</span></span>
 <span><span class="co">## </span></span>
 <span><span class="co">## *** result begin ***********************************</span></span>
 <span><span class="co">## [1] "individual coefficients"</span></span>
-<span><span class="co">##                     Estimate   Std. Error    t value     Pr(&gt;|t|)</span></span>
-<span><span class="co">## diet52          9.593548e+03     2515.919  3.8131390 1.563001e-04</span></span>
-<span><span class="co">## exposures52    -1.804279e+07  6242831.088 -2.8901617 4.036180e-03</span></span>
-<span><span class="co">## mentalhealth52 -1.024576e+08 23083291.471 -4.4386060 1.139662e-05</span></span>
-<span><span class="co">## physical52      6.623689e+04   149653.080  0.4426029 6.582652e-01</span></span>
-<span><span class="co">## [1] "multivar-ANOVA p-value p = 1.2093e-08"</span></span>
+<span><span class="co">##                     Estimate   Std. Error     t value     Pr(&gt;|t|)</span></span>
+<span><span class="co">## diet48              272.7954     448.8071  0.60782332 5.436086e-01</span></span>
+<span><span class="co">## exposures48       -7279.5465  300900.2673 -0.02419256 9.807096e-01</span></span>
+<span><span class="co">## mentalhealth48 -6443734.2724 1387092.0018 -4.64549883 4.450481e-06</span></span>
+<span><span class="co">## physical48     -1575473.7369  942355.8349 -1.67184590 9.524374e-02</span></span>
+<span><span class="co">## [1] "multivar-ANOVA p-value p = 7.4666e-05"</span></span>
 <span><span class="co">## [1] "z_digit_re"</span></span>
 <span><span class="co">## [1] "Simlr weights diet"</span></span>
-<span><span class="co">##  DR1TP204    DR1TLZ    DR1TVK </span></span>
-<span><span class="co">## 1.0000000 0.9723691 0.9270495</span></span></code></pre>
+<span><span class="co">##  DR1TS180    DR1TVC  DR1TS140 </span></span>
+<span><span class="co">## 1.0000000 0.7589670 0.7516782</span></span></code></pre>
 <p><img src="simlr_nhanes_files/figure-html/nhanessimlrstat-105.png" width="700"></p>
 <pre><code><span><span class="co">## [1] "Simlr weights exposures"</span></span>
-<span><span class="co">##   LBXV06   LBXVFN   LBXVEB </span></span>
-<span><span class="co">## 1.000000 0.829875 0.657945</span></span></code></pre>
+<span><span class="co">##    LBXBPB  LBDBPBSI    LBXVBZ </span></span>
+<span><span class="co">## 1.0000000 0.9995124 0.4829268</span></span></code></pre>
 <p><img src="simlr_nhanes_files/figure-html/nhanessimlrstat-106.png" width="700"></p>
 <pre><code><span><span class="co">## [1] "Simlr weights mentalhealth"</span></span>
-<span><span class="co">##    DPQ070    DPQ050    DPQ060 </span></span>
-<span><span class="co">## 1.0000000 0.8979866 0.5083455</span></span></code></pre>
+<span><span class="co">##    DPQ040    DPQ020    DPQ100 </span></span>
+<span><span class="co">## 1.0000000 0.8798535 0.6173470</span></span></code></pre>
 <p><img src="simlr_nhanes_files/figure-html/nhanessimlrstat-107.png" width="700"></p>
 <pre><code><span><span class="co">## [1] "Simlr weights physical"</span></span>
-<span><span class="co">##   BMXARML    BMXLEG     BMXHT </span></span>
-<span><span class="co">## 1.0000000 0.5862356 0.4702659</span></span></code></pre>
+<span><span class="co">##    BPXDI3     BMXHT    BPXML1 </span></span>
+<span><span class="co">## 1.0000000 0.8826354 0.7891928</span></span></code></pre>
 <p><img src="simlr_nhanes_files/figure-html/nhanessimlrstat-108.png" width="700"></p>
 <pre><code><span><span class="co">## *** result end ***********************************</span></span>
 <span><span class="co">## </span></span>
 <span><span class="co">## *** result begin ***********************************</span></span>
 <span><span class="co">## [1] "individual coefficients"</span></span>
-<span><span class="co">##                     Estimate   Std. Error    t value    Pr(&gt;|t|)</span></span>
-<span><span class="co">## diet55             26364.152     9429.901  2.7958036 0.005398150</span></span>
-<span><span class="co">## exposures55       914607.038   492573.267  1.8567939 0.063992290</span></span>
-<span><span class="co">## mentalhealth55 -31621757.997 10078026.607 -3.1376934 0.001814394</span></span>
-<span><span class="co">## physical55          8631.413    19823.535  0.4354124 0.663471424</span></span>
-<span><span class="co">## [1] "multivar-ANOVA p-value p = 8.6558e-05"</span></span>
+<span><span class="co">##                     Estimate   Std. Error   t value     Pr(&gt;|t|)</span></span>
+<span><span class="co">## diet49          6.569443e+02     197.4613  3.326953 9.493524e-04</span></span>
+<span><span class="co">## exposures49    -1.075317e+07 5824336.4170 -1.846248 6.550692e-02</span></span>
+<span><span class="co">## mentalhealth49 -7.197176e+06 1803416.2138 -3.990857 7.674822e-05</span></span>
+<span><span class="co">## physical49     -9.205253e+05  535545.5998 -1.718855 8.632243e-02</span></span>
+<span><span class="co">## [1] "multivar-ANOVA p-value p = 5.5686e-07"</span></span>
 <span><span class="co">## [1] "z_digit_re"</span></span>
 <span><span class="co">## [1] "Simlr weights diet"</span></span>
-<span><span class="co">##  DR1TP182  DR1TPFAT  DR1TCARB </span></span>
-<span><span class="co">## 1.0000000 0.8478466 0.8258695</span></span></code></pre>
+<span><span class="co">##  DR1TNUMF  DR1TS120  DR1TS080 </span></span>
+<span><span class="co">## 1.0000000 0.7495266 0.6605490</span></span></code></pre>
 <p><img src="simlr_nhanes_files/figure-html/nhanessimlrstat-109.png" width="700"></p>
 <pre><code><span><span class="co">## [1] "Simlr weights exposures"</span></span>
-<span><span class="co">##    LBXBSE  LBDBSESI  LBDSZNSI </span></span>
-<span><span class="co">## 1.0000000 0.9948571 0.5158409</span></span></code></pre>
+<span><span class="co">##    LBXBCD    LBX2DF    LBXVEB </span></span>
+<span><span class="co">## 1.0000000 0.3001702 0.2817344</span></span></code></pre>
 <p><img src="simlr_nhanes_files/figure-html/nhanessimlrstat-110.png" width="700"></p>
 <pre><code><span><span class="co">## [1] "Simlr weights mentalhealth"</span></span>
-<span><span class="co">##    DPQ020    DPQ030    DPQ070 </span></span>
-<span><span class="co">## 1.0000000 0.2916871 0.1271566</span></span></code></pre>
+<span><span class="co">##    DPQ060    DPQ080    DPQ050 </span></span>
+<span><span class="co">## 1.0000000 0.6667410 0.5719157</span></span></code></pre>
 <p><img src="simlr_nhanes_files/figure-html/nhanessimlrstat-111.png" width="700"></p>
 <pre><code><span><span class="co">## [1] "Simlr weights physical"</span></span>
-<span><span class="co">##     BMXWT  BMXWAIST    BMXBMI </span></span>
-<span><span class="co">## 1.0000000 0.8992729 0.8319022</span></span></code></pre>
+<span><span class="co">##    BMXLEG    BPXDI2    BPXSY3 </span></span>
+<span><span class="co">## 1.0000000 0.8389196 0.8218275</span></span></code></pre>
 <p><img src="simlr_nhanes_files/figure-html/nhanessimlrstat-112.png" width="700"></p>
 <pre><code><span><span class="co">## *** result end ***********************************</span></span>
 <span><span class="co">## </span></span>
 <span><span class="co">## *** result begin ***********************************</span></span>
 <span><span class="co">## [1] "individual coefficients"</span></span>
-<span><span class="co">##                    Estimate Std. Error   t value     Pr(&gt;|t|)</span></span>
-<span><span class="co">## diet61             31593.54   11711.63  2.697622 7.245446e-03</span></span>
-<span><span class="co">## exposures61       250224.41  297919.53  0.839906 4.014061e-01</span></span>
-<span><span class="co">## mentalhealth61 -32376090.27 7960582.07 -4.067051 5.619215e-05</span></span>
-<span><span class="co">## physical61         22963.09   17645.23  1.301377 1.937938e-01</span></span>
-<span><span class="co">## [1] "multivar-ANOVA p-value p = 1.0802e-05"</span></span>
+<span><span class="co">##                     Estimate   Std. Error    t value     Pr(&gt;|t|)</span></span>
+<span><span class="co">## diet51              902.1539 2.207991e+02  4.0858580 5.192145e-05</span></span>
+<span><span class="co">## exposures51        3000.8472 1.295587e+04  0.2316207 8.169370e-01</span></span>
+<span><span class="co">## mentalhealth51 -1710839.1137 4.101131e+05 -4.1716272 3.624597e-05</span></span>
+<span><span class="co">## physical51      2177370.2132 1.234826e+07  0.1763301 8.601132e-01</span></span>
+<span><span class="co">## [1] "multivar-ANOVA p-value p = 4.1995e-07"</span></span>
 <span><span class="co">## [1] "z_digit_re"</span></span>
 <span><span class="co">## [1] "Simlr weights diet"</span></span>
-<span><span class="co">##  DR1TNUMF  DR1TSELE  DR1TCOPP </span></span>
-<span><span class="co">## 1.0000000 0.8782127 0.8724056</span></span></code></pre>
+<span><span class="co">##  DR1TS040  DR1TS060  DR1TS140 </span></span>
+<span><span class="co">## 1.0000000 0.7284464 0.6977556</span></span></code></pre>
 <p><img src="simlr_nhanes_files/figure-html/nhanessimlrstat-113.png" width="700"></p>
 <pre><code><span><span class="co">## [1] "Simlr weights exposures"</span></span>
-<span><span class="co">##    LBXBPB  LBDBPBSI    LBX2DF </span></span>
-<span><span class="co">## 1.0000000 0.9956426 0.7154365</span></span></code></pre>
+<span><span class="co">##    LBXBPB  LBDBPBSI    LBXBGM </span></span>
+<span><span class="co">## 1.0000000 0.9993942 0.4508393</span></span></code></pre>
 <p><img src="simlr_nhanes_files/figure-html/nhanessimlrstat-114.png" width="700"></p>
 <pre><code><span><span class="co">## [1] "Simlr weights mentalhealth"</span></span>
-<span><span class="co">##    DPQ090    DPQ020    DPQ040 </span></span>
-<span><span class="co">## 1.0000000 0.7433379 0.3674288</span></span></code></pre>
+<span><span class="co">##    DPQ050    DPQ040    SLQ050 </span></span>
+<span><span class="co">## 1.0000000 0.7725628 0.6504166</span></span></code></pre>
 <p><img src="simlr_nhanes_files/figure-html/nhanessimlrstat-115.png" width="700"></p>
 <pre><code><span><span class="co">## [1] "Simlr weights physical"</span></span>
-<span><span class="co">##   BMXARML     BMXWT     BMXHT </span></span>
-<span><span class="co">## 1.0000000 0.9139467 0.7902091</span></span></code></pre>
+<span><span class="co">##     BMXHT    BMXLEG   BMXARML </span></span>
+<span><span class="co">## 1.0000000 0.8314546 0.6353009</span></span></code></pre>
 <p><img src="simlr_nhanes_files/figure-html/nhanessimlrstat-116.png" width="700"></p>
 <pre><code><span><span class="co">## *** result end ***********************************</span></span>
 <span><span class="co">## </span></span>
 <span><span class="co">## *** result begin ***********************************</span></span>
 <span><span class="co">## [1] "individual coefficients"</span></span>
-<span><span class="co">##                    Estimate Std. Error   t value     Pr(&gt;|t|)</span></span>
-<span><span class="co">## diet62             31265.08   18862.47  1.657528 9.810813e-02</span></span>
-<span><span class="co">## exposures62      -983358.53  963206.58 -1.020922 3.078388e-01</span></span>
-<span><span class="co">## mentalhealth62 -34236920.66 8602814.59 -3.979735 8.038017e-05</span></span>
-<span><span class="co">## physical62         40500.78   19487.29  2.078318 3.824495e-02</span></span>
-<span><span class="co">## [1] "multivar-ANOVA p-value p = 6.8127e-05"</span></span>
+<span><span class="co">##                     Estimate   Std. Error   t value     Pr(&gt;|t|)</span></span>
+<span><span class="co">## diet53          1.549781e+02 4.109091e+01  3.771591 0.0001836666</span></span>
+<span><span class="co">## exposures53    -1.444880e+06 1.263421e+06 -1.143625 0.2533817569</span></span>
+<span><span class="co">## mentalhealth53 -4.831935e+06 1.832002e+06 -2.637517 0.0086381707</span></span>
+<span><span class="co">## physical53     -1.487397e+07 7.874920e+06 -1.888777 0.0595588323</span></span>
+<span><span class="co">## [1] "multivar-ANOVA p-value p = 3.1733e-05"</span></span>
 <span><span class="co">## [1] "z_digit_re"</span></span>
 <span><span class="co">## [1] "Simlr weights diet"</span></span>
-<span><span class="co">##          DR1TNUMF DR1TWS_Don.t.know          DR1TTHEO </span></span>
-<span><span class="co">##         1.0000000         0.5299795         0.5256163</span></span></code></pre>
+<span><span class="co">##  DR1TBCAR    DR1TFF  DR1TFOLA </span></span>
+<span><span class="co">## 1.0000000 0.9889694 0.8017904</span></span></code></pre>
 <p><img src="simlr_nhanes_files/figure-html/nhanessimlrstat-117.png" width="700"></p>
 <pre><code><span><span class="co">## [1] "Simlr weights exposures"</span></span>
-<span><span class="co">##    LBXBCD  LBDBCDSI  LBDBPBSI </span></span>
-<span><span class="co">## 1.0000000 0.9990841 0.6734969</span></span></code></pre>
+<span><span class="co">##    LBXBCD    LBXBPB  LBDBPBSI </span></span>
+<span><span class="co">## 1.0000000 0.9074958 0.9063471</span></span></code></pre>
 <p><img src="simlr_nhanes_files/figure-html/nhanessimlrstat-118.png" width="700"></p>
 <pre><code><span><span class="co">## [1] "Simlr weights mentalhealth"</span></span>
-<span><span class="co">##    DPQ010    DPQ070    DPQ040 </span></span>
-<span><span class="co">## 1.0000000 0.5304410 0.4662948</span></span></code></pre>
+<span><span class="co">##    DPQ050    DPQ030    DPQ020 </span></span>
+<span><span class="co">## 1.0000000 0.9644221 0.2474463</span></span></code></pre>
 <p><img src="simlr_nhanes_files/figure-html/nhanessimlrstat-119.png" width="700"></p>
 <pre><code><span><span class="co">## [1] "Simlr weights physical"</span></span>
-<span><span class="co">##     BMXHT    BMXLEG   BMXARML </span></span>
-<span><span class="co">## 1.0000000 0.7534100 0.6249946</span></span></code></pre>
+<span><span class="co">##    BPXML1    BPXSY1    BPXSY2 </span></span>
+<span><span class="co">## 1.0000000 0.9771972 0.8207566</span></span></code></pre>
 <p><img src="simlr_nhanes_files/figure-html/nhanessimlrstat-120.png" width="700"></p>
 <pre><code><span><span class="co">## *** result end ***********************************</span></span>
 <span><span class="co">## </span></span>
 <span><span class="co">## *** result begin ***********************************</span></span>
 <span><span class="co">## [1] "individual coefficients"</span></span>
-<span><span class="co">##                    Estimate  Std. Error    t value    Pr(&gt;|t|)</span></span>
-<span><span class="co">## diet64             12503.09    4108.795  3.0430071 0.002479075</span></span>
-<span><span class="co">## exposures64       195247.90  618352.297  0.3157551 0.752334453</span></span>
-<span><span class="co">## mentalhealth64 -22241932.13 6082889.409 -3.6564748 0.000285851</span></span>
-<span><span class="co">## physical64         40203.93  366175.723  0.1097941 0.912621523</span></span>
-<span><span class="co">## [1] "multivar-ANOVA p-value p = 4.0454e-05"</span></span>
+<span><span class="co">##                     Estimate   Std. Error    t value     Pr(&gt;|t|)</span></span>
+<span><span class="co">## diet56              727.5794     286.8749  2.5362249 0.0115395756</span></span>
+<span><span class="co">## exposures56      143774.2773  461333.7764  0.3116491 0.7554502429</span></span>
+<span><span class="co">## mentalhealth56 -4568697.6462 1178135.5310 -3.8779050 0.0001209245</span></span>
+<span><span class="co">## physical56     -1450909.7256 1247583.5741 -1.1629760 0.2454501574</span></span>
+<span><span class="co">## [1] "multivar-ANOVA p-value p = 7.0468e-05"</span></span>
 <span><span class="co">## [1] "z_digit_re"</span></span>
 <span><span class="co">## [1] "Simlr weights diet"</span></span>
-<span><span class="co">##  DR1TCALC  DR1TS100  DR1TNUMF </span></span>
-<span><span class="co">## 1.0000000 0.7490953 0.7468161</span></span></code></pre>
+<span><span class="co">##      DR1TMOIS DR1TWS_Spring      DR1TS060 </span></span>
+<span><span class="co">##     1.0000000     0.6182352     0.5169213</span></span></code></pre>
 <p><img src="simlr_nhanes_files/figure-html/nhanessimlrstat-121.png" width="700"></p>
 <pre><code><span><span class="co">## [1] "Simlr weights exposures"</span></span>
-<span><span class="co">##  LBDSSESI    LBXSSE  LBDBSESI </span></span>
-<span><span class="co">## 1.0000000 0.9944533 0.5678488</span></span></code></pre>
+<span><span class="co">##    LBXBPB  LBDBPBSI    LBXBCD </span></span>
+<span><span class="co">## 1.0000000 0.9977438 0.5560881</span></span></code></pre>
 <p><img src="simlr_nhanes_files/figure-html/nhanessimlrstat-122.png" width="700"></p>
 <pre><code><span><span class="co">## [1] "Simlr weights mentalhealth"</span></span>
-<span><span class="co">##    DPQ060    SLQ060    DPQ050 </span></span>
-<span><span class="co">## 1.0000000 0.4144604 0.3911414</span></span></code></pre>
+<span><span class="co">##    DPQ020    DPQ050    DPQ060 </span></span>
+<span><span class="co">## 1.0000000 0.4144192 0.1094852</span></span></code></pre>
 <p><img src="simlr_nhanes_files/figure-html/nhanessimlrstat-123.png" width="700"></p>
 <pre><code><span><span class="co">## [1] "Simlr weights physical"</span></span>
-<span><span class="co">##    BMXLEG     BMXHT    BPXDI3 </span></span>
-<span><span class="co">## 1.0000000 0.9234619 0.8972592</span></span></code></pre>
+<span><span class="co">##    BMXLEG   BMXARML    BPXSY3 </span></span>
+<span><span class="co">## 1.0000000 0.4075884 0.2532310</span></span></code></pre>
 <p><img src="simlr_nhanes_files/figure-html/nhanessimlrstat-124.png" width="700"></p>
 <pre><code><span><span class="co">## *** result end ***********************************</span></span>
 <span><span class="co">## </span></span>
 <span><span class="co">## *** result begin ***********************************</span></span>
 <span><span class="co">## [1] "individual coefficients"</span></span>
-<span><span class="co">##                     Estimate  Std. Error    t value     Pr(&gt;|t|)</span></span>
-<span><span class="co">## diet66              8016.321    2826.784  2.8358452 0.0047760651</span></span>
-<span><span class="co">## exposures66       472163.855  633842.152  0.7449234 0.4567060243</span></span>
-<span><span class="co">## mentalhealth66 -22690659.802 6459669.239 -3.5126659 0.0004883604</span></span>
-<span><span class="co">## physical66       -344780.182  443074.351 -0.7781542 0.4368861312</span></span>
-<span><span class="co">## [1] "multivar-ANOVA p-value p = 0.0001"</span></span>
+<span><span class="co">##                     Estimate  Std. Error    t value    Pr(&gt;|t|)</span></span>
+<span><span class="co">## diet58              427.0912    166.8346  2.5599676 0.010790897</span></span>
+<span><span class="co">## exposures58      214027.3289 136415.1304  1.5689413 0.117358298</span></span>
+<span><span class="co">## mentalhealth58 -3067564.8911 934628.8872 -3.2821208 0.001109789</span></span>
+<span><span class="co">## physical58       279327.8040 292470.4964  0.9550632 0.340053993</span></span>
+<span><span class="co">## [1] "multivar-ANOVA p-value p = 9.0835e-05"</span></span>
 <span><span class="co">## [1] "z_digit_re"</span></span>
 <span><span class="co">## [1] "Simlr weights diet"</span></span>
-<span><span class="co">##  DR1TMOIS  DR1TNUMF  DR1TCAFF </span></span>
-<span><span class="co">## 1.0000000 0.9624204 0.7778351</span></span></code></pre>
+<span><span class="co">##  DR1TPOTA   DR1TVB2   DR1TVB6 </span></span>
+<span><span class="co">## 1.0000000 0.8283381 0.7969937</span></span></code></pre>
 <p><img src="simlr_nhanes_files/figure-html/nhanessimlrstat-125.png" width="700"></p>
 <pre><code><span><span class="co">## [1] "Simlr weights exposures"</span></span>
-<span><span class="co">##  LBDBCDSI    LBXBCD  LBDBSESI </span></span>
-<span><span class="co">## 1.0000000 0.9983064 0.7883140</span></span></code></pre>
+<span><span class="co">##  LBDTHGSI    LBXTHG    LBXBGM </span></span>
+<span><span class="co">## 1.0000000 0.9993681 0.9768894</span></span></code></pre>
 <p><img src="simlr_nhanes_files/figure-html/nhanessimlrstat-126.png" width="700"></p>
 <pre><code><span><span class="co">## [1] "Simlr weights mentalhealth"</span></span>
-<span><span class="co">##    SLQ060    DPQ060    DPQ050 </span></span>
-<span><span class="co">## 1.0000000 0.8143426 0.7093365</span></span></code></pre>
+<span><span class="co">##    DPQ010    DPQ050    DPQ060 </span></span>
+<span><span class="co">## 1.0000000 0.4866873 0.3539674</span></span></code></pre>
 <p><img src="simlr_nhanes_files/figure-html/nhanessimlrstat-127.png" width="700"></p>
 <pre><code><span><span class="co">## [1] "Simlr weights physical"</span></span>
-<span><span class="co">## BPXPTY_Radial         BMXHT        BPXDI1 </span></span>
-<span><span class="co">##     1.0000000     0.4859132     0.4143666</span></span></code></pre>
+<span><span class="co">##     BMXHT   BMXSAD2   BMXSAD1 </span></span>
+<span><span class="co">## 1.0000000 0.2054590 0.2039115</span></span></code></pre>
 <p><img src="simlr_nhanes_files/figure-html/nhanessimlrstat-128.png" width="700"></p>
 <pre><code><span><span class="co">## *** result end ***********************************</span></span>
 <span><span class="co">## </span></span>
 <span><span class="co">## *** result begin ***********************************</span></span>
 <span><span class="co">## [1] "individual coefficients"</span></span>
-<span><span class="co">##                    Estimate Std. Error    t value     Pr(&gt;|t|)</span></span>
-<span><span class="co">## diet69             32100.31   10737.04  2.9896789 2.945424e-03</span></span>
-<span><span class="co">## exposures69      -303640.16  937179.12 -0.3239937 7.460930e-01</span></span>
-<span><span class="co">## mentalhealth69 -31495479.49 7789713.99 -4.0432138 6.200095e-05</span></span>
-<span><span class="co">## physical69        386411.52  262660.62  1.4711437 1.419496e-01</span></span>
-<span><span class="co">## [1] "multivar-ANOVA p-value p = 9.2962e-06"</span></span>
+<span><span class="co">##                     Estimate   Std. Error    t value     Pr(&gt;|t|)</span></span>
+<span><span class="co">## diet59              477.3371     131.1234  3.6403653 0.0003035789</span></span>
+<span><span class="co">## exposures59      145947.5763  188887.7160  0.7726684 0.4401206901</span></span>
+<span><span class="co">## mentalhealth59 -4830119.9174 1249090.3781 -3.8669099 0.0001263228</span></span>
+<span><span class="co">## physical59       514871.0208  493927.9305  1.0424011 0.2977805083</span></span>
+<span><span class="co">## [1] "multivar-ANOVA p-value p = 1.5656e-06"</span></span>
 <span><span class="co">## [1] "z_digit_re"</span></span>
 <span><span class="co">## [1] "Simlr weights diet"</span></span>
-<span><span class="co">## DR1TWS_Well.or.rain.cistern                    DR1TCAFF </span></span>
-<span><span class="co">##                   1.0000000                   0.8848821 </span></span>
-<span><span class="co">##                     DR1TVB2 </span></span>
-<span><span class="co">##                   0.8090914</span></span></code></pre>
+<span><span class="co">##  DR1TFIBE  DR1TATOC  DR1TCOPP </span></span>
+<span><span class="co">## 1.0000000 0.9359951 0.8529683</span></span></code></pre>
 <p><img src="simlr_nhanes_files/figure-html/nhanessimlrstat-129.png" width="700"></p>
 <pre><code><span><span class="co">## [1] "Simlr weights exposures"</span></span>
-<span><span class="co">##    LBXSCU  LBDSCUSI    LBXBGE </span></span>
-<span><span class="co">## 1.0000000 0.9998487 0.9209837</span></span></code></pre>
+<span><span class="co">##    LBXBGM  LBDTHGSI    LBXTHG </span></span>
+<span><span class="co">## 1.0000000 0.9461398 0.9460664</span></span></code></pre>
 <p><img src="simlr_nhanes_files/figure-html/nhanessimlrstat-130.png" width="700"></p>
 <pre><code><span><span class="co">## [1] "Simlr weights mentalhealth"</span></span>
-<span><span class="co">##    DPQ060    SLQ050    DPQ040 </span></span>
-<span><span class="co">## 1.0000000 0.7293988 0.5660773</span></span></code></pre>
+<span><span class="co">##    DPQ060    DPQ080    DPQ020 </span></span>
+<span><span class="co">## 1.0000000 0.8743927 0.4829924</span></span></code></pre>
 <p><img src="simlr_nhanes_files/figure-html/nhanessimlrstat-131.png" width="700"></p>
 <pre><code><span><span class="co">## [1] "Simlr weights physical"</span></span>
-<span><span class="co">##         BMXHT       BMXARML BPXPTY_Radial </span></span>
-<span><span class="co">##     1.0000000     0.5407942     0.4004294</span></span></code></pre>
+<span><span class="co">##     BMXHT   BMXARML    BPXPLS </span></span>
+<span><span class="co">## 1.0000000 0.8203702 0.3404926</span></span></code></pre>
 <p><img src="simlr_nhanes_files/figure-html/nhanessimlrstat-132.png" width="700"></p>
+<pre><code><span><span class="co">## *** result end ***********************************</span></span>
+<span><span class="co">## </span></span>
+<span><span class="co">## *** result begin ***********************************</span></span>
+<span><span class="co">## [1] "individual coefficients"</span></span>
+<span><span class="co">##                     Estimate   Std. Error     t value     Pr(&gt;|t|)</span></span>
+<span><span class="co">## diet61              117.7533 5.849614e+01  2.01300978 0.0447034023</span></span>
+<span><span class="co">## exposures61     2504945.2338 1.760811e+06  1.42260919 0.1555361931</span></span>
+<span><span class="co">## mentalhealth61 -7230018.1217 1.855651e+06 -3.89621569 0.0001124158</span></span>
+<span><span class="co">## physical61        67270.5495 1.816509e+06  0.03703288 0.9704750643</span></span>
+<span><span class="co">## [1] "multivar-ANOVA p-value p = 0.0001"</span></span>
+<span><span class="co">## [1] "z_digit_re"</span></span>
+<span><span class="co">## [1] "Simlr weights diet"</span></span>
+<span><span class="co">##  DR1TM201    DR1TLZ  DR1TFIBE </span></span>
+<span><span class="co">## 1.0000000 0.9975434 0.9868845</span></span></code></pre>
+<p><img src="simlr_nhanes_files/figure-html/nhanessimlrstat-133.png" width="700"></p>
+<pre><code><span><span class="co">## [1] "Simlr weights exposures"</span></span>
+<span><span class="co">##    LBXVXY    LBXVEB    LBXVTE </span></span>
+<span><span class="co">## 1.0000000 0.9278228 0.8338193</span></span></code></pre>
+<p><img src="simlr_nhanes_files/figure-html/nhanessimlrstat-134.png" width="700"></p>
+<pre><code><span><span class="co">## [1] "Simlr weights mentalhealth"</span></span>
+<span><span class="co">##    DPQ020    DPQ040    DPQ010 </span></span>
+<span><span class="co">## 1.0000000 0.3219281 0.2712690</span></span></code></pre>
+<p><img src="simlr_nhanes_files/figure-html/nhanessimlrstat-135.png" width="700"></p>
+<pre><code><span><span class="co">## [1] "Simlr weights physical"</span></span>
+<span><span class="co">##     BMXWT    BPXSY3    BMXBMI </span></span>
+<span><span class="co">## 1.0000000 0.6223161 0.6103312</span></span></code></pre>
+<p><img src="simlr_nhanes_files/figure-html/nhanessimlrstat-136.png" width="700"></p>
+<pre><code><span><span class="co">## *** result end ***********************************</span></span>
+<span><span class="co">## </span></span>
+<span><span class="co">## *** result begin ***********************************</span></span>
+<span><span class="co">## [1] "individual coefficients"</span></span>
+<span><span class="co">##                     Estimate   Std. Error    t value     Pr(&gt;|t|)</span></span>
+<span><span class="co">## diet63              1179.129     465.0253  2.5356228 0.0115591494</span></span>
+<span><span class="co">## exposures63        98864.703  109291.4245  0.9045971 0.3661586547</span></span>
+<span><span class="co">## mentalhealth63 -14494037.137 3702732.3297 -3.9144167 0.0001045219</span></span>
+<span><span class="co">## physical63        489670.558  583702.2755  0.8389047 0.4019642989</span></span>
+<span><span class="co">## [1] "multivar-ANOVA p-value p = 4.2018e-05"</span></span>
+<span><span class="co">## [1] "z_digit_re"</span></span>
+<span><span class="co">## [1] "Simlr weights diet"</span></span>
+<span><span class="co">##  DR1TNUMF    DR1TVC  DR1TCOPP </span></span>
+<span><span class="co">## 1.0000000 0.6761245 0.6279582</span></span></code></pre>
+<p><img src="simlr_nhanes_files/figure-html/nhanessimlrstat-137.png" width="700"></p>
+<pre><code><span><span class="co">## [1] "Simlr weights exposures"</span></span>
+<span><span class="co">##    LBXBGM    LBXTHG  LBDTHGSI </span></span>
+<span><span class="co">## 1.0000000 0.9576354 0.9561931</span></span></code></pre>
+<p><img src="simlr_nhanes_files/figure-html/nhanessimlrstat-138.png" width="700"></p>
+<pre><code><span><span class="co">## [1] "Simlr weights mentalhealth"</span></span>
+<span><span class="co">##    DPQ060    DPQ020    DPQ010 </span></span>
+<span><span class="co">## 1.0000000 0.9293246 0.7796525</span></span></code></pre>
+<p><img src="simlr_nhanes_files/figure-html/nhanessimlrstat-139.png" width="700"></p>
+<pre><code><span><span class="co">## [1] "Simlr weights physical"</span></span>
+<span><span class="co">##     BMXLEG      BMXWT   BMXWAIST </span></span>
+<span><span class="co">## 1.00000000 0.20242965 0.08923804</span></span></code></pre>
+<p><img src="simlr_nhanes_files/figure-html/nhanessimlrstat-140.png" width="700"></p>
+<pre><code><span><span class="co">## *** result end ***********************************</span></span>
+<span><span class="co">## </span></span>
+<span><span class="co">## *** result begin ***********************************</span></span>
+<span><span class="co">## [1] "individual coefficients"</span></span>
+<span><span class="co">##                     Estimate   Std. Error    t value     Pr(&gt;|t|)</span></span>
+<span><span class="co">## diet67          6.025103e+01 2.761215e+01  2.1820475 0.0296180039</span></span>
+<span><span class="co">## exposures67     3.883968e+04 3.913970e+04  0.9923346 0.3215629319</span></span>
+<span><span class="co">## mentalhealth67 -5.763206e+06 1.511212e+06 -3.8136329 0.0001558661</span></span>
+<span><span class="co">## physical67      4.368706e+06 1.997796e+06  2.1867634 0.0292694606</span></span>
+<span><span class="co">## [1] "multivar-ANOVA p-value p = 0.0001"</span></span>
+<span><span class="co">## [1] "z_digit_re"</span></span>
+<span><span class="co">## [1] "Simlr weights diet"</span></span>
+<span><span class="co">##  DR1TFIBE    DR1TFF  DR1TMAGN </span></span>
+<span><span class="co">## 1.0000000 0.9657865 0.8818575</span></span></code></pre>
+<p><img src="simlr_nhanes_files/figure-html/nhanessimlrstat-141.png" width="700"></p>
+<pre><code><span><span class="co">## [1] "Simlr weights exposures"</span></span>
+<span><span class="co">##    LBXBGM  LBDTHGSI    LBXTHG </span></span>
+<span><span class="co">## 1.0000000 0.9871150 0.9856478</span></span></code></pre>
+<p><img src="simlr_nhanes_files/figure-html/nhanessimlrstat-142.png" width="700"></p>
+<pre><code><span><span class="co">## [1] "Simlr weights mentalhealth"</span></span>
+<span><span class="co">##    SLQ060    DPQ090    DPQ050 </span></span>
+<span><span class="co">## 1.0000000 0.4824985 0.3128870</span></span></code></pre>
+<p><img src="simlr_nhanes_files/figure-html/nhanessimlrstat-143.png" width="700"></p>
+<pre><code><span><span class="co">## [1] "Simlr weights physical"</span></span>
+<span><span class="co">##     BMXHT   BMXARMC     BMXWT </span></span>
+<span><span class="co">## 1.0000000 0.2103116 0.1152352</span></span></code></pre>
+<p><img src="simlr_nhanes_files/figure-html/nhanessimlrstat-144.png" width="700"></p>
+<pre><code><span><span class="co">## *** result end ***********************************</span></span>
+<span><span class="co">## </span></span>
+<span><span class="co">## *** result begin ***********************************</span></span>
+<span><span class="co">## [1] "individual coefficients"</span></span>
+<span><span class="co">##                     Estimate   Std. Error    t value     Pr(&gt;|t|)</span></span>
+<span><span class="co">## diet68              452.6829     113.4525  3.9900660 7.699587e-05</span></span>
+<span><span class="co">## exposures68     -830213.5722 1931979.5698 -0.4297217 6.676020e-01</span></span>
+<span><span class="co">## mentalhealth68 -2855939.3097  792696.5429 -3.6028154 3.495726e-04</span></span>
+<span><span class="co">## physical68      -485148.2984 2104561.5212 -0.2305223 8.177898e-01</span></span>
+<span><span class="co">## [1] "multivar-ANOVA p-value p = 4.6266e-06"</span></span>
+<span><span class="co">## [1] "z_digit_re"</span></span>
+<span><span class="co">## [1] "Simlr weights diet"</span></span>
+<span><span class="co">##  DR1TS040  DR1TCALC  DR1TS060 </span></span>
+<span><span class="co">## 1.0000000 0.7879048 0.7422918</span></span></code></pre>
+<p><img src="simlr_nhanes_files/figure-html/nhanessimlrstat-145.png" width="700"></p>
+<pre><code><span><span class="co">## [1] "Simlr weights exposures"</span></span>
+<span><span class="co">##    LBX2DF    LBXVFN    LBXVBZ </span></span>
+<span><span class="co">## 1.0000000 0.9714041 0.8492377</span></span></code></pre>
+<p><img src="simlr_nhanes_files/figure-html/nhanessimlrstat-146.png" width="700"></p>
+<pre><code><span><span class="co">## [1] "Simlr weights mentalhealth"</span></span>
+<span><span class="co">##    SLQ060    DPQ040    DPQ060 </span></span>
+<span><span class="co">## 1.0000000 0.7832059 0.2737045</span></span></code></pre>
+<p><img src="simlr_nhanes_files/figure-html/nhanessimlrstat-147.png" width="700"></p>
+<pre><code><span><span class="co">## [1] "Simlr weights physical"</span></span>
+<span><span class="co">##    BPXDI3    BPXDI2    BPXDI1 </span></span>
+<span><span class="co">## 1.0000000 0.9365439 0.8809460</span></span></code></pre>
+<p><img src="simlr_nhanes_files/figure-html/nhanessimlrstat-148.png" width="700"></p>
+<pre><code><span><span class="co">## *** result end ***********************************</span></span>
+<span><span class="co">## </span></span>
+<span><span class="co">## *** result begin ***********************************</span></span>
+<span><span class="co">## [1] "individual coefficients"</span></span>
+<span><span class="co">##                     Estimate   Std. Error   t value     Pr(&gt;|t|)</span></span>
+<span><span class="co">## diet70          5.289213e+02 2.555168e+02  2.070006 0.0390167490</span></span>
+<span><span class="co">## exposures70     2.914183e+06 2.088770e+06  1.395167 0.1636476157</span></span>
+<span><span class="co">## mentalhealth70 -8.681066e+06 2.452460e+06 -3.539738 0.0004418413</span></span>
+<span><span class="co">## physical70     -2.393467e+07 1.287913e+07 -1.858407 0.0637582906</span></span>
+<span><span class="co">## [1] "multivar-ANOVA p-value p = 6.7347e-05"</span></span>
+<span><span class="co">## [1] "z_digit_re"</span></span>
+<span><span class="co">## [1] "Simlr weights diet"</span></span>
+<span><span class="co">##          DR1TCAFF          DR1TALCO DR1TWS_Don.t.know </span></span>
+<span><span class="co">##         1.0000000         0.7972873         0.4053632</span></span></code></pre>
+<p><img src="simlr_nhanes_files/figure-html/nhanessimlrstat-149.png" width="700"></p>
+<pre><code><span><span class="co">## [1] "Simlr weights exposures"</span></span>
+<span><span class="co">##    LBXBCD    LBXVEB    LBXVXY </span></span>
+<span><span class="co">## 1.0000000 0.7497329 0.6461673</span></span></code></pre>
+<p><img src="simlr_nhanes_files/figure-html/nhanessimlrstat-150.png" width="700"></p>
+<pre><code><span><span class="co">## [1] "Simlr weights mentalhealth"</span></span>
+<span><span class="co">##    DPQ080    SLQ060    DPQ010 </span></span>
+<span><span class="co">## 1.0000000 0.7596818 0.6759724</span></span></code></pre>
+<p><img src="simlr_nhanes_files/figure-html/nhanessimlrstat-151.png" width="700"></p>
+<pre><code><span><span class="co">## [1] "Simlr weights physical"</span></span>
+<span><span class="co">##    BPXSY1    BPXSY2    BPXML1 </span></span>
+<span><span class="co">## 1.0000000 0.7270506 0.6626029</span></span></code></pre>
+<p><img src="simlr_nhanes_files/figure-html/nhanessimlrstat-152.png" width="700"></p>
 <pre><code><span><span class="co">## *** result end ***********************************</span></span></code></pre>
-<div class="sourceCode" id="cb176"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb196"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co">##########################################################################################</span></span>
 <span><span class="co">##########################################################################################</span></span>
 <span><span class="co"># https://wwwn.cdc.gov/nchs/nhanes/search/default.aspx</span></span>
@@ -1337,7 +1485,8 @@ years). • OCD390G: Employment Status (in occupation questionnaire).</p>
 <span><span class="co"># 1.0000000 0.3346728 0.1868323 0.0586727 </span></span>
 <span><span class="co">##########################################################################################</span></span></code></pre></div>
 </div>
-  </main>
+  </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
+    </nav></aside>
 </div>
 
 

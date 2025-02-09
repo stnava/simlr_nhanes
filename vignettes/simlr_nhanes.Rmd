@@ -259,10 +259,10 @@ if ( ! exists("resultNH") ) {
         iterations=100,
         sparsenessQuantiles=rep(0.5,length(nh_list)),
         positivities=rep("positive",length(nh_list)), 
-#        energyType='regression', mixAlg='ica',
-        energyType='cca', mixAlg='svd',
-#        scale=c("centerAndScale",  "np"),
-        scale=c("whiten", "np"),
+        energyType='regression', mixAlg='ica',
+#        energyType='cca', mixAlg='pca',
+        scale=c("centerAndScale",  "np"),
+#        scale=c("whiten", "np"),
         constraint="Stiefelx10x10",
         initialUMatrix=initu, verbose=T )
   }
@@ -301,7 +301,7 @@ if ( doimp ) {
 covars=" ~ riagendr + ridageyr + race + dmdeduc2 + INDFMPIR + "
 covars=" ~ riagendr + ridageyr + dmdeduc2 +  " # race adjusted scores
 basep=0.01
-basep=1e-12
+# basep=1e-12
 # rooter
 if ( ! exists("cogind" ) ) cogind = length(cognames)
 #############################
