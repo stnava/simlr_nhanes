@@ -8,6 +8,25 @@ vignette: >
 ---
 
 
+## Introduction
+
+We extract distinct but related types of data from the [NHANES](https://wwwn.cdc.gov/nchs/nhanes/Default.aspx).  The data types are:
+
+* demographics: age, sex, educational attainment;
+
+* diet: measurements of nutritional status;
+
+* physical: blood pressure and physical measurements;
+
+* mental health: outcomes from Patient Health Questionnaire-9;
+
+* environmental exposures: metals and related environmental toxins.
+
+These are combined into SiMLR for an unsupervised dimensionality reduction.  The resulting low-dimensional representations are used for joint prediction of cognitive outcomes.  Over 400 subjects with these measurements are available along with environmental exposures.
+
+## Setup 
+
+Load the relevant librarys.
 
 ```{r setup}
 # Load necessary libraries
@@ -25,13 +44,7 @@ data("nhanescog_2011_2014")
 
 ## NHANES example
 
-
-The five publicly available data categories are: - Demographics (DEMO) - Dietary (DIET) - Examination (EXAM) - Laboratory (LAB) - Questionnaire (Q). The abbreviated forms in parentheses may be substituted for the long form in nhanesA commands.
-
-INDFMPIR: Poverty Income Ratio (0 = no income, higher values = higher income relative to poverty threshold).
-	•	INDHHIN2: Annual Household Income (categorized ranges).
-	•	DMDEDUC2: Education Level (for adults 20+ years).
-	•	OCD390G: Employment Status (in occupation questionnaire).
+We download these data on the fly and merge them together using the embedded data as well as the `nhanesA` package.
 
 ```{r nhanes,cache=TRUE,echo=FALSE}
 # Demographic data (e.g., 2011-2012 cycle)
@@ -118,9 +131,6 @@ depnames = c(
 )
 for ( x in depnames ) merged_data[,x]=map_freq_to_numeric(merged_data,x) 
 
-# deek
-
-
 idata = impute_data(merged_data)
 idata = idata[ idata$BPXDI1 > 20 & idata$BPXDI2 > 20 & idata$BPXDI3 > 20 & idata$BPXDI4 > 20,  ]
 fdata <- filter_na_columns(merged_data, max_na_percent = 0.85)  # Removes columns with >10% NAs
@@ -175,6 +185,8 @@ idata2=impute_data(fdata )
 ```
 
 
+Define the categories of data so that these can be used to identify a low-dimensional representation based on the SiMLR objective.
+
 ```{r simlrcats,eval=TRUE,echo=TRUE}
 ####################################
 colcats=rep("Basic",ncol(fdata))
@@ -212,7 +224,7 @@ for ( k in knm ) {
     if ( k %in% c('exposures','diet') ) {
       nn = colnames(temp)
       for (  jj in 1:ncol(temp) ) temp = truncatehi(temp, nn[jj], t = 10, removeit = FALSE)
-      # temp = robustMatrixTransform( temp )
+#      temp = robustMatrixTransform( temp )
       colnames(temp) = nn
     }
     for ( j in 1:ncol(temp) ) {
@@ -228,33 +240,35 @@ names(nh_list)=knm
 
 ```
 
+Run the methods using reasonable defaults as recommended by prior work.
 
 ```{r nhanessimlrrun,eval=TRUE}
 ################################################################################
 # regs <- regularizeSimlr(nh_list,fraction=0.15,sigma=rep(1.0,length(nh_list)))
-# regs <- regularizeSimlr(nh_list)
 #
 regs=list()
 wdemog=which( knm == 'demog')
 for ( wdemog in 1:length(nh_list) ) regs[[ wdemog]]=diag( ncol(nh_list[[wdemog]]))
+# regs = regularizeSimlr(nh_list)
 names( regs ) = knm[ -1 ]
 initu=initializeSimlr( nh_list, k=round(max_columns_list(nh_list)), jointReduction=TRUE )
-#initu=initializeSimlr( nh_list, k=min_columns_list(nh_list), jointReduction=TRUE )
-#initu=initializeSimlr( nh_list, k=round(min_columns_list(nh_list)*2), jointReduction=TRUE )
 ###########################
-if ( ! exists("resultNH") )
+if ( ! exists("resultNH") ) {
   resultNH <- simlr( nh_list, 
-        iterations=200,
+        iterations=100,
         sparsenessQuantiles=rep(0.5,length(nh_list)),
         positivities=rep("positive",length(nh_list)), 
         energyType='regression', mixAlg='ica',
 #        energyType='cca', mixAlg='svd',
-        scale=c("centerAndScale",  "np"),
-#        scale=c("robust", "center", "np"),
+#        scale=c("centerAndScale",  "np"),
+        scale=c("whiten", "np"),
         constraint="Stiefelx10x10",
         initialUMatrix=initu, verbose=T )
+  }
 #####################################################
 ```
+
+Apply the learned representations to the data matrices.
 
 ```{r nhanessimlrstat,eval=TRUE}
 # drwwrd
@@ -284,17 +298,21 @@ if ( doimp ) {
   }
 #################################
 covars=" ~ riagendr + ridageyr + race + dmdeduc2 + INDFMPIR + "
-covars=" ~ riagendr + ridageyr + race + dmdeduc2 +  "
+covars=" ~ riagendr + ridageyr + dmdeduc2 +  " # race adjusted scores
+basep=0.01
+# basep=1e-16
+# rooter
+if ( ! exists("cogind" ) ) cogind = length(cognames)
 #############################
 for ( kk in 1:ncol(initu)) {
-  bform = paste0( cognames[length(cognames)], covars, "1" )
-  myform = paste0( cognames[length(cognames)], covars,paste0( paste0(names(projlist),kk), collapse='+'))
-  tempdf = simdf2[mycc,]
+  bform = paste0( cognames[cogind], covars, "1" )
+  myform = paste0( cognames[cogind], covars,paste0( paste0(names(projlist),kk), collapse='+'))
+  if ( basep >= 0.001 ) tempdf = simdf2[mycc,] else tempdf = simdf2[,]
   bmdl = lm( bform, data=tempdf )
   mdl = lm( myform, data=tempdf )
 #  if (doimp) mdl = lm( myform, data=tempdf, weights=tempdf$wtint2yr ) else mdl = lm( myform, data=tempdf, weights=tempdf$wtint2yr  )
   myanv = anova( bmdl, mdl )
-  if ( myanv$Pr[2] < 0.01/mysimk ) {
+  if ( myanv$Pr[2] < basep/mysimk ) {
     cat("*** result begin ***********************************\n")
     print("individual coefficients")
     tailcoffs = tail( coefficients( summary( mdl ) ), 4 )

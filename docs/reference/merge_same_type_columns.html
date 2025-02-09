@@ -66,7 +66,13 @@
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="fu">merge_same_type_columns</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span>a <span class="op">=</span> <span class="fl">1</span><span class="op">:</span><span class="fl">3</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span>a <span class="op">=</span> <span class="fl">4</span><span class="op">:</span><span class="fl">6</span><span class="op">)</span><span class="op">)</span></span></span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in bind_rows(df1[, matching_columns, drop = FALSE], df2[, matching_columns,     drop = FALSE]):</span> could not find function "bind_rows"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   a</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1 1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2 2</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3 3</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 4 4</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 5 5</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 6 6</span>
 </code></pre></div>
     </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
