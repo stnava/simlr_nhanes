@@ -264,6 +264,7 @@ if ( ! exists("resultNH") ) {
         scale=c("centerAndScale",  "np"),
 #        scale=c("whiten", "np"),
         constraint="Stiefelx10x10",
+        randomSeed=99,
         initialUMatrix=initu, verbose=T )
   }
 #####################################################
