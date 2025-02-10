@@ -300,9 +300,9 @@ if ( doimp ) {
   }
 #################################
 covars=" ~ riagendr + ridageyr + race + dmdeduc2 + INDFMPIR + "
-covars=" ~ riagendr + ridageyr + dmdeduc2 +  " # race adjusted scores
+covars=" ~ riagendr + ridageyr + dmdeduc2 + INDFMPIR + " # race adjusted scores
 basep=0.01
-# basep=1e-12
+basep=1e-8
 # rooter
 if ( ! exists("cogind" ) ) cogind = length(cognames)
 #############################
