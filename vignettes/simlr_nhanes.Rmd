@@ -32,6 +32,7 @@ Load the relevant librarys.
 # Load necessary libraries
 library(ggplot2)
 library(ggfortify)
+library(gridExtra)
 library(ellipse)
 library(ANTsR)
 library(subtyper)
@@ -272,7 +273,7 @@ if ( ! exists("resultNH") ) {
 
 Apply the learned representations to the data matrices.
 
-```{r nhanessimlrstat,eval=TRUE}
+```{r nhanessimlrstat,eval=TRUE,fig.width=10,fig.height=8}
 # drwwrd
 projlist=list()
 mysimk=ncol(initu)
@@ -302,7 +303,7 @@ if ( doimp ) {
 covars=" ~ riagendr + ridageyr + race + dmdeduc2 + INDFMPIR + "
 covars=" ~ riagendr + ridageyr + dmdeduc2 + INDFMPIR + " # race adjusted scores
 basep=0.01
-basep=1e-8
+# basep=1e-8
 # rooter
 if ( ! exists("cogind" ) ) cogind = length(cognames)
 #############################
@@ -321,12 +322,14 @@ for ( kk in 1:ncol(initu)) {
     print( tailcoffs )
     print( paste("multivar-ANOVA p-value", insight::format_p(myanv$Pr[2],digits=4) ) )
     print( cognames[cogind])
+    gglist=list()
     for ( k in names(projlist) ) {
       print( paste("Simlr weights", k ) )
       print( interpret_simlr_vector2( resultNH$v[[k]], kk, n2show=3, shortnames=F ) )
       ttl = paste0(k,kk, " ", insight::format_p(tailcoffs[paste0(k,kk),"Pr(>|t|)"],digits=4)  )
-      visreg::visreg(mdl, paste0(k,kk), main=ttl )
+      gglist[[length(gglist)+1]]=visreg::visreg(mdl, paste0(k,kk), gg=TRUE ) + ggtitle(ttl) + theme_minimal()
       }
+    print( grid.arrange( grobs=gglist ) )
     cat("*** result end ***********************************\n\n")
 #    Sys.sleep(3)
   }
