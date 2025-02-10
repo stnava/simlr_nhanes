@@ -396,7 +396,11 @@ max_columns_list <- function(matrix_list) {
 #' @export
 remove_perfectly_correlated <- function(df, tolerance=1e-6 ) {
   # Calculate correlation matrix
-  cor_matrix <- abs(cor(df, use = "pairwise.complete.obs"))
+  get_numeric_columns <- function(df) {
+    df[sapply(df, is.numeric)]
+  }
+  
+  cor_matrix <- abs( cor(get_numeric_columns(df), use = "pairwise.complete.obs"))
 
   # Identify perfectly correlated pairs
   to_remove <- c()
