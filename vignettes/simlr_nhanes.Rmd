@@ -252,9 +252,6 @@ table(mycc)
 doimp=TRUE
 for ( k in knm ) {
     print(k)
-#    if ( doimp ) {
-#      temp0 = impute_data( fdatanum[ ,colcats==k] )
-#    } else 
     temp0=(fdatanum[mycc,colcats==k])
     temp = data.frame(convert_to_numeric_matrix( temp0 ))
     vv=apply( temp, 2, FUN=var, na.rm=T )
@@ -264,7 +261,6 @@ for ( k in knm ) {
       for (  jj in 1:ncol(temp) ) { # temp = truncatehi(temp, nn[jj], t = 50, removeit = FALSE)
         temp[ , nn[jj] ] = sqrt(temp[ , nn[jj] ]-min(temp[ , nn[jj] ],na.rm=T))
         }
-#      temp = robustMatrixTransform( temp )
       colnames(temp) = nn
       temp = remove_perfectly_correlated( data.frame( temp ))
       vv=apply( temp, 2, FUN=var, na.rm=T )
