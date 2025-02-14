@@ -40,6 +40,11 @@ library( nhanesA )
 library( simlr.nhanes )
 library( dplyr )
 data("nhanescog_2011_2014")
+dtname="/Users/stnava/Downloads/cleaned_nhanes_21743372/41731260_dictionary_nhanes.csv"
+if ( file.exists( dtname ) ) {
+  nhanes_dict = read.csv( dtname ) 
+  }
+
 ```
 
 
@@ -364,6 +369,28 @@ simdf2[thesena]=NA
 ```
 
 ```{r nhanessimlrstatlm,eval=TRUE,fig.width=10,fig.height=8}
+# Function to search NHANES variable descriptions
+search_nhanes_var <- function(var_name, dtname) {
+  # Use an environment to store the dictionary globally
+  if (!exists("nhanes_dict", envir = .GlobalEnv)) {
+    if (file.exists(dtname)) {
+      assign("nhanes_dict", read.csv(dtname, stringsAsFactors = FALSE), envir = .GlobalEnv)
+    } else {
+      stop("Dictionary file not found!")
+    }
+  }
+  
+  # Search for the variable name (case insensitive)
+  result <- unique(subset(nhanes_dict, grepl(var_name, variable_codename_use, ignore.case = TRUE))$variable_description_use)
+  
+  # Return the first match if available
+  if (length(result) > 0) {
+    return(result[1])
+  } else {
+    return("Variable not found.")
+  }
+}
+
 covars=" ~ riagendr + ridageyr + dmdeduc2  +" # race adjusted scores
 covars=" ~ 1 +" # race adjusted scores
 covars=" ~ riagendr + ridageyr  + dmdeduc2 + INDFMPIR + "
@@ -396,7 +423,10 @@ for ( kk in 1:ncol(initu)) {
     gglist=list()
     for ( k in pnames ) {
       print( paste("Simlr weights", k ) )
-      print( interpret_simlr_vector2( resultNH$v[[k]], kk, n2show=3, shortnames=F ) )
+      ivec = interpret_simlr_vector2( resultNH$v[[k]], kk, n2show=3, shortnames=F )
+      print( ivec )
+      print( search_nhanes_var( ivec[1] ) )
+      print( search_nhanes_var( ivec[2] ) )
       ttl = paste0(k,kk, " ", insight::format_p(tailcoffs[paste0(k,sep,kk),"Pr(>|t|)"],digits=4)  )
       gglist[[length(gglist)+1]]=visreg::visreg(mdl, paste0(k,sep,kk), gg=TRUE ) + ggtitle(ttl) + theme_minimal()
       }
