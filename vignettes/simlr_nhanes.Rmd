@@ -48,7 +48,9 @@ data("nhanescog_2011_2014")
 We download these data on the fly and merge them together using the embedded data as well as the `nhanesA` package.
 
 ```{r nhanes,cache=TRUE,echo=FALSE}
+#
 # Demographic data (e.g., 2011-2012 cycle)
+#
 demo_data <- nhanes('DEMO_G')
 cog_data <- nhanes('CFQ_G')
 depression_data <- nhanes('DPQ_G')
@@ -88,9 +90,10 @@ ig13 <- nhanes('IHgEM_H')  # Example for phthalates and blood metals
 uh <- nhanes('UHG_G')  # Example for phthalates and blood metals
 uh13 <- nhanes('UHG_H')  # Example for phthalates and blood metals
 
+# check UH, IH, CU, PF, PS, UA, VOC, PH, BD, BM
+
 di <- nhanes('DR1TOT_G')  # diet
 di13 <- nhanes('DR1TOT_H')  # diet
-
 
 merge_nhanes_data <- function( joinid, nacol,  ...) {
   datasets <- list(...)
@@ -124,6 +127,9 @@ table(merged_data$RIAGENDR)
 nhanescog$SEQN = nhanescog$seqn
 merged_data=merge(nhanescog, merged_data, by='SEQN')
 
+missvec=colSums(is.na(merged_data)) / nrow( merged_data )
+hist( missvec, main='histogram of % NA')
+
 
 depnames = c( 
   getNamesFromDataframe( "SLQ", merged_data ),
@@ -135,12 +141,15 @@ for ( x in depnames ) merged_data[,x]=map_freq_to_numeric(merged_data,x)
 idata = impute_data(merged_data)
 idata = idata[ idata$BPXDI1 > 20 & idata$BPXDI2 > 20 & idata$BPXDI3 > 20 & idata$BPXDI4 > 20,  ]
 fdata <- filter_na_columns(merged_data, max_na_percent = 0.85)  # Removes columns with >10% NAs
+missvec=colSums(is.na(fdata)) / nrow( fdata )
+hist( missvec, main='histogram of % NA')
 fdata = fdata[ na2f(fdata$BPXDI1 > 20 & fdata$BPXDI2 > 20 & fdata$BPXDI3 > 20 ),  ]
 fdata$race = factor( fdata$race )
 fdata$riagendr = factor( fdata$riagendr )
 
 myformR =  create_formula( fdata, 'z_digit_re', c('SEQN', 'RIDAGEMN','RIDRETH3', 'CFASTAT', 'CFDCRNC', 'CFDCIT', 'CFDCST', 'CFDAPP', 'CFDAST', 'CFALANG', 'BPAARM', 'CFDCCS', 'CFDCST', 'CFDCIT', 'CFDCSR', 'CFDCIR', 'CFDCST', 'CFDCIT', 'CFDARNC', 'CFDDS',
-'INDHHIN2','DMDHRBR4','INDFMIN2','PEASCST1','PEASCCT1','PEASCTM1','BPACSZ','BPXML1','URXMBP','URXMC1','URDUMMAL','SLD010H','LBXBMN','URXCNP','URXECP','URXMHH','URXMHP','URXMHNC','LBXV06','LBXV2A','LBXV3B','LBXV4C','LBXVCB','LBXVEB','LBXVCB','LBXVIPB','LBXVMC','LBXVOX','LBXVTC','LBXVTE','LBXVXY','URXUAS5','URXUAB','URXUAC','URXUMMA','URXUAS3','LBXBSE', 'RIAGENDR', 'RIDAGEYR', 'RIDRETH1', 'seqn',
+'INDHHIN2','DMDHRBR4','INDFMIN2','PEASCST1','PEASCCT1','PEASCTM1',
+# 'BPACSZ','BPXML1','URXMBP','URXMC1','URDUMMAL','SLD010H','LBXBMN','URXCNP','URXECP','URXMHH','URXMHP','URXMHNC','LBXV06','LBXV2A','LBXV3B','LBXV4C','LBXVCB','LBXVEB','LBXVCB','LBXVIPB','LBXVMC','LBXVOX','LBXVTC','LBXVTE','LBXVXY','URXUAS5','URXUAB','URXUAC','URXUMMA','URXUAS3','LBXBSE', 'RIAGENDR', 'RIDAGEYR', 'RIDRETH1', 'seqn',
 'age_cat','ridreth1','ridreth3','edu_cat','cfastat','year','female','cerad_sum',
 # 'wtint2yr','wtmec2yr',
 'BMXARML','BMXARMC','BMXHT','BMXLEG','BMXWAIST',
@@ -153,10 +162,10 @@ getNamesFromDataframe( 'low_',fdata),
 getNamesFromDataframe( 'sdm',fdata),
 # getNamesFromDataframe( 'DPQ',depression_data, exclusions=c('DPQ080','DPQ030''DPQ080',)),
 # getNamesFromDataframe( 'DPQ',depression_data, exclusions=c('DPQ100')),
-getNamesFromDataframe( 'URXUCR',fdata ),
-getNamesFromDataframe( 'BMXSAD',fdata ),
-getNamesFromDataframe( 'BPAEN',fdata ),
-getNamesFromDataframe( 'BPXP',fdata ),
+# getNamesFromDataframe( 'URXUCR',fdata ),
+# getNamesFromDataframe( 'BMXSAD',fdata ),
+# getNamesFromDataframe( 'BPAEN',fdata ),
+# getNamesFromDataframe( 'BPXP',fdata ),
 getNamesFromDataframe( 'DMD',fdata ),
 getNamesFromDataframe( 'DMDHHSZ',fdata ),
 getNamesFromDataframe( 'DRD',fdata ),
@@ -188,49 +197,81 @@ idata2=impute_data(fdata )
 
 Define the categories of data so that these can be used to identify a low-dimensional representation based on the SiMLR objective.
 
-```{r simlrcats,eval=TRUE,echo=TRUE}
+```{r simlrcats0,eval=TRUE,echo=TRUE}
 ####################################
-colcats=rep("Basic",ncol(fdata))
-colcats[ colnames(fdata) %in%  c("ridageyr","riagendr","race","dmdeduc2","INDFMPIR") ]='demog'
-bpname=getNamesFromDataframe( "BPX",fdata)
-bmname=getNamesFromDataframe( "BMX",fdata)
-colcats[ colnames(fdata) %in%  c(bmname,bpname,"Testosterone","TotChol","Diabetes" ) ]='physical'
-colcats[ colnames(fdata) %in%   c(
-  getNamesFromDataframe( "DPQ", fdata ), 
-  getNamesFromDataframe( "SLQ", fdata ) )  ]='mentalhealth'
+if ( TRUE ) {
+  fdatanum = convert_to_numeric_matrix( fdata )
+  tarcols = colnames(fdatanum)
+  grepper =multigrep( c("_NA","limit"),tarcols) 
+  fdatanum = fdatanum[ , -grepper]
+  tarcols=tarcols[-grepper]
+  fdatanum = data.frame( (fdatanum))
+  colnames(fdatanum)=tarcols
+}
+```
+
+```{r simlrcats1,eval=TRUE,echo=TRUE}
+colcats=rep("Basic",ncol(fdatanum))
+colcats[ colnames(fdatanum) %in%  c("ridageyr",
+  getNamesFromDataframe("riagendr",fdatanum),
+  getNamesFromDataframe("race",fdatanum),
+  "dmdeduc2","INDFMPIR") ]='demog'
+```
+
+```{r simlrcats2,eval=TRUE,echo=TRUE}
+bpname=getNamesFromDataframe( "BPX",fdatanum)
+bmname=getNamesFromDataframe( "BMX",fdatanum)
+colcats[ colnames(fdatanum) %in%  c(bmname,bpname,"Testosterone","TotChol","Diabetes" ) ]='physical'
+colcats[ colnames(fdatanum) %in%   c(
+  getNamesFromDataframe( "DPQ", fdatanum ), 
+  getNamesFromDataframe( "SLQ", fdatanum ) )  ]='mentalhealth'
 x=c('LC','.x','.y','URDUMMAL','LBXVDE','LBX4CE')
-colcats[ colnames(fdata) %in%  getNamesFromDataframe( "LBX", fdata, exclusions=x ) ]='exposures'
-colcats[ colnames(fdata) %in%  getNamesFromDataframe( "LBD", fdata, exclusions=x ) ]='exposures'
-#colcats[ colnames(fdata) %in%  getNamesFromDataframe( "URX", fdata, exclusions=x ) ]='exposures'
-# colcats[ colnames(fdata) %in%  getNamesFromDataframe( "URD", fdata, exclusions=x ) ]='exposures'
-# colcats[ colnames(fdata) %in%  getNamesFromDataframe( "LBC", fdata, exclusions=x ) ]='exposures'
-colcats[ colnames(fdata) %in%  getNamesFromDataframe( "DR1T", fdata ) ]='diet'
-# colcats[ colnames(fdata) %in%  getNamesFromDataframe( "cfd", fdata )[-1] ]='digitspan'
+colcats[ colnames(fdatanum) %in%  getNamesFromDataframe( "LBX", fdatanum, exclusions=x ) ]='exposures'
+colcats[ colnames(fdatanum) %in%  getNamesFromDataframe( "LBD", fdatanum, exclusions=x ) ]='exposures'
+colcats[ colnames(fdatanum) %in%  getNamesFromDataframe( "URX", fdatanum, exclusions=x ) ]='exposures'
+colcats[ colnames(fdatanum) %in%  getNamesFromDataframe( "URD", fdatanum, exclusions=x ) ]='exposures'
+colcats[ colnames(fdatanum) %in%  getNamesFromDataframe( "LBC", fdatanum, exclusions=x ) ]='exposures'
+colcats[ colnames(fdatanum) %in%  getNamesFromDataframe( "DR1T", fdatanum, exclusions='DR1TWS' ) ]='diet'
+# colcats[ colnames(fdatanum) %in%  getNamesFromDataframe( "cfd", fdatanum )[-1] ]='digitspan'
 tbl=table(colcats)
+for ( nm in names(tbl)) {
+  expmiss=colSums(is.na(fdatanum[ ,colcats == nm ]) )
+  colcats[ colnames(fdatanum) %in% names(expmiss)[ expmiss > 800 ]  ] = 'Basic'
+  }
+tbl=table(colcats)
+```
+
+
+```{r simlrcats3,eval=TRUE,echo=TRUE}
 ##############
 nh_list=list()
-knm=names(tbl)[-1]
-mycc = complete.cases( fdata[ , colcats %in% 'demog' ])
-mycc = complete.cases( fdata[ , colcats %in% 'exposures' ])
+knm=names(tbl)[-c(1)]
+mycc = complete.cases( fdatanum[ , colcats %in% 'demog' ])
+# mycc = !is.na(fdata$LBXTHG) # complete.cases( fdatanum[ , colcats %in% 'exposures' ])
 table(mycc)
 doimp=TRUE
 for ( k in knm ) {
     print(k)
-    if ( doimp ) {
-      temp0 = impute_data( fdata[ ,colcats==k] )
-    } else temp0=(fdata[mycc,colcats==k])
+#    if ( doimp ) {
+#      temp0 = impute_data( fdatanum[ ,colcats==k] )
+#    } else 
+    temp0=(fdatanum[mycc,colcats==k])
     temp = data.frame(convert_to_numeric_matrix( temp0 ))
-    vv=apply( temp, 2, FUN=var )
+    vv=apply( temp, 2, FUN=var, na.rm=T )
     temp = temp[ , vv > 0 ]
-    if ( k %in% c('exposures','diet') ) {
+    if ( k %in% c('exposures','diet') | TRUE ) {
       nn = colnames(temp)
-      for (  jj in 1:ncol(temp) ) temp = truncatehi(temp, nn[jj], t = 10, removeit = FALSE)
+      for (  jj in 1:ncol(temp) ) { # temp = truncatehi(temp, nn[jj], t = 50, removeit = FALSE)
+        temp[ , nn[jj] ] = sqrt(temp[ , nn[jj] ]-min(temp[ , nn[jj] ],na.rm=T))
+        }
 #      temp = robustMatrixTransform( temp )
       colnames(temp) = nn
-      temp = remove_perfectly_correlated( temp )
+      temp = remove_perfectly_correlated( data.frame( temp ))
+      vv=apply( temp, 2, FUN=var, na.rm=T )
+      temp = temp[ , vv > 0 ]
     }
     for ( j in 1:ncol(temp) ) {
-        hist( temp[,j], main=colnames(temp)[j])
+#        hist( temp[,j], main=colnames(temp)[j])
 #        Sys.sleep(1)
         }
     nh_list[[length(nh_list)+1]]=data.matrix( ( temp ) )
@@ -250,69 +291,103 @@ Run the methods using reasonable defaults as recommended by prior work.
 #
 regs=list()
 wdemog=which( knm == 'demog')
-for ( wdemog in 1:length(nh_list) ) regs[[ wdemog]]=diag( ncol(nh_list[[wdemog]]))
+for ( wdemog in 1:length(nh_list) ) {
+  nh_list[[wdemog]]=antsrimpute( nh_list[[wdemog]] )
+  regs[[ wdemog]]=diag( ncol(nh_list[[wdemog]]))
+}
 # regs = regularizeSimlr(nh_list)
 names( regs ) = knm[ -1 ]
 initu=initializeSimlr( nh_list, k=round(max_columns_list(nh_list)), jointReduction=TRUE )
-###########################
+########################### ########################### 
 if ( ! exists("resultNH") ) {
+  mysigns = rep("positive",length(nh_list))
+  mysigns[ (knm) %in% c('exposures','diet') ]='either'
   resultNH <- simlr( nh_list, 
         iterations=100,
         sparsenessQuantiles=rep(0.5,length(nh_list)),
-        positivities=rep("positive",length(nh_list)), 
+        positivities=mysigns, 
         energyType='regression', mixAlg='ica',
 #        energyType='cca', mixAlg='pca',
-        scale=c("centerAndScale",  "np"),
-#        scale=c("whiten", "np"),
+#        scale=c("centerAndScale",  "np"),
+        scale=c("whiten", "np"),
         constraint="Stiefelx10x10",
         randomSeed=99,
         initialUMatrix=initu, verbose=T )
   }
 #####################################################
+#
+#####################################################
+#
+#####################################################
 ```
 
 Apply the learned representations to the data matrices.
 
-```{r nhanessimlrstat,eval=TRUE,fig.width=10,fig.height=8}
+```{r nhanessimlrstat0,eval=TRUE,fig.width=10,fig.height=8}
 # drwwrd
 projlist=list()
 mysimk=ncol(initu)
-for ( k in 2:length(nh_list)) {
-    rownames(resultNH$v[[k]])=colnames( nh_list[[k]])
-    ux=data.frame(nh_list[[k]] %*% abs(resultNH$v[[k]][,1:mysimk]))
-    colnames(ux)=paste0(names(nh_list)[k],1:ncol(ux))
-    projlist[[length(projlist)+1]]=ux
-    names( projlist )[length(projlist)]=knm[k]
-}
-simdf=simdf2=dplyr::bind_cols(projlist)
+for ( k in 1:length(nh_list)) rownames(resultNH$v[[k]])=colnames(nh_list[[k]])
+simdf2=data.frame(fdatanum)
+simdf2=apply_simlr_matrices( simdf2, resultNH$v, n_limit=ncol(initu), robust=FALSE, center=TRUE, 
+  scale=TRUE, absolute_value=mysigns=='positive', verbose=FALSE )
+newnames=simdf2[[2]]
+simdf2=simdf2[[1]]
 cognames = c(
   "z_cerad_re", "z_animal_re",      "z_delayed_re",    "z_global_re",     "z_digit_re"
 #  "z_cerad_age", "z_animal_age",     "z_digit_age",      "z_delayed_age",    "z_global_age",
 #  "z_cerad_edu", "z_animal_edu",     "z_digit_edu",      "z_delayed_edu",    "z_global_edu"
 )
 # cognames=c("cerad_sum","cfdast","cfdds")
+```
+
+```{r nhanessimlrstatimp,eval=TRUE,fig.width=10,fig.height=8}
 dnames = c( "riagendr", "ridageyr", "race", "dmdeduc2", "INDFMPIR",'wtint2yr','wtmec2yr')
-if ( doimp ) {
-  simdf2[,dnames]=fdata[,dnames]
-  simdf2[,cognames]=fdata[,cognames]
-  } else {
-  simdf2[,dnames]=fdata[mycc,dnames]
-  simdf2[,cognames]=fdata[mycc,cognames]
+simdf2 = data.frame(simdf2)
+simdf2[,dnames]=fdata[,dnames]
+simdf2[,cognames]=fdata[,cognames]
+sep='PC'
+tocomp = c("dietPC1","mentalhealthPC1",'physicalPC1')
+mycc2 = complete.cases( simdf2[,tocomp]  )
+simdf2=simdf2[mycc2,]
+for ( n in 'exposures' ) {
+    for ( v in 1:mysimk ) {
+      thiscol=paste0(n,sep,v)
+      if ( any( is.na( simdf2[,thiscol] ) )) {
+#        simdf2 = simlr_impute( data.frame(simdf2), knm, v, n, separator=sep )
+#        simdf2[,thiscol]=antsrimpute(simdf2[,thiscol])
+      }
+    }
   }
-#################################
-covars=" ~ riagendr + ridageyr + race + dmdeduc2 + INDFMPIR + "
-covars=" ~ riagendr + ridageyr + dmdeduc2 + INDFMPIR + " # race adjusted scores
-basep=0.01
-# basep=1e-8
+thesena=is.na(simdf2)
+nn=colnames(simdf2)
+# simdf2 = data.frame( robustMatrixTransform(simdf2))
+colnames(simdf2)=nn
+simdf2[thesena]=NA
+##################################
+```
+
+```{r nhanessimlrstatlm,eval=TRUE,fig.width=10,fig.height=8}
+covars=" ~ riagendr + ridageyr + dmdeduc2  +" # race adjusted scores
+covars=" ~ 1 +" # race adjusted scores
+covars=" ~ riagendr + ridageyr  + dmdeduc2 + INDFMPIR + "
+basep=1e-4
 # rooter
 if ( ! exists("cogind" ) ) cogind = length(cognames)
 #############################
+pnames=knm[-1]
+nsig=0
 for ( kk in 1:ncol(initu)) {
   bform = paste0( cognames[cogind], covars, "1" )
-  myform = paste0( cognames[cogind], covars,paste0( paste0(names(projlist),kk), collapse='+'))
-  if ( basep >= 0.001 ) tempdf = simdf2[mycc,] else tempdf = simdf2[,]
-  bmdl = lm( bform, data=tempdf )
+  myform = paste0( cognames[cogind], covars,paste0( paste0(pnames,sep,kk), collapse='+'))
+  tempdf = simdf2
+  for ( qq in knm ) {
+    tt=paste0(qq,sep,kk)
+    tempdf[ , tt]=psych::winsor( sqrt(tempdf[ , tt] - min(tempdf[ , tt],na.rm=T)), 0.005 )
+#    if ( qq == 'exposures' ) tempdf[ , tt]=antsrimpute( tempdf[ , tt] )
+  }
   mdl = lm( myform, data=tempdf )
+  bmdl = lm( bform, data=tempdf[names(predict(mdl)),] )
 #  if (doimp) mdl = lm( myform, data=tempdf, weights=tempdf$wtint2yr ) else mdl = lm( myform, data=tempdf, weights=tempdf$wtint2yr  )
   myanv = anova( bmdl, mdl )
   if ( myanv$Pr[2] < basep/mysimk ) {
@@ -323,17 +398,19 @@ for ( kk in 1:ncol(initu)) {
     print( paste("multivar-ANOVA p-value", insight::format_p(myanv$Pr[2],digits=4) ) )
     print( cognames[cogind])
     gglist=list()
-    for ( k in names(projlist) ) {
+    for ( k in pnames ) {
       print( paste("Simlr weights", k ) )
       print( interpret_simlr_vector2( resultNH$v[[k]], kk, n2show=3, shortnames=F ) )
-      ttl = paste0(k,kk, " ", insight::format_p(tailcoffs[paste0(k,kk),"Pr(>|t|)"],digits=4)  )
-      gglist[[length(gglist)+1]]=visreg::visreg(mdl, paste0(k,kk), gg=TRUE ) + ggtitle(ttl) + theme_minimal()
+      ttl = paste0(k,kk, " ", insight::format_p(tailcoffs[paste0(k,sep,kk),"Pr(>|t|)"],digits=4)  )
+      gglist[[length(gglist)+1]]=visreg::visreg(mdl, paste0(k,sep,kk), gg=TRUE ) + ggtitle(ttl) + theme_minimal()
       }
-    print( grid.arrange( grobs=gglist ) )
+    ( grid.arrange( grobs=gglist, nrow=2 ) )
+    nsig=nsig+1
     cat("*** result end ***********************************\n\n")
 #    Sys.sleep(3)
   }
 }
+print(nsig)
 ##########################################################################################
 ##########################################################################################
 # https://wwwn.cdc.gov/nchs/nhanes/search/default.aspx
