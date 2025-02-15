@@ -267,7 +267,7 @@ for ( k in knm ) {
         temp[ , nn[jj] ] = sqrt(temp[ , nn[jj] ]-min(temp[ , nn[jj] ],na.rm=T))
         }
       colnames(temp) = nn
-      temp = remove_perfectly_correlated( data.frame( temp ))
+      temp = remove_perfectly_correlated( data.frame( temp ), tolerance=0.05 )
       vv=apply( temp, 2, FUN=var, na.rm=T )
       temp = temp[ , vv > 0 ]
     }
@@ -299,20 +299,26 @@ for ( wdemog in 1:length(nh_list) ) {
 # regs = regularizeSimlr(nh_list)
 names( regs ) = knm[ -1 ]
 initu=initializeSimlr( nh_list, k=round(max_columns_list(nh_list)), jointReduction=TRUE )
+initu=initializeSimlr( nh_list, k=round(max_columns_list(nh_list)*0.5), jointReduction=TRUE )
 ########################### ########################### 
 if ( ! exists("resultNH") ) {
   mysigns = rep("positive",length(nh_list))
   mysigns[ (knm) %in% c('exposures','diet') ]='either'
+  params = list( list() )
+  params[[1]][[1]] = c('cca','pca')
+  params[[1]][[2]] = c('centerAndScale','np')
+  params[[2]]=list()
+  params[[2]][[1]] = c('regression','ica')
+  params[[2]][[2]] = c('whiten','np')
+  pindex = 2
   resultNH <- simlr( nh_list, 
         iterations=100,
         sparsenessQuantiles=rep(0.5,length(nh_list)),
         positivities=mysigns, 
-        energyType='regression', mixAlg='ica',
-#        energyType='cca', mixAlg='pca',
-#        scale=c("centerAndScale",  "np"),
-        scale=c("whiten", "np"),
+        energyType=params[[pindex]][[1]][1], mixAlg=params[[pindex]][[1]][2],
+        scale=params[[pindex]][[2]],
         constraint="Stiefelx10x10",
-        randomSeed=99,
+        randomSeed=808,
         initialUMatrix=initu, verbose=T )
   }
 #####################################################
@@ -370,7 +376,7 @@ simdf2[thesena]=NA
 
 ```{r nhanessimlrstatlm,eval=TRUE,fig.width=10,fig.height=8}
 # Function to search NHANES variable descriptions
-search_nhanes_var <- function(var_name, dtname) {
+search_nhanes_var <- function(var_name_in, dtname) {
   # Use an environment to store the dictionary globally
   if (!exists("nhanes_dict", envir = .GlobalEnv)) {
     if (file.exists(dtname)) {
@@ -381,7 +387,7 @@ search_nhanes_var <- function(var_name, dtname) {
   }
   
   # Search for the variable name (case insensitive)
-  result <- unique(subset(nhanes_dict, grepl(var_name, variable_codename_use, ignore.case = TRUE))$variable_description_use)
+  result <- unique(subset(nhanes_dict, grepl(var_name_in, nhanes_dict$variable_codename_use, ignore.case = TRUE))$variable_description_use)
   
   # Return the first match if available
   if (length(result) > 0) {
@@ -425,8 +431,8 @@ for ( kk in 1:ncol(initu)) {
       print( paste("Simlr weights", k ) )
       ivec = interpret_simlr_vector2( resultNH$v[[k]], kk, n2show=3, shortnames=F )
       print( ivec )
-      print( search_nhanes_var( ivec[1] ) )
-      print( search_nhanes_var( ivec[2] ) )
+      print( search_nhanes_var( names(ivec)[1] ) )
+      print( search_nhanes_var( names(ivec)[2] ) )
       ttl = paste0(k,kk, " ", insight::format_p(tailcoffs[paste0(k,sep,kk),"Pr(>|t|)"],digits=4)  )
       gglist[[length(gglist)+1]]=visreg::visreg(mdl, paste0(k,sep,kk), gg=TRUE ) + ggtitle(ttl) + theme_minimal()
       }
