@@ -310,6 +310,15 @@ matrix_from_latent <- function(latent_matrix, target_p, noise_sd = 0.3) {
 "nhanescog"
 
 
+#' NHANES data dictionary
+#' @format Curated nhanes cognition data dictionary from kaggle NGUYENVY
+#' @examples
+#' \dontrun{
+#'  data("nhanes_dict")
+#' }
+"nhanes_dict"
+
+
 #' Calculate the Minimum Number of Columns in a List of Matrices
 #'
 #' This function loops through a list of matrices and returns the minimum 

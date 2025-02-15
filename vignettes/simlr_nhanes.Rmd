@@ -40,11 +40,7 @@ library( nhanesA )
 library( simlr.nhanes )
 library( dplyr )
 data("nhanescog_2011_2014")
-dtname="/Users/stnava/Downloads/cleaned_nhanes_21743372/41731260_dictionary_nhanes.csv"
-dtname="/Users/stnava/Downloads/archive/dictionary_nhanes.csv"
-if ( file.exists( dtname ) ) {
-  nhanes_dict = read.csv( dtname ) 
-  }
+data("nhanes_dict")
 
 ```
 
@@ -268,7 +264,7 @@ for ( k in knm ) {
         temp[ , nn[jj] ] = sqrt(temp[ , nn[jj] ]-min(temp[ , nn[jj] ],na.rm=T))
         }
       colnames(temp) = nn
-      temp = remove_perfectly_correlated( data.frame( temp ), tolerance=0.05 )
+      temp = remove_perfectly_correlated( data.frame( temp ), tolerance=0.01 )
       vv=apply( temp, 2, FUN=var, na.rm=T )
       temp = temp[ , vv > 0 ]
     }
@@ -380,19 +376,10 @@ simdf2[thesena]=NA
 
 ```{r nhanessimlrstatlm,eval=TRUE,fig.width=10,fig.height=8}
 # Function to search NHANES variable descriptions
-search_nhanes_var <- function(var_name_in, dtname) {
-  # Use an environment to store the dictionary globally
-  if (!exists("nhanes_dict", envir = .GlobalEnv)) {
-    if (file.exists(dtname)) {
-      assign("nhanes_dict", read.csv(dtname, stringsAsFactors = FALSE), envir = .GlobalEnv)
-    } else {
-      stop("Dictionary file not found!")
-    }
-  }
-  
+search_nhanes_var <- function(var_name_in, dtname) {  
   # Search for the variable name (case insensitive)
+  var_name_in=gsub( "DR1T" ,  "DRXT" , var_name_in)
   result <- unique(subset(nhanes_dict, grepl(var_name_in, nhanes_dict$variable_codename_use, ignore.case = TRUE))$variable_description_use)
-  
   # Return the first match if available
   if (length(result) > 0) {
     return(result[1])
