@@ -39,8 +39,11 @@ library(subtyper)
 library( nhanesA )
 library( simlr.nhanes )
 library( dplyr )
+library(htmlwidgets)
 data("nhanescog_2011_2014")
 data("nhanes_dict")
+
+
 
 ```
 
@@ -357,6 +360,7 @@ sep='PC'
 tocomp = c("dietPC1","mentalhealthPC1",'physicalPC1')
 mycc2 = complete.cases( simdf2[,tocomp]  )
 simdf2=simdf2[mycc2,]
+simdf2[,newnames]=scale(simdf2[,newnames],T,T)
 for ( n in 'exposures' ) {
     for ( v in 1:mysimk ) {
       thiscol=paste0(n,sep,v)
@@ -404,7 +408,6 @@ for ( kk in 1:ncol(initu)) {
   for ( qq in knm ) {
     tt=paste0(qq,sep,kk)
     tempdf[ , tt]=psych::winsor( sqrt(tempdf[ , tt] - min(tempdf[ , tt],na.rm=T)), 0.005 )
-#    if ( qq == 'exposures' ) tempdf[ , tt]=antsrimpute( tempdf[ , tt] )
   }
   mdl = lm( myform, data=tempdf )
   bmdl = lm( bform, data=tempdf[names(predict(mdl)),] )
@@ -418,15 +421,23 @@ for ( kk in 1:ncol(initu)) {
     print( paste("multivar-ANOVA p-value", insight::format_p(myanv$Pr[2],digits=4) ) )
     print( cognames[cogind])
     gglist=list()
+    simpreds = c()
+    simwts = c()
     for ( k in pnames ) {
       print( paste("Simlr weights", k ) )
       ivec = interpret_simlr_vector2( resultNH$v[[k]], kk, n2show=3, shortnames=F )
       print( ivec )
       print( search_nhanes_var( names(ivec)[1] ) )
       print( search_nhanes_var( names(ivec)[2] ) )
+      simpreds = c( simpreds, names(ivec)[1:2] )
+      simwts = c( simwts, ivec[1:2] * abs(tailcoffs[paste0(k,sep,kk),"t value"] ))
       ttl = paste0(k,kk, " ", insight::format_p(tailcoffs[paste0(k,sep,kk),"Pr(>|t|)"],digits=4)  )
       gglist[[length(gglist)+1]]=visreg::visreg(mdl, paste0(k,sep,kk), gg=TRUE ) + ggtitle(ttl) + theme_minimal()
       }
+    print( plot_regression_graph( simpreds, simwts, cognames[cogind], method = "ggraph") )
+#    sankey <- plot_regression_graph(simpreds, simwts, cognames[cogind], method = "sankey")
+#    saveWidget(sankey, "sankey_plot.html", selfcontained = TRUE)
+#    htmltools::includeHTML("sankey_plot.html")
     ( grid.arrange( grobs=gglist, nrow=2 ) )
     nsig=nsig+1
     cat("*** result end ***********************************\n\n")
