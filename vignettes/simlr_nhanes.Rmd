@@ -24,6 +24,10 @@ We extract distinct but related types of data from the [NHANES](https://wwwn.cdc
 
 These are combined into SiMLR for an unsupervised dimensionality reduction.  The resulting low-dimensional representations are used for joint prediction of cognitive outcomes.  Over 400 subjects with these measurements are available along with environmental exposures.
 
+We predict the variable `z_digit_re` in NHANES which refers to the Digit Symbol Substitution Test (DSST), a cognitive assessment tool. The DSST evaluates processing speed, sustained attention, and working memory by requiring participants to match symbols with corresponding numbers under time constraints.
+
+In summary, SiMLR identifies predictors from diet, physical measurements, environmental exposures and mental health that jointly relate to DSST and related variables.  This example builds on prior work such as [this](https://pmc.ncbi.nlm.nih.gov/articles/PMC10093810/) and [this]().
+
 ## Setup 
 
 Load the relevant librarys.
@@ -52,7 +56,7 @@ data("nhanes_dict")
 
 We download these data on the fly and merge them together using the embedded data as well as the `nhanesA` package.
 
-```{r nhanes,cache=TRUE,echo=FALSE}
+```{r nhanes,cache=FALSE,echo=FALSE}
 #
 # Demographic data (e.g., 2011-2012 cycle)
 #

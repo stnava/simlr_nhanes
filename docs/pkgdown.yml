@@ -4,7 +4,7 @@ pkgdown_sha: ~
 articles:
   pca_cca_simlr: pca_cca_simlr.html
   simlr_nhanes: simlr_nhanes.html
-last_built: 2025-02-15T21:32Z
+last_built: 2025-02-15T21:52Z
 urls:
   reference: https://github.com/stnava/simlr_nhanes/reference
   article: https://github.com/stnava/simlr_nhanes/articles
