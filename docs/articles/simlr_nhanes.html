@@ -161,10 +161,7 @@ measurements are available along with environmental exposures.</p>
 <span><span class="co">##     intersect, setdiff, setequal, union</span></span></code></pre>
 <div class="sourceCode" id="cb26"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="st">"nhanescog_2011_2014"</span><span class="op">)</span></span>
-<span><span class="va">dtname</span><span class="op">=</span><span class="st">"/Users/stnava/Downloads/cleaned_nhanes_21743372/41731260_dictionary_nhanes.csv"</span></span>
-<span><span class="kw">if</span> <span class="op">(</span> <span class="fu"><a href="https://rdrr.io/r/base/files.html" class="external-link">file.exists</a></span><span class="op">(</span> <span class="va">dtname</span> <span class="op">)</span> <span class="op">)</span> <span class="op">{</span></span>
-<span>  <span class="va">nhanes_dict</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/utils/read.table.html" class="external-link">read.csv</a></span><span class="op">(</span> <span class="va">dtname</span> <span class="op">)</span> </span>
-<span>  <span class="op">}</span></span></code></pre></div>
+<span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="st">"nhanes_dict"</span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="nhanes-example">NHANES example<a class="anchor" aria-label="anchor" href="#nhanes-example"></a>
@@ -244,7 +241,7 @@ low-dimensional representation based on the SiMLR objective.</p>
 <span>        <span class="va">temp</span><span class="op">[</span> , <span class="va">nn</span><span class="op">[</span><span class="va">jj</span><span class="op">]</span> <span class="op">]</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/MathFun.html" class="external-link">sqrt</a></span><span class="op">(</span><span class="va">temp</span><span class="op">[</span> , <span class="va">nn</span><span class="op">[</span><span class="va">jj</span><span class="op">]</span> <span class="op">]</span><span class="op">-</span><span class="fu"><a href="https://rdrr.io/pkg/ANTsR/man/antsImageSummary.html" class="external-link">min</a></span><span class="op">(</span><span class="va">temp</span><span class="op">[</span> , <span class="va">nn</span><span class="op">[</span><span class="va">jj</span><span class="op">]</span> <span class="op">]</span>,na.rm<span class="op">=</span><span class="cn">T</span><span class="op">)</span><span class="op">)</span></span>
 <span>        <span class="op">}</span></span>
 <span>      <span class="fu"><a href="https://rdrr.io/r/base/colnames.html" class="external-link">colnames</a></span><span class="op">(</span><span class="va">temp</span><span class="op">)</span> <span class="op">=</span> <span class="va">nn</span></span>
-<span>      <span class="va">temp</span> <span class="op">=</span> <span class="fu"><a href="../reference/remove_perfectly_correlated.html">remove_perfectly_correlated</a></span><span class="op">(</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span> <span class="va">temp</span> <span class="op">)</span>, tolerance<span class="op">=</span><span class="fl">0.05</span> <span class="op">)</span></span>
+<span>      <span class="va">temp</span> <span class="op">=</span> <span class="fu"><a href="../reference/remove_perfectly_correlated.html">remove_perfectly_correlated</a></span><span class="op">(</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span> <span class="va">temp</span> <span class="op">)</span>, tolerance<span class="op">=</span><span class="fl">0.01</span> <span class="op">)</span></span>
 <span>      <span class="va">vv</span><span class="op">=</span><span class="fu"><a href="https://rdrr.io/pkg/ANTsR/man/apply.html" class="external-link">apply</a></span><span class="op">(</span> <span class="va">temp</span>, <span class="fl">2</span>, FUN<span class="op">=</span><span class="va">var</span>, na.rm<span class="op">=</span><span class="cn">T</span> <span class="op">)</span></span>
 <span>      <span class="va">temp</span> <span class="op">=</span> <span class="va">temp</span><span class="op">[</span> , <span class="va">vv</span> <span class="op">&gt;</span> <span class="fl">0</span> <span class="op">]</span></span>
 <span>    <span class="op">}</span></span>
@@ -261,17 +258,18 @@ low-dimensional representation based on the SiMLR objective.</p>
 <span><span class="co">## [6] "race_2"     "race_3"     "race_4"    </span></span>
 <span><span class="co">## [1] "diet"</span></span>
 <span><span class="co">##  [1] "DR1TNUMF" "DR1TKCAL" "DR1TPROT" "DR1TCARB" "DR1TSUGR" "DR1TFIBE"</span></span>
-<span><span class="co">##  [7] "DR1TTFAT" "DR1TSFAT" "DR1TPFAT" "DR1TCHOL" "DR1TATOC" "DR1TATOA"</span></span>
-<span><span class="co">## [13] "DR1TRET"  "DR1TVARA" "DR1TACAR" "DR1TBCAR" "DR1TCRYP" "DR1TLYCO"</span></span>
-<span><span class="co">## [19] "DR1TLZ"   "DR1TVB1"  "DR1TVB2"  "DR1TNIAC" "DR1TVB6"  "DR1TFOLA"</span></span>
-<span><span class="co">## [25] "DR1TFA"   "DR1TFF"   "DR1TCHL"  "DR1TVB12" "DR1TB12A" "DR1TVC"  </span></span>
-<span><span class="co">## [31] "DR1TVD"   "DR1TVK"   "DR1TCALC" "DR1TPHOS" "DR1TMAGN" "DR1TIRON"</span></span>
-<span><span class="co">## [37] "DR1TZINC" "DR1TCOPP" "DR1TSODI" "DR1TPOTA" "DR1TSELE" "DR1TCAFF"</span></span>
-<span><span class="co">## [43] "DR1TTHEO" "DR1TALCO" "DR1TMOIS" "DR1TS040" "DR1TS080" "DR1TS120"</span></span>
-<span><span class="co">## [49] "DR1TS140" "DR1TM161" "DR1TM201" "DR1TM221" "DR1TP183" "DR1TP184"</span></span>
-<span><span class="co">## [55] "DR1TP204" "DR1TP205" "DR1TP225" "DR1TP226"</span></span>
+<span><span class="co">##  [7] "DR1TTFAT" "DR1TSFAT" "DR1TMFAT" "DR1TPFAT" "DR1TCHOL" "DR1TATOC"</span></span>
+<span><span class="co">## [13] "DR1TATOA" "DR1TRET"  "DR1TVARA" "DR1TACAR" "DR1TBCAR" "DR1TCRYP"</span></span>
+<span><span class="co">## [19] "DR1TLYCO" "DR1TLZ"   "DR1TVB1"  "DR1TVB2"  "DR1TNIAC" "DR1TVB6" </span></span>
+<span><span class="co">## [25] "DR1TFOLA" "DR1TFA"   "DR1TFF"   "DR1TFDFE" "DR1TCHL"  "DR1TVB12"</span></span>
+<span><span class="co">## [31] "DR1TB12A" "DR1TVC"   "DR1TVD"   "DR1TVK"   "DR1TCALC" "DR1TPHOS"</span></span>
+<span><span class="co">## [37] "DR1TMAGN" "DR1TIRON" "DR1TZINC" "DR1TCOPP" "DR1TSODI" "DR1TPOTA"</span></span>
+<span><span class="co">## [43] "DR1TSELE" "DR1TCAFF" "DR1TTHEO" "DR1TALCO" "DR1TMOIS" "DR1TS040"</span></span>
+<span><span class="co">## [49] "DR1TS060" "DR1TS080" "DR1TS100" "DR1TS120" "DR1TS140" "DR1TS160"</span></span>
+<span><span class="co">## [55] "DR1TS180" "DR1TM161" "DR1TM201" "DR1TM221" "DR1TP183" "DR1TP184"</span></span>
+<span><span class="co">## [61] "DR1TP204" "DR1TP205" "DR1TP225" "DR1TP226"</span></span>
 <span><span class="co">## [1] "exposures"</span></span>
-<span><span class="co">## [1] "LBXBPB" "LBXBCD" "LBXTHG" "LBXBSE" "LBXBMN" "LBXIHG" "LBXBGE"</span></span>
+<span><span class="co">## [1] "LBXBPB" "LBXBCD" "LBXTHG" "LBXBSE" "LBXBMN" "LBXIHG" "LBXBGE" "LBXBGM"</span></span>
 <span><span class="co">## [1] "mentalhealth"</span></span>
 <span><span class="co">##  [1] "DPQ010" "DPQ020" "DPQ030" "DPQ040" "DPQ050" "DPQ060" "DPQ070" "DPQ080"</span></span>
 <span><span class="co">##  [9] "DPQ090" "SLQ050" "SLQ060"</span></span>
@@ -323,107 +321,78 @@ work.</p>
 <span>  <span class="op">}</span></span></code></pre></div>
 <pre><code><span><span class="co">## [1] "Stiefel" "10"      "10"     </span></span>
 <span><span class="co">## [1] "     &lt;0&gt; BUILD-V &lt;0&gt; BUILD-V &lt;0&gt; BUILD-V &lt;0&gt; BUILD-V &lt;0&gt;    "</span></span>
-<span><span class="co">## [1] "initialDataTerm: 2.62989681313549  &lt;o&gt; mixer: ica  &lt;o&gt; E:  regression"</span></span>
-<span><span class="co">## [1] "Iteration: 1 bestEv: 14.4059399643926 bestIt: 1 CE: 14.4059399643926 featOrth: 0.137441320516198"</span></span>
-<span><span class="co">## [1] "Iteration: 2 bestEv: 1.71436742077834 bestIt: 2 CE: 1.71436742077834 featOrth: 0.130745395408405"</span></span>
-<span><span class="co">## [1] "Iteration: 3 bestEv: 1.07827632965365 bestIt: 3 CE: 1.07827632965365 featOrth: 0.10902001631207"</span></span>
-<span><span class="co">## [1] "Iteration: 4 bestEv: 0.987946722907712 bestIt: 4 CE: 0.987946722907712 featOrth: 0.0990597953669404"</span></span>
-<span><span class="co">## [1] "Iteration: 5 bestEv: 0.950201586351703 bestIt: 5 CE: 0.950201586351703 featOrth: 0.0926611436879981"</span></span>
-<span><span class="co">## [1] "Iteration: 6 bestEv: 0.872628355997215 bestIt: 6 CE: 0.872628355997215 featOrth: 0.0877332967677394"</span></span>
-<span><span class="co">## [1] "Iteration: 7 bestEv: 0.798373817967933 bestIt: 7 CE: 0.798373817967933 featOrth: 0.080333228356766"</span></span>
-<span><span class="co">## [1] "Iteration: 8 bestEv: 0.67788814308418 bestIt: 8 CE: 0.67788814308418 featOrth: 0.067721926984851"</span></span>
-<span><span class="co">## [1] "Iteration: 9 bestEv: 0.60423460678298 bestIt: 9 CE: 0.60423460678298 featOrth: 0.060530322568825"</span></span>
-<span><span class="co">## [1] "Iteration: 10 bestEv: 0.537001484405108 bestIt: 10 CE: 0.537001484405108 featOrth: 0.0534485754935069"</span></span>
-<span><span class="co">## [1] "Iteration: 11 bestEv: 0.510695353081807 bestIt: 11 CE: 0.510695353081807 featOrth: 0.0507578575583826"</span></span>
-<span><span class="co">## [1] "Iteration: 12 bestEv: 0.476886656292718 bestIt: 12 CE: 0.476886656292718 featOrth: 0.0476243104170116"</span></span>
-<span><span class="co">## [1] "Iteration: 13 bestEv: 0.387188176319932 bestIt: 13 CE: 0.387188176319932 featOrth: 0.0386820190844655"</span></span>
-<span><span class="co">## [1] "Iteration: 14 bestEv: 0.366198316349536 bestIt: 14 CE: 0.366198316349536 featOrth: 0.0364743662040543"</span></span>
-<span><span class="co">## [1] "Iteration: 15 bestEv: 0.339282617800783 bestIt: 15 CE: 0.339282617800783 featOrth: 0.0338219409772607"</span></span>
-<span><span class="co">## [1] "Iteration: 16 bestEv: 0.322343694158017 bestIt: 16 CE: 0.322343694158017 featOrth: 0.0320920546118971"</span></span>
-<span><span class="co">## [1] "Iteration: 17 bestEv: 0.313567657553766 bestIt: 17 CE: 0.313567657553766 featOrth: 0.0312507976326073"</span></span>
-<span><span class="co">## [1] "Iteration: 18 bestEv: 0.308563155066892 bestIt: 18 CE: 0.308563155066892 featOrth: 0.0307225299872834"</span></span>
-<span><span class="co">## [1] "Iteration: 19 bestEv: 0.304545344346464 bestIt: 19 CE: 0.304545344346464 featOrth: 0.0302226221501555"</span></span>
-<span><span class="co">## [1] "Iteration: 20 bestEv: 0.292252463913407 bestIt: 20 CE: 0.292252463913407 featOrth: 0.0290705396734664"</span></span>
-<span><span class="co">## [1] "Iteration: 21 bestEv: 0.288134844975608 bestIt: 21 CE: 0.288134844975608 featOrth: 0.0286481378698642"</span></span>
-<span><span class="co">## [1] "Iteration: 22 bestEv: 0.281956158945781 bestIt: 22 CE: 0.281956158945781 featOrth: 0.0280514972705353"</span></span>
-<span><span class="co">## [1] "Iteration: 23 bestEv: 0.281333614246523 bestIt: 23 CE: 0.281333614246523 featOrth: 0.0279942039091028"</span></span>
-<span><span class="co">## [1] "Iteration: 24 bestEv: 0.276378044945376 bestIt: 24 CE: 0.276378044945376 featOrth: 0.0275127496530792"</span></span>
-<span><span class="co">## [1] "Iteration: 25 bestEv: 0.273314963494116 bestIt: 25 CE: 0.273314963494116 featOrth: 0.0272063823350215"</span></span>
-<span><span class="co">## [1] "Iteration: 26 bestEv: 0.272508767900418 bestIt: 26 CE: 0.272508767900418 featOrth: 0.027122926711206"</span></span>
-<span><span class="co">## [1] "Iteration: 27 bestEv: 0.269846260937601 bestIt: 27 CE: 0.269846260937601 featOrth: 0.0268519671760481"</span></span>
-<span><span class="co">## [1] "Iteration: 28 bestEv: 0.262815651781906 bestIt: 28 CE: 0.262815651781906 featOrth: 0.0231301062228915"</span></span>
-<span><span class="co">## [1] "Iteration: 29 bestEv: 0.219490166103559 bestIt: 29 CE: 0.219490166103559 featOrth: 0.0218164573445244"</span></span>
-<span><span class="co">## [1] "Iteration: 30 bestEv: 0.219377930240841 bestIt: 30 CE: 0.219377930240841 featOrth: 0.0218074759572753"</span></span>
-<span><span class="co">## [1] "Iteration: 31 bestEv: 0.214183183745514 bestIt: 31 CE: 0.214183183745514 featOrth: 0.0212955654100738"</span></span>
-<span><span class="co">## [1] "Iteration: 32 bestEv: 0.21403836089231 bestIt: 32 CE: 0.21403836089231 featOrth: 0.0212826286048762"</span></span>
-<span><span class="co">## [1] "Iteration: 33 bestEv: 0.196993480194893 bestIt: 33 CE: 0.196993480194893 featOrth: 0.0195741412131966"</span></span>
-<span><span class="co">## [1] "Iteration: 34 bestEv: 0.18328509531899 bestIt: 34 CE: 0.18328509531899 featOrth: 0.0182055789811528"</span></span>
-<span><span class="co">## [1] "Iteration: 35 bestEv: 0.183200135322205 bestIt: 35 CE: 0.183200135322205 featOrth: 0.0181997846788099"</span></span>
-<span><span class="co">## [1] "Iteration: 36 bestEv: 0.183065745674488 bestIt: 36 CE: 0.183065745674488 featOrth: 0.0181887811814881"</span></span>
-<span><span class="co">## [1] "Iteration: 37 bestEv: 0.182953344516318 bestIt: 37 CE: 0.182953344516318 featOrth: 0.0181797472817897"</span></span>
-<span><span class="co">## [1] "Iteration: 38 bestEv: 0.178124691528801 bestIt: 38 CE: 0.178124691528801 featOrth: 0.017700109984798"</span></span>
-<span><span class="co">## [1] "Iteration: 39 bestEv: 0.178075901794333 bestIt: 39 CE: 0.178075901794333 featOrth: 0.0176939616407453"</span></span>
-<span><span class="co">## [1] "Iteration: 40 bestEv: 0.173241429168419 bestIt: 40 CE: 0.173241429168419 featOrth: 0.0172110300531402"</span></span>
-<span><span class="co">## [1] "Iteration: 41 bestEv: 0.173214369718456 bestIt: 41 CE: 0.173214369718456 featOrth: 0.017209244693137"</span></span>
-<span><span class="co">## [1] "Iteration: 42 bestEv: 0.168809835570977 bestIt: 42 CE: 0.168809835570977 featOrth: 0.0167688288878424"</span></span>
-<span><span class="co">## [1] "Iteration: 43 bestEv: 0.168798439659657 bestIt: 43 CE: 0.168798439659657 featOrth: 0.0167685496864901"</span></span>
-<span><span class="co">## [1] "Iteration: 44 bestEv: 0.163416778276955 bestIt: 44 CE: 0.163416778276955 featOrth: 0.0162316558677796"</span></span>
-<span><span class="co">## [1] "Iteration: 45 bestEv: 0.163386145123184 bestIt: 45 CE: 0.163386145123184 featOrth: 0.0162293250839719"</span></span>
-<span><span class="co">## [1] "Iteration: 46 bestEv: 0.163367615583396 bestIt: 46 CE: 0.163367615583396 featOrth: 0.0162277477668695"</span></span>
-<span><span class="co">## [1] "Iteration: 47 bestEv: 0.158534513537579 bestIt: 47 CE: 0.158534513537579 featOrth: 0.015744033181664"</span></span>
-<span><span class="co">## [1] "Iteration: 48 bestEv: 0.140915578226435 bestIt: 48 CE: 0.140915578226435 featOrth: 0.0139832997052191"</span></span>
-<span><span class="co">## [1] "Iteration: 49 bestEv: 0.136632674164986 bestIt: 49 CE: 0.136632674164986 featOrth: 0.0135557292624059"</span></span>
-<span><span class="co">## [1] "Iteration: 50 bestEv: 0.136625825375904 bestIt: 50 CE: 0.136625825375904 featOrth: 0.0135539567528134"</span></span>
-<span><span class="co">## [1] "Iteration: 51 bestEv: 0.136605846861864 bestIt: 51 CE: 0.136605846861864 featOrth: 0.0135539567088718"</span></span>
-<span><span class="co">## [1] "Iteration: 52 bestEv: 0.133393930025251 bestIt: 52 CE: 0.133393930025251 featOrth: 0.013231766548129"</span></span>
-<span><span class="co">## [1] "Iteration: 53 bestEv: 0.121815231282171 bestIt: 53 CE: 0.121815231282171 featOrth: 0.0120744055716015"</span></span>
-<span><span class="co">## [1] "Iteration: 54 bestEv: 0.112272420395773 bestIt: 54 CE: 0.112272420395773 featOrth: 0.0111197917654773"</span></span>
-<span><span class="co">## [1] "Iteration: 55 bestEv: 0.10793520136675 bestIt: 55 CE: 0.10793520136675 featOrth: 0.0106866426847117"</span></span>
-<span><span class="co">## [1] "Iteration: 56 bestEv: 0.103074572859167 bestIt: 56 CE: 0.103074572859167 featOrth: 0.0102006074727999"</span></span>
-<span><span class="co">## [1] "Iteration: 57 bestEv: 0.10307405855512 bestIt: 57 CE: 0.10307405855512 featOrth: 0.010199979898903"</span></span>
-<span><span class="co">## [1] "Iteration: 58 bestEv: 0.103017743151182 bestIt: 58 CE: 0.103017743151182 featOrth: 0.0101943353411016"</span></span>
-<span><span class="co">## [1] "Iteration: 59 bestEv: 0.0924325582051188 bestIt: 59 CE: 0.0924325582051188 featOrth: 0.00913674408487939"</span></span>
-<span><span class="co">## [1] "Iteration: 60 bestEv: 0.092426803545498 bestIt: 60 CE: 0.092426803545498 featOrth: 0.00913615760840388"</span></span>
-<span><span class="co">## [1] "Iteration: 61 bestEv: 0.0924177440138596 bestIt: 61 CE: 0.0924177440138596 featOrth: 0.00913556950652335"</span></span>
-<span><span class="co">## [1] "Iteration: 62 bestEv: 0.0924094813073564 bestIt: 62 CE: 0.0924094813073564 featOrth: 0.00913560260934428"</span></span>
-<span><span class="co">## [1] "Iteration: 63 bestEv: 0.0924055133476095 bestIt: 63 CE: 0.0924055133476095 featOrth: 0.009135363119069"</span></span>
-<span><span class="co">## [1] "Iteration: 64 bestEv: 0.0870941632709072 bestIt: 64 CE: 0.0870941632709072 featOrth: 0.0086053264598772"</span></span>
-<span><span class="co">## [1] "Iteration: 65 bestEv: 0.0727777812140487 bestIt: 65 CE: 0.0727777812140486 featOrth: 0.00717338867145749"</span></span>
-<span><span class="co">## [1] "Iteration: 66 bestEv: 0.0727636037184751 bestIt: 66 CE: 0.0727636037184751 featOrth: 0.00717305944595617"</span></span>
-<span><span class="co">## [1] "Iteration: 67 bestEv: 0.0726183560984098 bestIt: 67 CE: 0.0726183560984098 featOrth: 0.00716135330173678"</span></span>
-<span><span class="co">## [1] "Iteration: 68 bestEv: 0.0671469773936359 bestIt: 68 CE: 0.0671469773936359 featOrth: 0.0066140401196575"</span></span>
-<span><span class="co">## [1] "Iteration: 69 bestEv: 0.0671391589449826 bestIt: 69 CE: 0.0671391589449826 featOrth: 0.00661395340421009"</span></span>
-<span><span class="co">## [1] "Iteration: 70 bestEv: 0.0671348662665583 bestIt: 70 CE: 0.0671348662665583 featOrth: 0.00661373472231999"</span></span>
-<span><span class="co">## [1] "Iteration: 71 bestEv: 0.0608423268924974 bestIt: 71 CE: 0.0608423268924974 featOrth: 0.00598452747198498"</span></span>
-<span><span class="co">## [1] "Iteration: 72 bestEv: 0.0570648568774 bestIt: 72 CE: 0.0570648568774 featOrth: 0.00560767154606059"</span></span>
-<span><span class="co">## [1] "Iteration: 73 bestEv: 0.0570648568774 bestIt: 72 CE: 0.0873197076176613 featOrth: 0.0056075756039286"</span></span>
-<span><span class="co">## [1] "Iteration: 74 bestEv: 0.0550970859572759 bestIt: 74 CE: 0.0550970859572759 featOrth: 0.00541027187001207"</span></span>
-<span><span class="co">## [1] "Iteration: 75 bestEv: 0.0522838495265217 bestIt: 75 CE: 0.0522838495265217 featOrth: 0.00512982253073375"</span></span>
-<span><span class="co">## [1] "Iteration: 76 bestEv: 0.0503202140840706 bestIt: 76 CE: 0.0503202140840706 featOrth: 0.004933518997875"</span></span>
-<span><span class="co">## [1] "Iteration: 77 bestEv: 0.0503202140840706 bestIt: 76 CE: 0.050322265345152 featOrth: 0.00493353134725908"</span></span>
-<span><span class="co">## [1] "Iteration: 78 bestEv: 0.0503115823799135 bestIt: 78 CE: 0.0503115823799135 featOrth: 0.00493353129862908"</span></span>
-<span><span class="co">## [1] "Iteration: 79 bestEv: 0.0476389488062793 bestIt: 79 CE: 0.0476389488062793 featOrth: 0.00466532960473309"</span></span>
-<span><span class="co">## [1] "Iteration: 80 bestEv: 0.0476389488062793 bestIt: 79 CE: 0.0476422579009312 featOrth: 0.00466532533292062"</span></span>
-<span><span class="co">## [1] "Iteration: 81 bestEv: 0.0449034942181222 bestIt: 81 CE: 0.0449034942181222 featOrth: 0.00439193203878587"</span></span>
-<span><span class="co">## [1] "Iteration: 82 bestEv: 0.044830242390364 bestIt: 82 CE: 0.044830242390364 featOrth: 0.00438446086817899"</span></span>
-<span><span class="co">## [1] "Iteration: 83 bestEv: 0.044830242390364 bestIt: 82 CE: 0.044830656292499 featOrth: 0.00438427513523537"</span></span>
-<span><span class="co">## [1] "Iteration: 84 bestEv: 0.0448261327880746 bestIt: 84 CE: 0.0448261327880746 featOrth: 0.00438416483181871"</span></span>
-<span><span class="co">## [1] "Iteration: 85 bestEv: 0.0424424430371664 bestIt: 85 CE: 0.0424424430371664 featOrth: 0.00414555102566834"</span></span>
-<span><span class="co">## [1] "Iteration: 86 bestEv: 0.0424400500156764 bestIt: 86 CE: 0.0424400500156764 featOrth: 0.00414553232342031"</span></span>
-<span><span class="co">## [1] "Iteration: 87 bestEv: 0.0424355773238859 bestIt: 87 CE: 0.0424355773238859 featOrth: 0.0041455784773815"</span></span>
-<span><span class="co">## [1] "Iteration: 88 bestEv: 0.0424355773238859 bestIt: 87 CE: 0.0424392398419575 featOrth: 0.00414560499200765"</span></span>
-<span><span class="co">## [1] "Iteration: 89 bestEv: 0.0402352965569645 bestIt: 89 CE: 0.0402352965569645 featOrth: 0.00392620426808978"</span></span>
-<span><span class="co">## [1] "Iteration: 90 bestEv: 0.0386483470494215 bestIt: 90 CE: 0.0386483470494215 featOrth: 0.00376773421692112"</span></span>
-<span><span class="co">## [1] "Iteration: 91 bestEv: 0.0301559657418322 bestIt: 91 CE: 0.0301559657418322 featOrth: 0.00291825165520952"</span></span>
-<span><span class="co">## [1] "Iteration: 92 bestEv: 0.0287338229041454 bestIt: 92 CE: 0.0287338229041454 featOrth: 0.00277621520109729"</span></span>
-<span><span class="co">## [1] "Iteration: 93 bestEv: 0.0287322976538284 bestIt: 93 CE: 0.0287322976538284 featOrth: 0.00277621347595765"</span></span>
-<span><span class="co">## [1] "Iteration: 94 bestEv: 0.027047021833802 bestIt: 94 CE: 0.027047021833802 featOrth: 0.00260707046144292"</span></span>
-<span><span class="co">## [1] "Iteration: 95 bestEv: 0.027047021833802 bestIt: 94 CE: 0.0553019281331094 featOrth: 0.00240822796390057"</span></span>
-<span><span class="co">## [1] "Iteration: 96 bestEv: 0.0238846421346667 bestIt: 96 CE: 0.0238846421346667 featOrth: 0.00229180179715985"</span></span>
-<span><span class="co">## [1] "Iteration: 97 bestEv: 0.0233582666366605 bestIt: 97 CE: 0.0233582666366605 featOrth: 0.00223851229409552"</span></span>
-<span><span class="co">## [1] "Iteration: 98 bestEv: 0.0228351644831962 bestIt: 98 CE: 0.0228351644831962 featOrth: 0.00218695811852158"</span></span>
-<span><span class="co">## [1] "Iteration: 99 bestEv: 0.0222570934795629 bestIt: 99 CE: 0.0222570934795629 featOrth: 0.00212885118240577"</span></span>
-<span><span class="co">## [1] "Iteration: 100 bestEv: 0.022254456672839 bestIt: 100 CE: 0.022254456672839 featOrth: 0.00212883853671226"</span></span></code></pre>
+<span><span class="co">## [1] "initialDataTerm: 2.71020797188974  &lt;o&gt; mixer: ica  &lt;o&gt; E:  regression"</span></span>
+<span><span class="co">## [1] "Iteration: 1 bestEv: 11.9935692039907 bestIt: 1 CE: 11.9935692039907 featOrth: 0.127772743147944"</span></span>
+<span><span class="co">## [1] "Iteration: 2 bestEv: 1.63986172874373 bestIt: 2 CE: 1.63986172874373 featOrth: 0.103912739937169"</span></span>
+<span><span class="co">## [1] "Iteration: 3 bestEv: 0.965356711163832 bestIt: 3 CE: 0.965356711163832 featOrth: 0.0931254867177344"</span></span>
+<span><span class="co">## [1] "Iteration: 4 bestEv: 0.888954416336653 bestIt: 4 CE: 0.888954416336653 featOrth: 0.0892884076783108"</span></span>
+<span><span class="co">## [1] "Iteration: 5 bestEv: 0.870325847048973 bestIt: 5 CE: 0.870325847048973 featOrth: 0.0870346161218532"</span></span>
+<span><span class="co">## [1] "Iteration: 6 bestEv: 0.825000374227063 bestIt: 6 CE: 0.825000374227063 featOrth: 0.0826346778383063"</span></span>
+<span><span class="co">## [1] "Iteration: 7 bestEv: 0.693047419244424 bestIt: 7 CE: 0.693047419244424 featOrth: 0.0692126932977422"</span></span>
+<span><span class="co">## [1] "Iteration: 8 bestEv: 0.693047419244424 bestIt: 7 CE: 0.913749417618968 featOrth: 0.0687079726732635"</span></span>
+<span><span class="co">## [1] "Iteration: 9 bestEv: 0.693047419244424 bestIt: 7 CE: 0.80799295195613 featOrth: 0.0667889966914588"</span></span>
+<span><span class="co">## [1] "Iteration: 10 bestEv: 0.665209691854451 bestIt: 10 CE: 0.665209691854451 featOrth: 0.0663889270275271"</span></span>
+<span><span class="co">## [1] "Iteration: 11 bestEv: 0.665209691854451 bestIt: 10 CE: 0.793431315683012 featOrth: 0.0655793224156168"</span></span>
+<span><span class="co">## [1] "Iteration: 12 bestEv: 0.634167245559621 bestIt: 12 CE: 0.634167245559621 featOrth: 0.0635194776700486"</span></span>
+<span><span class="co">## [1] "Iteration: 13 bestEv: 0.620888182613552 bestIt: 13 CE: 0.620888182613552 featOrth: 0.062066453537709"</span></span>
+<span><span class="co">## [1] "Iteration: 14 bestEv: 0.6096107364349 bestIt: 14 CE: 0.6096107364349 featOrth: 0.0609236402130791"</span></span>
+<span><span class="co">## [1] "Iteration: 15 bestEv: 0.595442889630652 bestIt: 15 CE: 0.595442889630652 featOrth: 0.0593091067869315"</span></span>
+<span><span class="co">## [1] "Iteration: 16 bestEv: 0.577946722705794 bestIt: 16 CE: 0.577946722705793 featOrth: 0.0576933714653939"</span></span>
+<span><span class="co">## [1] "Iteration: 17 bestEv: 0.571402078391595 bestIt: 17 CE: 0.571402078391595 featOrth: 0.0572490849972004"</span></span>
+<span><span class="co">## [1] "Iteration: 18 bestEv: 0.541863341618253 bestIt: 18 CE: 0.541863341618253 featOrth: 0.054334570724129"</span></span>
+<span><span class="co">## [1] "Iteration: 19 bestEv: 0.535451267426237 bestIt: 19 CE: 0.535451267426237 featOrth: 0.0532292456669716"</span></span>
+<span><span class="co">## [1] "Iteration: 20 bestEv: 0.518391263944661 bestIt: 20 CE: 0.518391263944661 featOrth: 0.0518258835574758"</span></span>
+<span><span class="co">## [1] "Iteration: 21 bestEv: 0.518391263944661 bestIt: 20 CE: 0.520067200973396 featOrth: 0.0518152057596057"</span></span>
+<span><span class="co">## [1] "Iteration: 22 bestEv: 0.515448663518788 bestIt: 22 CE: 0.515448663518788 featOrth: 0.0513236402064409"</span></span>
+<span><span class="co">## [1] "Iteration: 23 bestEv: 0.512142939104632 bestIt: 23 CE: 0.512142939104632 featOrth: 0.0510932486182008"</span></span>
+<span><span class="co">## [1] "Iteration: 24 bestEv: 0.50420447114908 bestIt: 24 CE: 0.50420447114908 featOrth: 0.0503298856104212"</span></span>
+<span><span class="co">## [1] "Iteration: 25 bestEv: 0.501651140465264 bestIt: 25 CE: 0.501651140465264 featOrth: 0.050166495519882"</span></span>
+<span><span class="co">## [1] "Iteration: 26 bestEv: 0.501651140465264 bestIt: 25 CE: 0.639967466789289 featOrth: 0.0500925259468789"</span></span>
+<span><span class="co">## [1] "Iteration: 27 bestEv: 0.50067848783321 bestIt: 27 CE: 0.50067848783321 featOrth: 0.0500726705549758"</span></span>
+<span><span class="co">## [1] "Iteration: 28 bestEv: 0.487779124216728 bestIt: 28 CE: 0.487779124216728 featOrth: 0.04862778514325"</span></span>
+<span><span class="co">## [1] "Iteration: 29 bestEv: 0.443079833904369 bestIt: 29 CE: 0.443079833904369 featOrth: 0.0442397922184025"</span></span>
+<span><span class="co">## [1] "Iteration: 30 bestEv: 0.428947929952196 bestIt: 30 CE: 0.428947929952196 featOrth: 0.0429651965613985"</span></span>
+<span><span class="co">## [1] "Iteration: 31 bestEv: 0.426754903954766 bestIt: 31 CE: 0.426754903954766 featOrth: 0.0426286121799032"</span></span>
+<span><span class="co">## [1] "Iteration: 32 bestEv: 0.367859876803134 bestIt: 32 CE: 0.367859876803134 featOrth: 0.0366586388984767"</span></span>
+<span><span class="co">## [1] "Iteration: 33 bestEv: 0.358340622276047 bestIt: 33 CE: 0.358340622276047 featOrth: 0.0357033480678789"</span></span>
+<span><span class="co">## [1] "Iteration: 34 bestEv: 0.351876294473785 bestIt: 34 CE: 0.351876294473785 featOrth: 0.0351460102557289"</span></span>
+<span><span class="co">## [1] "Iteration: 35 bestEv: 0.344701915984941 bestIt: 35 CE: 0.344701915984941 featOrth: 0.0342216877785652"</span></span>
+<span><span class="co">## [1] "Iteration: 36 bestEv: 0.342329479847354 bestIt: 36 CE: 0.342329479847354 featOrth: 0.0342017352538828"</span></span>
+<span><span class="co">## [1] "Iteration: 37 bestEv: 0.292809803833917 bestIt: 37 CE: 0.292809803833917 featOrth: 0.0292608804270109"</span></span>
+<span><span class="co">## [1] "Iteration: 38 bestEv: 0.291857642373701 bestIt: 38 CE: 0.291857642373701 featOrth: 0.029111797984013"</span></span>
+<span><span class="co">## [1] "Iteration: 39 bestEv: 0.27443316363898 bestIt: 39 CE: 0.27443316363898 featOrth: 0.0274324975061715"</span></span>
+<span><span class="co">## [1] "Iteration: 40 bestEv: 0.274424740053844 bestIt: 40 CE: 0.274424740053844 featOrth: 0.0274324975091159"</span></span>
+<span><span class="co">## [1] "Iteration: 41 bestEv: 0.253831348063335 bestIt: 41 CE: 0.253831348063335 featOrth: 0.0253581616702929"</span></span>
+<span><span class="co">## [1] "Iteration: 42 bestEv: 0.249307466663937 bestIt: 42 CE: 0.249307466663937 featOrth: 0.0249066326620324"</span></span>
+<span><span class="co">## [1] "Iteration: 43 bestEv: 0.249298312381587 bestIt: 43 CE: 0.249298312381587 featOrth: 0.0249066326783903"</span></span>
+<span><span class="co">## [1] "Iteration: 44 bestEv: 0.244300833659568 bestIt: 44 CE: 0.244300833659568 featOrth: 0.0243767504662566"</span></span>
+<span><span class="co">## [1] "Iteration: 45 bestEv: 0.244300833659568 bestIt: 44 CE: 0.382898628652233 featOrth: 0.0243671029923175"</span></span>
+<span><span class="co">## [1] "Iteration: 46 bestEv: 0.244300833659568 bestIt: 44 CE: 0.382828162137128 featOrth: 0.0243571675247792"</span></span>
+<span><span class="co">## [1] "Iteration: 47 bestEv: 0.244091295487538 bestIt: 47 CE: 0.244091295487538 featOrth: 0.0243563764893334"</span></span>
+<span><span class="co">## [1] "Iteration: 48 bestEv: 0.244091295487538 bestIt: 47 CE: 0.353165629679563 featOrth: 0.0214068898908113"</span></span>
+<span><span class="co">## [1] "Iteration: 49 bestEv: 0.211539906421047 bestIt: 49 CE: 0.211539906421047 featOrth: 0.0210772630332334"</span></span>
+<span><span class="co">## [1] "Iteration: 50 bestEv: 0.205016657515942 bestIt: 50 CE: 0.205016657515942 featOrth: 0.0204638561971728"</span></span>
+<span><span class="co">## [1] "Iteration: 51 bestEv: 0.193449667874766 bestIt: 51 CE: 0.193449667874766 featOrth: 0.0193027856040291"</span></span>
+<span><span class="co">## [1] "Iteration: 52 bestEv: 0.166509460823367 bestIt: 52 CE: 0.166509460823367 featOrth: 0.0168024932895878"</span></span>
+<span><span class="co">## [1] "Iteration: 53 bestEv: 0.166509460823367 bestIt: 52 CE: 0.16651166147952 featOrth: 0.0168024001641276"</span></span>
+<span><span class="co">## [1] "Iteration: 54 bestEv: 0.159138236127841 bestIt: 54 CE: 0.159138236127841 featOrth: 0.0158953340224972"</span></span>
+<span><span class="co">## [1] "Iteration: 55 bestEv: 0.148692536645915 bestIt: 55 CE: 0.148692536645915 featOrth: 0.0148989786537554"</span></span>
+<span><span class="co">## [1] "Iteration: 56 bestEv: 0.133419407092261 bestIt: 56 CE: 0.133419407092261 featOrth: 0.0133552764857646"</span></span>
+<span><span class="co">## [1] "Iteration: 57 bestEv: 0.133419407092261 bestIt: 56 CE: 0.260971310879684 featOrth: 0.0123377405042708"</span></span>
+<span><span class="co">## [1] "Iteration: 58 bestEv: 0.133419407092261 bestIt: 56 CE: 0.260958910710326 featOrth: 0.0123362979956149"</span></span>
+<span><span class="co">## [1] "Iteration: 59 bestEv: 0.122169009737943 bestIt: 59 CE: 0.122169009737943 featOrth: 0.0123309576409961"</span></span>
+<span><span class="co">## [1] "Iteration: 60 bestEv: 0.12215840535691 bestIt: 60 CE: 0.12215840535691 featOrth: 0.0123300025963331"</span></span>
+<span><span class="co">## [1] "Iteration: 61 bestEv: 0.122153004259808 bestIt: 61 CE: 0.122153004259808 featOrth: 0.0123300025886837"</span></span>
+<span><span class="co">## [1] "Iteration: 62 bestEv: 0.109803062518839 bestIt: 62 CE: 0.109803062518839 featOrth: 0.0111087827743146"</span></span>
+<span><span class="co">## [1] "Iteration: 63 bestEv: 0.103559308842414 bestIt: 63 CE: 0.103559308842414 featOrth: 0.0103483911313693"</span></span>
+<span><span class="co">## [1] "Iteration: 64 bestEv: 0.0996629117059099 bestIt: 64 CE: 0.0996629117059099 featOrth: 0.00991209925994193"</span></span>
+<span><span class="co">## [1] "Iteration: 65 bestEv: 0.099642586543602 bestIt: 65 CE: 0.099642586543602 featOrth: 0.00991020831823585"</span></span>
+<span><span class="co">## [1] "Iteration: 66 bestEv: 0.099642586543602 bestIt: 65 CE: 0.099642586543602 featOrth: 0.00991020831823585"</span></span>
+<span><span class="co">## [1] "Iteration: 67 bestEv: 0.099642586543602 bestIt: 65 CE: 0.099642586543602 featOrth: 0.00991020831823585"</span></span>
+<span><span class="co">## [1] "Iteration: 68 bestEv: 0.099642586543602 bestIt: 65 CE: 0.099642586543602 featOrth: 0.00991020831823585"</span></span>
+<span><span class="co">## [1] "Iteration: 69 bestEv: 0.099642586543602 bestIt: 65 CE: 0.099642586543602 featOrth: 0.00991020831823585"</span></span>
+<span><span class="co">## [1] "Iteration: 70 bestEv: 0.099642586543602 bestIt: 65 CE: 0.099642586543602 featOrth: 0.00991020831823585"</span></span>
+<span><span class="co">## [1] "Iteration: 71 bestEv: 0.099642586543602 bestIt: 65 CE: 0.099642586543602 featOrth: 0.00991020831823585"</span></span></code></pre>
 <div class="sourceCode" id="cb40"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co">#####################################################</span></span>
 <span><span class="co">#                                          #</span></span>
@@ -476,19 +445,10 @@ work.</p>
 <span><span class="co">##################################</span></span></code></pre></div>
 <div class="sourceCode" id="cb43"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Function to search NHANES variable descriptions</span></span>
-<span><span class="va">search_nhanes_var</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">var_name_in</span>, <span class="va">dtname</span><span class="op">)</span> <span class="op">{</span></span>
-<span>  <span class="co"># Use an environment to store the dictionary globally</span></span>
-<span>  <span class="kw">if</span> <span class="op">(</span><span class="op">!</span><span class="fu"><a href="https://rdrr.io/r/base/exists.html" class="external-link">exists</a></span><span class="op">(</span><span class="st">"nhanes_dict"</span>, envir <span class="op">=</span> <span class="va">.GlobalEnv</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span>
-<span>    <span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/files.html" class="external-link">file.exists</a></span><span class="op">(</span><span class="va">dtname</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span>
-<span>      <span class="fu"><a href="https://rdrr.io/r/base/assign.html" class="external-link">assign</a></span><span class="op">(</span><span class="st">"nhanes_dict"</span>, <span class="fu"><a href="https://rdrr.io/r/utils/read.table.html" class="external-link">read.csv</a></span><span class="op">(</span><span class="va">dtname</span>, stringsAsFactors <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span>, envir <span class="op">=</span> <span class="va">.GlobalEnv</span><span class="op">)</span></span>
-<span>    <span class="op">}</span> <span class="kw">else</span> <span class="op">{</span></span>
-<span>      <span class="kw"><a href="https://rdrr.io/r/base/stop.html" class="external-link">stop</a></span><span class="op">(</span><span class="st">"Dictionary file not found!"</span><span class="op">)</span></span>
-<span>    <span class="op">}</span></span>
-<span>  <span class="op">}</span></span>
-<span>  </span>
+<span><span class="va">search_nhanes_var</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">var_name_in</span>, <span class="va">dtname</span><span class="op">)</span> <span class="op">{</span>  </span>
 <span>  <span class="co"># Search for the variable name (case insensitive)</span></span>
+<span>  <span class="va">var_name_in</span><span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/grep.html" class="external-link">gsub</a></span><span class="op">(</span> <span class="st">"DR1T"</span> ,  <span class="st">"DRXT"</span> , <span class="va">var_name_in</span><span class="op">)</span></span>
 <span>  <span class="va">result</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/unique.html" class="external-link">unique</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/subset.html" class="external-link">subset</a></span><span class="op">(</span><span class="va">nhanes_dict</span>, <span class="fu"><a href="https://rdrr.io/r/base/grep.html" class="external-link">grepl</a></span><span class="op">(</span><span class="va">var_name_in</span>, <span class="va">nhanes_dict</span><span class="op">$</span><span class="va">variable_codename_use</span>, ignore.case <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span><span class="op">$</span><span class="va">variable_description_use</span><span class="op">)</span></span>
-<span>  </span>
 <span>  <span class="co"># Return the first match if available</span></span>
 <span>  <span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">result</span><span class="op">)</span> <span class="op">&gt;</span> <span class="fl">0</span><span class="op">)</span> <span class="op">{</span></span>
 <span>    <span class="kw"><a href="https://rdrr.io/r/base/function.html" class="external-link">return</a></span><span class="op">(</span><span class="va">result</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span><span class="op">)</span></span>
@@ -544,263 +504,231 @@ work.</p>
 <span><span class="op">}</span></span></code></pre></div>
 <pre><code><span><span class="co">## *** result begin ***********************************</span></span>
 <span><span class="co">## [1] "individual coefficients"</span></span>
-<span><span class="co">##                   Estimate Std. Error   t value     Pr(&gt;|t|)</span></span>
-<span><span class="co">## dietPC3          -890.9101   423.3313 -2.104522 3.550503e-02</span></span>
-<span><span class="co">## exposuresPC3    -3742.5744  2935.0201 -1.275144 2.024628e-01</span></span>
-<span><span class="co">## mentalhealthPC3 -3644.3625   830.8893 -4.386099 1.237524e-05</span></span>
-<span><span class="co">## physicalPC3      1914.2826   566.3495  3.380037 7.440483e-04</span></span>
-<span><span class="co">## [1] "multivar-ANOVA p-value p = 8.0427e-07"</span></span>
+<span><span class="co">##                    Estimate Std. Error   t value     Pr(&gt;|t|)</span></span>
+<span><span class="co">## dietPC9            256.0192   116.9758  2.188651 2.878158e-02</span></span>
+<span><span class="co">## exposuresPC9     -1382.4779   489.6107 -2.823627 4.813421e-03</span></span>
+<span><span class="co">## mentalhealthPC9 -21172.3585  5156.7258 -4.105775 4.254865e-05</span></span>
+<span><span class="co">## physicalPC9        987.5045   461.9120  2.137863 3.269503e-02</span></span>
+<span><span class="co">## [1] "multivar-ANOVA p-value p = 5.3249e-07"</span></span>
 <span><span class="co">## [1] "z_digit_re"</span></span>
 <span><span class="co">## [1] "Simlr weights diet"</span></span>
-<span><span class="co">##   DR1TACAR    DR1TRET   DR1TLYCO </span></span>
-<span><span class="co">## -1.0000000 -0.7532974  0.6160423 </span></span>
-<span><span class="co">## [1] "Variable not found."</span></span>
-<span><span class="co">## [1] "Variable not found."</span></span>
+<span><span class="co">##     DR1TLZ   DR1TBCAR   DR1TLYCO </span></span>
+<span><span class="co">##  1.0000000  0.9349191 -0.5298659 </span></span>
+<span><span class="co">## [1] "Lutein + zeaxanthin (mcg)"</span></span>
+<span><span class="co">## [1] "Beta-carotene (mcg)"</span></span>
 <span><span class="co">## [1] "Simlr weights exposures"</span></span>
-<span><span class="co">##     LBXTHG     LBXBMN     LBXBSE </span></span>
-<span><span class="co">## -1.0000000  0.7379510 -0.2234585 </span></span>
-<span><span class="co">## [1] "Blood mercury, total (ug/L)"</span></span>
-<span><span class="co">## [1] "Blood manganese (ug/L)"</span></span>
+<span><span class="co">##    LBXBCD    LBXBSE    LBXBMN </span></span>
+<span><span class="co">## 1.0000000 0.1532214 0.1296443 </span></span>
+<span><span class="co">## [1] "Blood cadmium (ug/L)"</span></span>
+<span><span class="co">## [1] "Serum selenium replicate 2 (ug/L)"</span></span>
 <span><span class="co">## [1] "Simlr weights mentalhealth"</span></span>
-<span><span class="co">##    DPQ060    SLQ060    DPQ070 </span></span>
-<span><span class="co">## 1.0000000 0.8809100 0.7781053 </span></span>
-<span><span class="co">## [1] "Variable not found."</span></span>
-<span><span class="co">## [1] "Variable not found."</span></span>
+<span><span class="co">##    DPQ080    DPQ050    SLQ060 </span></span>
+<span><span class="co">## 1.0000000 0.6520809 0.2766467 </span></span>
+<span><span class="co">## [1] "Moving or speaking slowly or too fast"</span></span>
+<span><span class="co">## [1] "Poor appetite or overeating"</span></span>
 <span><span class="co">## [1] "Simlr weights physical"</span></span>
-<span><span class="co">##  BMXWAIST     BMXWT    BPXDI3 </span></span>
-<span><span class="co">## 1.0000000 0.5228697 0.3084241 </span></span>
-<span><span class="co">## [1] "Waist Circumference (cm)"</span></span>
-<span><span class="co">## [1] "Weight (kg)"</span></span></code></pre>
+<span><span class="co">##     BMXWT  BMXWAIST   BMXARMC </span></span>
+<span><span class="co">## 1.0000000 0.7354734 0.3632938 </span></span>
+<span><span class="co">## [1] "Weight (kg)"</span></span>
+<span><span class="co">## [1] "Waist Circumference (cm)"</span></span></code></pre>
 <p><img src="simlr_nhanes_files/figure-html/nhanessimlrstatlm-1.png" width="960"></p>
 <pre><code><span><span class="co">## *** result end ***********************************</span></span>
 <span><span class="co">## </span></span>
 <span><span class="co">## *** result begin ***********************************</span></span>
 <span><span class="co">## [1] "individual coefficients"</span></span>
 <span><span class="co">##                   Estimate Std. Error    t value     Pr(&gt;|t|)</span></span>
-<span><span class="co">## dietPC6           282.9019   93.25514  3.0336337 2.459308e-03</span></span>
-<span><span class="co">## exposuresPC6     2153.3081 2422.26874  0.8889633 3.741705e-01</span></span>
-<span><span class="co">## mentalhealthPC6 -3297.2248  821.64522 -4.0129544 6.303129e-05</span></span>
-<span><span class="co">## physicalPC6      2170.9473  658.57833  3.2964147 1.003003e-03</span></span>
-<span><span class="co">## [1] "multivar-ANOVA p-value p = 5.0900e-07"</span></span>
+<span><span class="co">## dietPC13           573.464   255.6539  2.2431264 2.503948e-02</span></span>
+<span><span class="co">## exposuresPC13     1407.784   309.9375  4.5421549 6.030778e-06</span></span>
+<span><span class="co">## mentalhealthPC13 -2741.417  3184.3335 -0.8609077 3.894315e-01</span></span>
+<span><span class="co">## physicalPC13      1244.380   463.8251  2.6828649 7.382590e-03</span></span>
+<span><span class="co">## [1] "multivar-ANOVA p-value p = 6.6709e-07"</span></span>
 <span><span class="co">## [1] "z_digit_re"</span></span>
 <span><span class="co">## [1] "Simlr weights diet"</span></span>
-<span><span class="co">##  DR1TBCAR    DR1TLZ  DR1TPOTA </span></span>
-<span><span class="co">## 1.0000000 0.6101053 0.4338191 </span></span>
-<span><span class="co">## [1] "Variable not found."</span></span>
-<span><span class="co">## [1] "Variable not found."</span></span>
+<span><span class="co">##   DR1TACAR   DR1TLYCO    DR1TRET </span></span>
+<span><span class="co">##  1.0000000 -0.6156907  0.5462487 </span></span>
+<span><span class="co">## [1] "Alpha-carotene (mcg)"</span></span>
+<span><span class="co">## [1] "Lycopene (mcg)"</span></span>
 <span><span class="co">## [1] "Simlr weights exposures"</span></span>
-<span><span class="co">##     LBXBPB     LBXBSE     LBXBGE </span></span>
-<span><span class="co">##  1.0000000  0.6234539 -0.1903010 </span></span>
-<span><span class="co">## [1] "Blood lead replicate 1 (ug/dL)"</span></span>
+<span><span class="co">##      LBXBSE      LBXBCD      LBXBPB </span></span>
+<span><span class="co">##  1.00000000 -0.22090618 -0.05029142 </span></span>
 <span><span class="co">## [1] "Serum selenium replicate 2 (ug/L)"</span></span>
+<span><span class="co">## [1] "Blood cadmium (ug/L)"</span></span>
 <span><span class="co">## [1] "Simlr weights mentalhealth"</span></span>
-<span><span class="co">##    DPQ010    DPQ050    DPQ080 </span></span>
-<span><span class="co">## 1.0000000 0.2728978 0.2483227 </span></span>
-<span><span class="co">## [1] "Variable not found."</span></span>
-<span><span class="co">## [1] "Variable not found."</span></span>
+<span><span class="co">##    DPQ030    DPQ040    DPQ010 </span></span>
+<span><span class="co">## 1.0000000 0.4771598 0.3031057 </span></span>
+<span><span class="co">## [1] "Trouble sleeping or sleeping too much"</span></span>
+<span><span class="co">## [1] "Feeling tired or having little energy"</span></span>
 <span><span class="co">## [1] "Simlr weights physical"</span></span>
-<span><span class="co">##     BMXWT  BMXWAIST     BMXHT </span></span>
-<span><span class="co">## 1.0000000 0.5858274 0.3094896 </span></span>
+<span><span class="co">##     BMXWT     BMXHT    BMXLEG </span></span>
+<span><span class="co">## 1.0000000 0.9743636 0.7344650 </span></span>
 <span><span class="co">## [1] "Weight (kg)"</span></span>
-<span><span class="co">## [1] "Waist Circumference (cm)"</span></span></code></pre>
+<span><span class="co">## [1] "Standing Height (cm)"</span></span></code></pre>
 <p><img src="simlr_nhanes_files/figure-html/nhanessimlrstatlm-2.png" width="960"></p>
 <pre><code><span><span class="co">## *** result end ***********************************</span></span>
 <span><span class="co">## </span></span>
 <span><span class="co">## *** result begin ***********************************</span></span>
 <span><span class="co">## [1] "individual coefficients"</span></span>
-<span><span class="co">##                    Estimate Std. Error   t value     Pr(&gt;|t|)</span></span>
-<span><span class="co">## dietPC7            257.1785   76.70967  3.352622 8.211629e-04</span></span>
-<span><span class="co">## exposuresPC7    -11000.2283 3399.17587 -3.236146 1.238962e-03</span></span>
-<span><span class="co">## mentalhealthPC7  -5164.9168 1306.26346 -3.953963 8.058151e-05</span></span>
-<span><span class="co">## physicalPC7        566.7359  409.56759  1.383742 1.666509e-01</span></span>
-<span><span class="co">## [1] "multivar-ANOVA p-value p = 4.3541e-08"</span></span>
+<span><span class="co">##                     Estimate Std. Error    t value     Pr(&gt;|t|)</span></span>
+<span><span class="co">## dietPC16            189.6374   291.2788  0.6510512 5.151168e-01</span></span>
+<span><span class="co">## exposuresPC16     -3128.0088   972.9950 -3.2148252 1.334048e-03</span></span>
+<span><span class="co">## mentalhealthPC16 -28087.5055  7193.8051 -3.9044018 9.880634e-05</span></span>
+<span><span class="co">## physicalPC16        906.6493   333.1673  2.7213031 6.580467e-03</span></span>
+<span><span class="co">## [1] "multivar-ANOVA p-value p = 1.2899e-06"</span></span>
 <span><span class="co">## [1] "z_digit_re"</span></span>
 <span><span class="co">## [1] "Simlr weights diet"</span></span>
-<span><span class="co">##  DR1TMOIS  DR1TSODI  DR1TKCAL </span></span>
-<span><span class="co">## 1.0000000 0.5030131 0.4652930 </span></span>
-<span><span class="co">## [1] "Variable not found."</span></span>
-<span><span class="co">## [1] "Variable not found."</span></span>
+<span><span class="co">##   DR1TSODI   DR1TCALC   DR1TVARA </span></span>
+<span><span class="co">## -1.0000000  0.8472620 -0.5697437 </span></span>
+<span><span class="co">## [1] "Sodium (mg)"</span></span>
+<span><span class="co">## [1] "Calcium (mg)"</span></span>
 <span><span class="co">## [1] "Simlr weights exposures"</span></span>
-<span><span class="co">##     LBXBPB     LBXBSE     LBXBCD </span></span>
-<span><span class="co">##  1.0000000 -0.6658359  0.3978877 </span></span>
-<span><span class="co">## [1] "Blood lead replicate 1 (ug/dL)"</span></span>
+<span><span class="co">##      LBXBSE      LBXIHG      LBXBMN </span></span>
+<span><span class="co">## -1.00000000  0.06540987 -0.01238522 </span></span>
 <span><span class="co">## [1] "Serum selenium replicate 2 (ug/L)"</span></span>
+<span><span class="co">## [1] "Mercury, Inorganic (ug/L)"</span></span>
 <span><span class="co">## [1] "Simlr weights mentalhealth"</span></span>
-<span><span class="co">##    DPQ090    DPQ070    DPQ080 </span></span>
-<span><span class="co">## 1.0000000 0.6658940 0.5482837 </span></span>
-<span><span class="co">## [1] "Variable not found."</span></span>
-<span><span class="co">## [1] "Variable not found."</span></span>
+<span><span class="co">##    DPQ060    DPQ020    DPQ080 </span></span>
+<span><span class="co">## 1.0000000 0.6704314 0.5145766 </span></span>
+<span><span class="co">## [1] "Feeling bad about yourself"</span></span>
+<span><span class="co">## [1] "Feeling down, depressed, or hopeless"</span></span>
 <span><span class="co">## [1] "Simlr weights physical"</span></span>
-<span><span class="co">##     BMXWT    BPXDI3    BPXDI1 </span></span>
-<span><span class="co">## 1.0000000 0.7274676 0.4588843 </span></span>
-<span><span class="co">## [1] "Weight (kg)"</span></span>
-<span><span class="co">## [1] "Diastolic: Blood pressure (third reading) mm Hg"</span></span></code></pre>
+<span><span class="co">##      BMXHT     BPXPLS      BMXWT </span></span>
+<span><span class="co">## 1.00000000 0.06563975 0.03663393 </span></span>
+<span><span class="co">## [1] "Standing Height (cm)"</span></span>
+<span><span class="co">## [1] "60 sec. pulse (30 sec. pulse * 2)"</span></span></code></pre>
 <p><img src="simlr_nhanes_files/figure-html/nhanessimlrstatlm-3.png" width="960"></p>
 <pre><code><span><span class="co">## *** result end ***********************************</span></span>
 <span><span class="co">## </span></span>
 <span><span class="co">## *** result begin ***********************************</span></span>
 <span><span class="co">## [1] "individual coefficients"</span></span>
-<span><span class="co">##                    Estimate Std. Error   t value     Pr(&gt;|t|)</span></span>
-<span><span class="co">## dietPC16           142.8935    47.0949  3.034161 0.0024550395</span></span>
-<span><span class="co">## exposuresPC16    -6277.3147  1672.9249 -3.752299 0.0001821456</span></span>
-<span><span class="co">## mentalhealthPC16 -2227.0477  1005.6878 -2.214452 0.0269530276</span></span>
-<span><span class="co">## physicalPC16      2791.5679  1295.2811  2.155183 0.0313120251</span></span>
-<span><span class="co">## [1] "multivar-ANOVA p-value p = 7.7638e-07"</span></span>
+<span><span class="co">##                     Estimate Std. Error   t value     Pr(&gt;|t|)</span></span>
+<span><span class="co">## dietPC25            127.9663   38.29727  3.341395 0.0008548350</span></span>
+<span><span class="co">## exposuresPC25      1715.4579  526.75709  3.256639 0.0011535050</span></span>
+<span><span class="co">## mentalhealthPC25 -15022.4148 4066.64489 -3.694056 0.0002289228</span></span>
+<span><span class="co">## physicalPC25        306.1486  105.60379  2.899031 0.0037996306</span></span>
+<span><span class="co">## [1] "multivar-ANOVA p-value p = 1.2937e-08"</span></span>
 <span><span class="co">## [1] "z_digit_re"</span></span>
 <span><span class="co">## [1] "Simlr weights diet"</span></span>
-<span><span class="co">##  DR1TLYCO    DR1TLZ  DR1TBCAR </span></span>
-<span><span class="co">## 1.0000000 0.5552698 0.5242060 </span></span>
-<span><span class="co">## [1] "Variable not found."</span></span>
-<span><span class="co">## [1] "Variable not found."</span></span>
+<span><span class="co">##  DR1TSODI  DR1TKCAL  DR1TPOTA </span></span>
+<span><span class="co">## 1.0000000 0.9099852 0.7321293 </span></span>
+<span><span class="co">## [1] "Sodium (mg)"</span></span>
+<span><span class="co">## [1] "Energy (kcal)"</span></span>
 <span><span class="co">## [1] "Simlr weights exposures"</span></span>
-<span><span class="co">##     LBXBCD     LBXBPB     LBXBSE </span></span>
-<span><span class="co">##  1.0000000  0.5838986 -0.4024370 </span></span>
-<span><span class="co">## [1] "Blood cadmium (ug/L)"</span></span>
+<span><span class="co">##    LBXBSE    LBXBPB    LBXBGM </span></span>
+<span><span class="co">## 1.0000000 0.2457419 0.0960980 </span></span>
+<span><span class="co">## [1] "Serum selenium replicate 2 (ug/L)"</span></span>
 <span><span class="co">## [1] "Blood lead replicate 1 (ug/dL)"</span></span>
 <span><span class="co">## [1] "Simlr weights mentalhealth"</span></span>
-<span><span class="co">##    SLQ060    SLQ050    DPQ010 </span></span>
-<span><span class="co">## 1.0000000 0.6686108 0.5443883 </span></span>
-<span><span class="co">## [1] "Variable not found."</span></span>
-<span><span class="co">## [1] "Variable not found."</span></span>
+<span><span class="co">##    DPQ050    DPQ070    DPQ010 </span></span>
+<span><span class="co">## 1.0000000 0.6006879 0.1416374 </span></span>
+<span><span class="co">## [1] "Poor appetite or overeating"</span></span>
+<span><span class="co">## [1] "Trouble concentrating on things"</span></span>
 <span><span class="co">## [1] "Simlr weights physical"</span></span>
-<span><span class="co">##     BMXWT    BPXDI3    BMXLEG </span></span>
-<span><span class="co">## 1.0000000 0.9184115 0.8857831 </span></span>
+<span><span class="co">##     BMXWT  BMXWAIST    BMXBMI </span></span>
+<span><span class="co">## 1.0000000 0.8664480 0.2383386 </span></span>
 <span><span class="co">## [1] "Weight (kg)"</span></span>
-<span><span class="co">## [1] "Diastolic: Blood pressure (third reading) mm Hg"</span></span></code></pre>
+<span><span class="co">## [1] "Waist Circumference (cm)"</span></span></code></pre>
 <p><img src="simlr_nhanes_files/figure-html/nhanessimlrstatlm-4.png" width="960"></p>
 <pre><code><span><span class="co">## *** result end ***********************************</span></span>
 <span><span class="co">## </span></span>
 <span><span class="co">## *** result begin ***********************************</span></span>
 <span><span class="co">## [1] "individual coefficients"</span></span>
-<span><span class="co">##                    Estimate Std. Error   t value     Pr(&gt;|t|)</span></span>
-<span><span class="co">## dietPC17           132.2955    50.7334  2.607660 0.0092101312</span></span>
-<span><span class="co">## exposuresPC17     1855.9396   526.6879  3.523794 0.0004386589</span></span>
-<span><span class="co">## mentalhealthPC17 -3214.4708  1065.7091 -3.016274 0.0026036394</span></span>
-<span><span class="co">## physicalPC17      1734.3586   643.1523  2.696653 0.0070852861</span></span>
-<span><span class="co">## [1] "multivar-ANOVA p-value p = 1.2208e-07"</span></span>
+<span><span class="co">##                     Estimate Std. Error   t value     Pr(&gt;|t|)</span></span>
+<span><span class="co">## dietPC27           -457.8236   235.5807 -1.943383 5.216355e-02</span></span>
+<span><span class="co">## exposuresPC27     -5286.3070  1329.1849 -3.977104 7.320693e-05</span></span>
+<span><span class="co">## mentalhealthPC27 -23946.0255  5997.8849 -3.992412 6.868515e-05</span></span>
+<span><span class="co">## physicalPC27       1962.1311  1208.6111  1.623460 1.047090e-01</span></span>
+<span><span class="co">## [1] "multivar-ANOVA p-value p = 8.5319e-08"</span></span>
 <span><span class="co">## [1] "z_digit_re"</span></span>
 <span><span class="co">## [1] "Simlr weights diet"</span></span>
-<span><span class="co">##  DR1TBCAR    DR1TLZ  DR1TACAR </span></span>
-<span><span class="co">## 1.0000000 0.8308679 0.6342225 </span></span>
-<span><span class="co">## [1] "Variable not found."</span></span>
-<span><span class="co">## [1] "Variable not found."</span></span>
+<span><span class="co">##   DR1TLYCO   DR1TSODI   DR1TMOIS </span></span>
+<span><span class="co">## -1.0000000 -0.7350936 -0.6125158 </span></span>
+<span><span class="co">## [1] "Lycopene (mcg)"</span></span>
+<span><span class="co">## [1] "Sodium (mg)"</span></span>
 <span><span class="co">## [1] "Simlr weights exposures"</span></span>
-<span><span class="co">##      LBXBSE      LBXBCD      LBXTHG </span></span>
-<span><span class="co">##  1.00000000 -0.04945171  0.04571774 </span></span>
+<span><span class="co">##     LBXBSE     LBXBPB     LBXBCD </span></span>
+<span><span class="co">## -1.0000000  0.3683468  0.3237641 </span></span>
 <span><span class="co">## [1] "Serum selenium replicate 2 (ug/L)"</span></span>
-<span><span class="co">## [1] "Blood cadmium (ug/L)"</span></span>
+<span><span class="co">## [1] "Blood lead replicate 1 (ug/dL)"</span></span>
 <span><span class="co">## [1] "Simlr weights mentalhealth"</span></span>
-<span><span class="co">##    DPQ070    DPQ090    DPQ020 </span></span>
-<span><span class="co">## 1.0000000 0.2470094 0.2263667 </span></span>
-<span><span class="co">## [1] "Variable not found."</span></span>
-<span><span class="co">## [1] "Variable not found."</span></span>
+<span><span class="co">##    DPQ010    DPQ070    DPQ050 </span></span>
+<span><span class="co">## 1.0000000 0.3480401 0.1101696 </span></span>
+<span><span class="co">## [1] "Little interest in doing things"</span></span>
+<span><span class="co">## [1] "Trouble concentrating on things"</span></span>
 <span><span class="co">## [1] "Simlr weights physical"</span></span>
-<span><span class="co">##     BMXWT  BMXWAIST   BMXARMC </span></span>
-<span><span class="co">## 1.0000000 0.7853051 0.5258853 </span></span>
-<span><span class="co">## [1] "Weight (kg)"</span></span>
-<span><span class="co">## [1] "Waist Circumference (cm)"</span></span></code></pre>
+<span><span class="co">##     BMXHT   BMXARML    BPXSY2 </span></span>
+<span><span class="co">## 1.0000000 0.8410460 0.2003101 </span></span>
+<span><span class="co">## [1] "Standing Height (cm)"</span></span>
+<span><span class="co">## [1] "Upper Arm Length (cm)"</span></span></code></pre>
 <p><img src="simlr_nhanes_files/figure-html/nhanessimlrstatlm-5.png" width="960"></p>
 <pre><code><span><span class="co">## *** result end ***********************************</span></span>
 <span><span class="co">## </span></span>
 <span><span class="co">## *** result begin ***********************************</span></span>
 <span><span class="co">## [1] "individual coefficients"</span></span>
-<span><span class="co">##                    Estimate Std. Error   t value     Pr(&gt;|t|)</span></span>
-<span><span class="co">## dietPC25           284.1225    98.0796  2.896856 0.0038259133</span></span>
-<span><span class="co">## exposuresPC25     -497.7451   160.8631 -3.094216 0.0020111377</span></span>
-<span><span class="co">## mentalhealthPC25 -1032.7487   491.1136 -2.102871 0.0356493571</span></span>
-<span><span class="co">## physicalPC25      1843.6483   541.9804  3.401688 0.0006879656</span></span>
-<span><span class="co">## [1] "multivar-ANOVA p-value p = 4.3785e-07"</span></span>
+<span><span class="co">##                     Estimate Std. Error   t value     Pr(&gt;|t|)</span></span>
+<span><span class="co">## dietPC38            241.2664   77.55682  3.110835 1.902044e-03</span></span>
+<span><span class="co">## exposuresPC38     -1226.5656  419.78198 -2.921911 3.532899e-03</span></span>
+<span><span class="co">## mentalhealthPC38 -12384.4539 2922.42879 -4.237727 2.400715e-05</span></span>
+<span><span class="co">## physicalPC38      -2039.6671 1229.32471 -1.659177 9.729686e-02</span></span>
+<span><span class="co">## [1] "multivar-ANOVA p-value p = 1.9180e-08"</span></span>
 <span><span class="co">## [1] "z_digit_re"</span></span>
 <span><span class="co">## [1] "Simlr weights diet"</span></span>
-<span><span class="co">##  DR1TPOTA    DR1TVC  DR1TKCAL </span></span>
-<span><span class="co">## 1.0000000 0.8665154 0.8284838 </span></span>
-<span><span class="co">## [1] "Variable not found."</span></span>
-<span><span class="co">## [1] "Variable not found."</span></span>
+<span><span class="co">##    DR1TLZ  DR1TBCAR  DR1TSODI </span></span>
+<span><span class="co">## 1.0000000 0.8801335 0.6660599 </span></span>
+<span><span class="co">## [1] "Lutein + zeaxanthin (mcg)"</span></span>
+<span><span class="co">## [1] "Beta-carotene (mcg)"</span></span>
 <span><span class="co">## [1] "Simlr weights exposures"</span></span>
-<span><span class="co">##        LBXBSE        LBXBMN        LBXBCD </span></span>
-<span><span class="co">## -1.000000e+00  2.884887e-04  8.893314e-05 </span></span>
+<span><span class="co">##       LBXBSE       LBXBGM       LBXTHG </span></span>
+<span><span class="co">## -1.000000000  0.005455579  0.005002908 </span></span>
 <span><span class="co">## [1] "Serum selenium replicate 2 (ug/L)"</span></span>
-<span><span class="co">## [1] "Blood manganese (ug/L)"</span></span>
+<span><span class="co">## [1] "Methylmercury (ug/L)"</span></span>
 <span><span class="co">## [1] "Simlr weights mentalhealth"</span></span>
-<span><span class="co">##    DPQ040    DPQ050    DPQ020 </span></span>
-<span><span class="co">## 1.0000000 0.7685787 0.5553835 </span></span>
-<span><span class="co">## [1] "Variable not found."</span></span>
-<span><span class="co">## [1] "Variable not found."</span></span>
+<span><span class="co">##    DPQ070    DPQ080    DPQ040 </span></span>
+<span><span class="co">## 1.0000000 0.4868629 0.2380073 </span></span>
+<span><span class="co">## [1] "Trouble concentrating on things"</span></span>
+<span><span class="co">## [1] "Moving or speaking slowly or too fast"</span></span>
 <span><span class="co">## [1] "Simlr weights physical"</span></span>
-<span><span class="co">##     BMXHT     BMXWT    BPXDI2 </span></span>
-<span><span class="co">## 1.0000000 0.3247854 0.1661275 </span></span>
-<span><span class="co">## [1] "Standing Height (cm)"</span></span>
-<span><span class="co">## [1] "Weight (kg)"</span></span></code></pre>
+<span><span class="co">##    BPXSY1   BMXARML    BPXML1 </span></span>
+<span><span class="co">## 1.0000000 0.7278574 0.5567605 </span></span>
+<span><span class="co">## [1] "Systolic: Blood pressure (first reading) mm Hg"</span></span>
+<span><span class="co">## [1] "Upper Arm Length (cm)"</span></span></code></pre>
 <p><img src="simlr_nhanes_files/figure-html/nhanessimlrstatlm-6.png" width="960"></p>
 <pre><code><span><span class="co">## *** result end ***********************************</span></span>
 <span><span class="co">## </span></span>
 <span><span class="co">## *** result begin ***********************************</span></span>
 <span><span class="co">## [1] "individual coefficients"</span></span>
-<span><span class="co">##                    Estimate Std. Error   t value     Pr(&gt;|t|)</span></span>
-<span><span class="co">## dietPC27          -151.4569   54.86277 -2.760650 0.0058414904</span></span>
-<span><span class="co">## exposuresPC27     6662.1065 2487.87366  2.677832 0.0074938824</span></span>
-<span><span class="co">## mentalhealthPC27 -3550.1926  883.85776 -4.016701 0.0000620488</span></span>
-<span><span class="co">## physicalPC27      1868.8324 1089.97688  1.714561 0.0866397856</span></span>
-<span><span class="co">## [1] "multivar-ANOVA p-value p = 1.0270e-06"</span></span>
-<span><span class="co">## [1] "z_digit_re"</span></span>
-<span><span class="co">## [1] "Simlr weights diet"</span></span>
-<span><span class="co">##   DR1TSODI   DR1TKCAL   DR1TPOTA </span></span>
-<span><span class="co">## -1.0000000 -0.9095000 -0.7320329 </span></span>
-<span><span class="co">## [1] "Variable not found."</span></span>
-<span><span class="co">## [1] "Variable not found."</span></span>
-<span><span class="co">## [1] "Simlr weights exposures"</span></span>
-<span><span class="co">##     LBXBSE     LBXBMN     LBXIHG </span></span>
-<span><span class="co">##  1.0000000 -0.9807334  0.7180764 </span></span>
-<span><span class="co">## [1] "Serum selenium replicate 2 (ug/L)"</span></span>
-<span><span class="co">## [1] "Blood manganese (ug/L)"</span></span>
-<span><span class="co">## [1] "Simlr weights mentalhealth"</span></span>
-<span><span class="co">##    DPQ050    DPQ010    DPQ020 </span></span>
-<span><span class="co">## 1.0000000 0.7469092 0.5804275 </span></span>
-<span><span class="co">## [1] "Variable not found."</span></span>
-<span><span class="co">## [1] "Variable not found."</span></span>
-<span><span class="co">## [1] "Simlr weights physical"</span></span>
-<span><span class="co">##  BMXWAIST   BMXSAD1    BMXLEG </span></span>
-<span><span class="co">## 1.0000000 0.6889326 0.6712539 </span></span>
-<span><span class="co">## [1] "Waist Circumference (cm)"</span></span>
-<span><span class="co">## [1] "Sagittal Abdominal Diameter 1st (cm)"</span></span></code></pre>
-<p><img src="simlr_nhanes_files/figure-html/nhanessimlrstatlm-7.png" width="960"></p>
-<pre><code><span><span class="co">## *** result end ***********************************</span></span>
-<span><span class="co">## </span></span>
-<span><span class="co">## *** result begin ***********************************</span></span>
-<span><span class="co">## [1] "individual coefficients"</span></span>
 <span><span class="co">##                   Estimate Std. Error   t value     Pr(&gt;|t|)</span></span>
-<span><span class="co">## dietPC33           231.693   191.9444  1.207084 0.2275969138</span></span>
-<span><span class="co">## exposuresPC33     3794.881  1020.3020  3.719370 0.0002073530</span></span>
-<span><span class="co">## mentalhealthPC33 -2835.060   852.0581 -3.327308 0.0008988970</span></span>
-<span><span class="co">## physicalPC33      3614.698  1081.9216  3.340998 0.0008560493</span></span>
-<span><span class="co">## [1] "multivar-ANOVA p-value p = 1.6786e-07"</span></span>
+<span><span class="co">## dietPC46          559.3533   166.2835  3.363853 0.0007887153</span></span>
+<span><span class="co">## exposuresPC46    3043.6240  1140.7095  2.668185 0.0077113925</span></span>
+<span><span class="co">## mentalhealthPC46 -665.1163   210.1647 -3.164738 0.0015845437</span></span>
+<span><span class="co">## physicalPC46      446.9325   185.1204  2.414280 0.0158897592</span></span>
+<span><span class="co">## [1] "multivar-ANOVA p-value p = 1.5039e-07"</span></span>
 <span><span class="co">## [1] "z_digit_re"</span></span>
 <span><span class="co">## [1] "Simlr weights diet"</span></span>
-<span><span class="co">##   DR1TALCO   DR1TLYCO   DR1TKCAL </span></span>
-<span><span class="co">## -1.0000000 -0.7477215 -0.6456758 </span></span>
-<span><span class="co">## [1] "Variable not found."</span></span>
-<span><span class="co">## [1] "Variable not found."</span></span>
+<span><span class="co">##  DR1TSODI    DR1TLZ  DR1TPOTA </span></span>
+<span><span class="co">## 1.0000000 0.6448342 0.6011317 </span></span>
+<span><span class="co">## [1] "Sodium (mg)"</span></span>
+<span><span class="co">## [1] "Lutein + zeaxanthin (mcg)"</span></span>
 <span><span class="co">## [1] "Simlr weights exposures"</span></span>
-<span><span class="co">##      LBXBSE      LBXTHG      LBXBCD </span></span>
-<span><span class="co">##  1.00000000  0.26227845 -0.07927815 </span></span>
-<span><span class="co">## [1] "Serum selenium replicate 2 (ug/L)"</span></span>
-<span><span class="co">## [1] "Blood mercury, total (ug/L)"</span></span>
+<span><span class="co">##     LBXBGM     LBXBCD     LBXIHG </span></span>
+<span><span class="co">## -1.0000000 -0.7490812  0.5251282 </span></span>
+<span><span class="co">## [1] "Methylmercury (ug/L)"</span></span>
+<span><span class="co">## [1] "Blood cadmium (ug/L)"</span></span>
 <span><span class="co">## [1] "Simlr weights mentalhealth"</span></span>
-<span><span class="co">##    DPQ060    DPQ020    DPQ010 </span></span>
-<span><span class="co">## 1.0000000 0.8617951 0.4702769 </span></span>
-<span><span class="co">## [1] "Variable not found."</span></span>
-<span><span class="co">## [1] "Variable not found."</span></span>
+<span><span class="co">##    DPQ060    DPQ020    DPQ070 </span></span>
+<span><span class="co">## 1.0000000 0.7285402 0.5864920 </span></span>
+<span><span class="co">## [1] "Feeling bad about yourself"</span></span>
+<span><span class="co">## [1] "Feeling down, depressed, or hopeless"</span></span>
 <span><span class="co">## [1] "Simlr weights physical"</span></span>
-<span><span class="co">##  BMXWAIST   BMXARMC    BPXDI3 </span></span>
-<span><span class="co">## 1.0000000 0.6113710 0.2724852 </span></span>
-<span><span class="co">## [1] "Waist Circumference (cm)"</span></span>
-<span><span class="co">## [1] "Arm Circumference (cm)"</span></span></code></pre>
-<p><img src="simlr_nhanes_files/figure-html/nhanessimlrstatlm-8.png" width="960"></p>
+<span><span class="co">##     BMXHT     BMXWT    BMXLEG </span></span>
+<span><span class="co">## 1.0000000 0.7472541 0.2897585 </span></span>
+<span><span class="co">## [1] "Standing Height (cm)"</span></span>
+<span><span class="co">## [1] "Weight (kg)"</span></span></code></pre>
+<p><img src="simlr_nhanes_files/figure-html/nhanessimlrstatlm-7.png" width="960"></p>
 <pre><code><span><span class="co">## *** result end ***********************************</span></span></code></pre>
-<div class="sourceCode" id="cb53"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb52"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">nsig</span><span class="op">)</span></span></code></pre></div>
-<pre><code><span><span class="co">## [1] 8</span></span></code></pre>
-<div class="sourceCode" id="cb55"><pre class="downlit sourceCode r">
+<pre><code><span><span class="co">## [1] 7</span></span></code></pre>
+<div class="sourceCode" id="cb54"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co">##########################################################################################</span></span>
 <span><span class="co">##########################################################################################</span></span>
 <span><span class="co"># https://wwwn.cdc.gov/nchs/nhanes/search/default.aspx</span></span>
