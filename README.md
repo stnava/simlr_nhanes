@@ -8,6 +8,12 @@
 
 documentation page [should be here](https://stnava.github.io/simlr_nhanes/)
 
+install via 
+
+```r
+remotes::install_github("stnava/simlr_nhanes")
+```
+
 ## SiMLR NHANES
 
 TODO
