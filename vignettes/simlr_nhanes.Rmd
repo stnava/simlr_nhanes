@@ -26,11 +26,11 @@ These are combined into SiMLR for an unsupervised dimensionality reduction.  The
 
 We predict the variable `z_digit_re` in NHANES which refers to the Digit Symbol Substitution Test (DSST), a cognitive assessment tool. The DSST evaluates processing speed, sustained attention, and working memory by requiring participants to match symbols with corresponding numbers under time constraints.
 
-In summary, SiMLR identifies predictors from diet, physical measurements, environmental exposures and mental health that jointly relate to DSST and related variables.  This example builds on prior work such as [this](https://pmc.ncbi.nlm.nih.gov/articles/PMC10093810/) and [this]().
+In summary, SiMLR identifies predictors from diet, physical measurements, environmental exposures and mental health that jointly relate to DSST and related variables.  This example builds on prior work such as [this](https://pmc.ncbi.nlm.nih.gov/articles/PMC10093810/) and [this](https://www.nature.com/articles/s41598-025-87384-y) and [many others](https://scholar.google.com/scholar?hl=en&as_sdt=0%2C33&q=NHANES+cognition+exposures+diet+&btnG=).
 
 ## Setup 
 
-Load the relevant librarys.
+Load the relevant libraries.
 
 ```{r setup}
 # Load necessary libraries
@@ -204,7 +204,7 @@ idata2=impute_data(fdata )
 ```
 
 
-Define the categories of data so that these can be used to identify a low-dimensional representation based on the SiMLR objective.
+Define the categories of data so that these can be used to identify a low-dimensional representation based on the SiMLR objective.  We do not use the cognitive data with which this embedding will be associated later.
 
 ```{r simlrcats0,eval=TRUE,echo=TRUE}
 ####################################
@@ -434,11 +434,11 @@ for ( kk in 1:ncol(initu)) {
       print( search_nhanes_var( names(ivec)[1] ) )
       print( search_nhanes_var( names(ivec)[2] ) )
       simpreds = c( simpreds, names(ivec)[1:2] )
-      simwts = c( simwts, ivec[1:2] * abs(tailcoffs[paste0(k,sep,kk),"t value"] ))
+      simwts = c( simwts, ivec[1:2] * (tailcoffs[paste0(k,sep,kk),"t value"] ))
       ttl = paste0(k,kk, " ", insight::format_p(tailcoffs[paste0(k,sep,kk),"Pr(>|t|)"],digits=4)  )
       gglist[[length(gglist)+1]]=visreg::visreg(mdl, paste0(k,sep,kk), gg=TRUE ) + ggtitle(ttl) + theme_minimal()
       }
-    print( plot_regression_graph( simpreds, simwts, cognames[cogind], method = "ggraph") )
+    print( plot_regression_graph( simpreds, simwts, cognames[cogind], method = "alluvial") )
 #    sankey <- plot_regression_graph(simpreds, simwts, cognames[cogind], method = "sankey")
 #    saveWidget(sankey, "sankey_plot.html", selfcontained = TRUE)
 #    htmltools::includeHTML("sankey_plot.html")

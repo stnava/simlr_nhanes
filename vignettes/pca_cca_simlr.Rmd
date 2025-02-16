@@ -60,9 +60,7 @@ ggplot(df, aes(x = Feature1, y = Feature2)) +
 ```
 
 
-
-
-This version first plots the original data (X1, X2 vs. Y1, Y2) and then displays the transformed low-dimensional projections (U1 vs. V1 from CCA).
+First plot the original data (X1, X2 vs. Y1, Y2) and then display the transformed low-dimensional projections (U1 vs. V1 from CCA).
 
 ```{r cca,fig.width=10,fig.height=4}
 
