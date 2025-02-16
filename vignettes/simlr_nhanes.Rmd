@@ -22,7 +22,7 @@ We extract distinct but related types of data from the [NHANES](https://wwwn.cdc
 
 * environmental exposures: metals and related environmental toxins.
 
-These are combined into SiMLR for an unsupervised dimensionality reduction.  The resulting low-dimensional representations are used for joint prediction of cognitive outcomes.  Over 400 subjects with these measurements are available along with environmental exposures.
+These are combined into SiMLR for an unsupervised dimensionality reduction.  The resulting low-dimensional representations are used for joint prediction of cognitive outcomes.  Over 2000 subjects with these measurements are available along with environmental exposures in a large majority of these ($>$ 1400).
 
 We predict the variable `z_digit_re` in NHANES which refers to the Digit Symbol Substitution Test (DSST), a cognitive assessment tool. The DSST evaluates processing speed, sustained attention, and working memory by requiring participants to match symbols with corresponding numbers under time constraints.
 
@@ -431,9 +431,10 @@ for ( kk in 1:ncol(initu)) {
       print( paste("Simlr weights", k ) )
       ivec = interpret_simlr_vector2( resultNH$v[[k]], kk, n2show=3, shortnames=F )
       print( ivec )
-      print( search_nhanes_var( names(ivec)[1] ) )
-      print( search_nhanes_var( names(ivec)[2] ) )
-      simpreds = c( simpreds, names(ivec)[1:2] )
+      interpname = c( 
+        search_nhanes_var( names(ivec)[1] ),
+        search_nhanes_var( names(ivec)[2] ) )
+      simpreds = c( simpreds, shorten_names( interpname ) )
       simwts = c( simwts, ivec[1:2] * (tailcoffs[paste0(k,sep,kk),"t value"] ))
       ttl = paste0(k,kk, " ", insight::format_p(tailcoffs[paste0(k,sep,kk),"Pr(>|t|)"],digits=4)  )
       gglist[[length(gglist)+1]]=visreg::visreg(mdl, paste0(k,sep,kk), gg=TRUE ) + ggtitle(ttl) + theme_minimal()
