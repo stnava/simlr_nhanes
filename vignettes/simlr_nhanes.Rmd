@@ -302,7 +302,7 @@ for ( wdemog in 1:length(nh_list) ) {
 }
 regs = regularizeSimlr(nh_list)
 for ( wdemog in 1:length(regs) ) {
-  plot( image( regs[[wdemog]] ) )
+  plot( image( regs[[wdemog]], main=paste("Regularization: ",names(regs)[wdemog] ) ))
 }
 names( regs ) = names(nh_list)
 # initu=initializeSimlr( nh_list, k=round(max_columns_list(nh_list)), jointReduction=TRUE )
