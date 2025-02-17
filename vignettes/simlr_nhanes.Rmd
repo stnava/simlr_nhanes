@@ -300,9 +300,12 @@ for ( wdemog in 1:length(nh_list) ) {
   nh_list[[wdemog]]=antsrimpute( nh_list[[wdemog]] )
   regs[[ wdemog]]=diag( ncol(nh_list[[wdemog]]))
 }
-# regs = regularizeSimlr(nh_list)
-names( regs ) = knm[ -1 ]
-initu=initializeSimlr( nh_list, k=round(max_columns_list(nh_list)), jointReduction=TRUE )
+regs = regularizeSimlr(nh_list)
+for ( wdemog in 1:length(regs) ) {
+  plot( image( regs[[wdemog]] ) )
+}
+names( regs ) = names(nh_list)
+# initu=initializeSimlr( nh_list, k=round(max_columns_list(nh_list)), jointReduction=TRUE )
 initu=initializeSimlr( nh_list, k=round(max_columns_list(nh_list)*0.8), jointReduction=TRUE )
 ########################### ########################### 
 if ( ! exists("resultNH") ) {
@@ -430,11 +433,12 @@ for ( kk in 1:ncol(initu)) {
     for ( k in pnames ) {
       print( paste("Simlr weights", k ) )
       ivec = interpret_simlr_vector2( resultNH$v[[k]], kk, n2show=3, shortnames=F )
-      print( ivec )
-      interpname = c( 
+      interpname = shorten_names( c( 
         search_nhanes_var( names(ivec)[1] ),
-        search_nhanes_var( names(ivec)[2] ) )
-      simpreds = c( simpreds, shorten_names( interpname ) )
+        search_nhanes_var( names(ivec)[2] ) ) )
+      names(ivec)[1:2]=interpname
+      print( ivec )
+      simpreds = c( simpreds, interpname )
       simwts = c( simwts, ivec[1:2] * (tailcoffs[paste0(k,sep,kk),"t value"] ))
       ttl = paste0(k,kk, " ", insight::format_p(tailcoffs[paste0(k,sep,kk),"Pr(>|t|)"],digits=4)  )
       gglist[[length(gglist)+1]]=visreg::visreg(mdl, paste0(k,sep,kk), gg=TRUE ) + ggtitle(ttl) + theme_minimal()
