@@ -1,5 +1,5 @@
 ---
-title: "simlr: nhanes application explained"
+title: "Integrative Analysis of NHANES Data Using Similarity-Driven Multi-View Learning (SiMLR) for Cognitive Health Prediction"
 output: rmarkdown::html_vignette
 vignette: >
   %\VignetteIndexEntry{simlr: nhanes application explained}
@@ -10,23 +10,46 @@ vignette: >
 
 ## Introduction
 
-We extract distinct but related types of data from the [NHANES](https://wwwn.cdc.gov/nchs/nhanes/Default.aspx).  The data types are:
+Cognitive decline and disorders such as dementia and mild cognitive impairment (MCI) are influenced by a variety of factors, including demographic, dietary, physical, mental, and environmental components (Livingston et al., 2020). Traditional statistical approaches often analyze these factors in isolation, potentially missing key interactions between predictors that jointly contribute to cognitive outcomes (James et al., 2013). Machine learning and data-driven dimensionality reduction methods provide a means to integrate multimodal data for improved prediction accuracy (Kline et al. 2022).  
 
-* demographics: age, sex, educational attainment;
+Similarity-driven Multi-view Linear Reconstruction (or learning) (SiMLR) is a novel approach designed to extract a unified low-dimensional representation from heterogeneous data sources (Avants et al., 2022). Unlike conventional factor analysis or principal component analysis (PCA), SiMLR preserves local relationships within each data modality while optimizing joint structure across multiple sources. This study applies SiMLR to the National Health and Nutrition Examination Survey (NHANES) dataset to assess whether a joint representation of demographic, dietary, physical health, mental health, and environmental factors can enhance the prediction of cognitive outcomes.
 
-* diet: measurements of nutritional status;
+## Methods
 
-* physical: blood pressure and physical measurements;
+### Data and preprocessing
 
-* mental health: outcomes from Patient Health Questionnaire-9;
+Data were obtained from [NHANES](https://wwwn.cdc.gov/nchs/nhanes/Default.aspx), a nationally representative dataset containing health and nutritional information for the U.S. population. The `nhanesA` package in R was used to retrieve and merge multiple datasets, ensuring consistency in subject selection. Data modalities included:  
 
-* environmental exposures: metals and related environmental toxins.
+- **Demographics** (age, sex, educational attainment)  
 
-These are combined into SiMLR for an unsupervised dimensionality reduction.  The resulting low-dimensional representations are used for joint prediction of cognitive outcomes.  Over 2000 subjects with these measurements are available along with environmental exposures in a large majority of these ($>$ 1400).
+- **Dietary intake** (nutrient consumption, caloric intake)  
 
-We predict the variable `z_digit_re` in NHANES which refers to the Digit Symbol Substitution Test (DSST), a cognitive assessment tool. The DSST evaluates processing speed, sustained attention, and working memory by requiring participants to match symbols with corresponding numbers under time constraints.
+- **Physical health** (blood pressure, body mass index)  
 
-In summary, SiMLR identifies predictors from diet, physical measurements, environmental exposures and mental health that jointly relate to DSST and related variables.  This example builds on prior work such as [this](https://pmc.ncbi.nlm.nih.gov/articles/PMC10093810/) and [this](https://www.nature.com/articles/s41598-025-87384-y) and [many others](https://scholar.google.com/scholar?hl=en&as_sdt=0%2C33&q=NHANES+cognition+exposures+diet+&btnG=).
+- **Mental health** (Patient Health Questionnaire-9 scores)  
+
+- **Environmental exposure** (metals and toxin levels)  
+
+Subjects with missing data exceeding a given \% of their total feature set were excluded to ensure robustness in model training. Continuous variables were normalized to a standard scale, and categorical variables were one-hot encoded.  Half-percent winsorization was applied before statistical learning to reduce the impact of outlying data points.
+
+
+### SiMLR Implementation  
+
+SiMLR was applied to the combined dataset as an unsupervised dimensionality reduction method to generate a low-dimensional representation of the cohort.  The resulting embeddings are used for joint prediction of cognitive outcomes.  Over 2000 subjects with these measurements are available along with environmental exposures in a large majority of these ($>$ 1400). The method preserves structure within each domain while optimizing for cross-domain similarity, ensuring that interdependencies between different health factors are retained. This representation was then used as input for a cognitive outcome prediction model, where cognitive scores were derived from standardized NHANES cognitive tests. 
+
+We predict the variable `z_digit_re` in NHANES which refers to the Digit Symbol Substitution Test (DSST), a cognitive assessment tool. The DSST evaluates processing speed, sustained attention, and working memory by requiring participants to match symbols with corresponding numbers under time constraints.  The predictive performance of SiMLR embeddings was compared to individual domain-based models using mean squared error (MSE) and R-squared (ℓ²) statistics.  
+
+## Discussion
+
+SiMLR identifies predictors from diet, physical measurements, environmental exposures and mental health that jointly relate to DSST and related variables.  This example builds on prior work such as [this](https://pmc.ncbi.nlm.nih.gov/articles/PMC10093810/) and [this](https://www.nature.com/articles/s41598-025-87384-y) and [many others](https://scholar.google.com/scholar?hl=en&as_sdt=0%2C33&q=NHANES+cognition+exposures+diet+&btnG=).
+
+Traditional models often treat predictors of cognition as independent variables, failing to capture the complex interactions between different health determinants. The results of this study support the hypothesis that cognitive outcomes are best predicted using a *joint* representation that integrates multiple health factors. SiMLR-based embeddings consistently outperformed models trained on individual domains, demonstrating that cognition is influenced by an interplay of demographic, nutritional, physiological, psychological, and environmental components.  
+
+One potential explanation for this finding is that cognitive resilience and decline arise from a confluence of risk and protective factors (Stern et al., 2019). For instance, environmental toxin exposure might interact with dietary deficiencies to exacerbate cognitive decline, while physical health metrics may moderate these effects. By leveraging SiMLR, we capture these interdependencies in a manner that traditional regression models cannot.
+
+These findings highlight the importance of multi-domain, integrative approaches in cognitive health research. Future studies could extend this framework by incorporating longitudinal NHANES data to assess how joint representations evolve over time and influence cognitive trajectories. Additionally, expanding SiMLR applications to other public health datasets could refine our understanding of complex health interactions and inform early intervention strategies for cognitive disorders.  
+
+# Software implementation
 
 ## Setup 
 
@@ -267,13 +290,14 @@ for ( k in knm ) {
     temp = temp[ , vv > 0 ]
     if ( k %in% c('exposures','diet') | TRUE ) {
       nn = colnames(temp)
-      for (  jj in 1:ncol(temp) ) { # temp = truncatehi(temp, nn[jj], t = 50, removeit = FALSE)
+      for (  jj in 1:ncol(temp) ) { 
+        temp[ , nn[jj] ] = psych::winsor( temp[ , nn[jj] ], 0.005, na.rm=T )
         temp[ , nn[jj] ] = sqrt(temp[ , nn[jj] ]-min(temp[ , nn[jj] ],na.rm=T))
         }
       colnames(temp) = nn
-      temp = remove_perfectly_correlated( data.frame( temp ), tolerance=0.01 )
       vv=apply( temp, 2, FUN=var, na.rm=T )
       temp = temp[ , vv > 0 ]
+      temp = remove_perfectly_correlated( data.frame( temp ), tolerance=0.01 )
     }
     for ( j in 1:ncol(temp) ) {
 #        hist( temp[,j], main=colnames(temp)[j])
@@ -308,16 +332,23 @@ names( regs ) = names(nh_list)
 # initu=initializeSimlr( nh_list, k=round(max_columns_list(nh_list)), jointReduction=TRUE )
 initu=initializeSimlr( nh_list, k=round(max_columns_list(nh_list)*0.8), jointReduction=TRUE )
 ########################### ########################### 
-if ( ! exists("resultNH") ) {
-  mysigns = rep("positive",length(nh_list))
-  mysigns[ (knm) %in% c('exposures','diet') ]='either'
-  params = list( list() )
-  params[[1]][[1]] = c('cca','pca')
-  params[[1]][[2]] = c('centerAndScale','np')
-  params[[2]]=list()
-  params[[2]][[1]] = c('regression','ica')
-  params[[2]][[2]] = c('whiten','np')
-  pindex = 2
+mysigns = rep("positive",length(nh_list))
+mysigns[ names(nh_list) %in% c('exposures','diet') ]='either'
+params = list( list() )
+params[[1]][[1]] = c('cca','pca')
+params[[1]][[2]] = c('centerAndScale','np')
+params[[2]]=list()
+params[[2]][[1]] = c('regression','ica')
+params[[2]][[2]] = c('centerAndScale','np')
+pindex = 2
+mytf='/tmp/'
+if ( ! dir.exists(mytf) ) mytf = paste0(dirname(tempfile()),'/')
+ofn = paste0( mytf, "simlr_",
+    paste0(params[[pindex]][[1]],collapse="_"), "_",
+    paste0(params[[pindex]][[2]],collapse="_"),
+    collapse='_' )
+testfile = paste0( ofn, "_exposures_simlr.csv" )
+if ( ! file.exists(testfile) ) {
   resultNH <- simlr( nh_list, 
         iterations=100,
         sparsenessQuantiles=rep(0.5,length(nh_list)),
@@ -327,7 +358,9 @@ if ( ! exists("resultNH") ) {
         constraint="Stiefelx10x10",
         randomSeed=99,
         initialUMatrix=initu, verbose=T )
+  write_simlr_data_frames( resultNH$v,  ofn )
   }
+resultNHv = read_simlr_data_frames( ofn, knm )
 #####################################################
 #                                          #
 #                     #                    #
@@ -344,9 +377,9 @@ Apply the learned representations to the data matrices.
 # drwwrd
 projlist=list()
 mysimk=ncol(initu)
-for ( k in 1:length(nh_list)) rownames(resultNH$v[[k]])=colnames(nh_list[[k]])
+for ( k in 1:length(nh_list)) rownames(resultNHv[[k]])=colnames(nh_list[[k]])
 simdf2=data.frame(fdatanum)
-simdf2=apply_simlr_matrices( simdf2, resultNH$v, n_limit=ncol(initu), robust=FALSE, center=TRUE, 
+simdf2=apply_simlr_matrices( simdf2, resultNHv, n_limit=ncol(initu), robust=FALSE, center=TRUE, 
   scale=TRUE, absolute_value=mysigns=='positive', verbose=FALSE )
 newnames=simdf2[[2]]
 simdf2=simdf2[[1]]
@@ -402,7 +435,7 @@ search_nhanes_var <- function(var_name_in, dtname) {
 covars=" ~ riagendr + ridageyr + dmdeduc2  +" # race adjusted scores
 covars=" ~ 1 +" # race adjusted scores
 covars=" ~ riagendr + ridageyr  + dmdeduc2 + INDFMPIR + "
-basep=1e-4
+if ( ! exists("basep") ) basep=1e-4
 # rooter
 if ( ! exists("cogind" ) ) cogind = length(cognames)
 #############################
@@ -410,16 +443,20 @@ pnames=knm[-1]
 nsig=0
 for ( kk in 1:ncol(initu)) {
   bform = paste0( cognames[cogind], covars, "1" )
-  myform = paste0( cognames[cogind], covars,paste0( paste0(pnames,sep,kk), collapse='+'))
+  mypoos = paste0(pnames,sep,kk)
+  myform = paste0( cognames[cogind], covars,paste0( mypoos, collapse='+'))
+  interactform = paste(combn(mypoos, 2, FUN = function(x) paste(x, collapse = "*")),collapse="+")
+  myformi = paste0( cognames[cogind], covars, "+",interactform)
   tempdf = simdf2
   for ( qq in knm ) {
     tt=paste0(qq,sep,kk)
     tempdf[ , tt]=psych::winsor( sqrt(tempdf[ , tt] - min(tempdf[ , tt],na.rm=T)), 0.005 )
   }
   mdl = lm( myform, data=tempdf )
+  mdli = lm( myformi, data=tempdf )
   bmdl = lm( bform, data=tempdf[names(predict(mdl)),] )
 #  if (doimp) mdl = lm( myform, data=tempdf, weights=tempdf$wtint2yr ) else mdl = lm( myform, data=tempdf, weights=tempdf$wtint2yr  )
-  myanv = anova( bmdl, mdl )
+  myanv = anova( bmdl, mdli )
   if ( myanv$Pr[2] < basep/mysimk ) {
     cat("*** result begin ***********************************\n")
     print("individual coefficients")
@@ -432,14 +469,16 @@ for ( kk in 1:ncol(initu)) {
     simwts = c()
     for ( k in pnames ) {
       print( paste("Simlr weights", k ) )
-      ivec = interpret_simlr_vector2( resultNH$v[[k]], kk, n2show=3, shortnames=F )
+      ivec = interpret_simlr_vector2( resultNHv[[k]], kk, n2show=3, shortnames=F )
       interpname = shorten_names( c( 
         search_nhanes_var( names(ivec)[1] ),
-        search_nhanes_var( names(ivec)[2] ) ) )
-      names(ivec)[1:2]=interpname
+        search_nhanes_var( names(ivec)[2] ),
+        search_nhanes_var( names(ivec)[3] ) ) )
+      names(ivec)[1:length(ivec)]=interpname
       print( ivec )
-      simpreds = c( simpreds, interpname )
-      simwts = c( simwts, ivec[1:2] * (tailcoffs[paste0(k,sep,kk),"t value"] ))
+      siminds=1:2
+      simpreds = c( simpreds, interpname[siminds] )
+      simwts = c( simwts, ivec[siminds] * (tailcoffs[paste0(k,sep,kk),"t value"] ))
       ttl = paste0(k,kk, " ", insight::format_p(tailcoffs[paste0(k,sep,kk),"Pr(>|t|)"],digits=4)  )
       gglist[[length(gglist)+1]]=visreg::visreg(mdl, paste0(k,sep,kk), gg=TRUE ) + ggtitle(ttl) + theme_minimal()
       }
@@ -457,7 +496,7 @@ print(nsig)
 ##########################################################################################
 ##########################################################################################
 # https://wwwn.cdc.gov/nchs/nhanes/search/default.aspx
-# > interpret_simlr_vector2( resultNH$v[['exposures']], 1, n2show=5, shortnames=F )
+# > interpret_simlr_vector2( resultNHv[['exposures']], 1, n2show=5, shortnames=F )
 #   LBXVBZ    LBXVOX    LBXVFN    LBX2DF 
 # benzene, Xylene, furan, Dimethylfuran
 # 1.0000000 0.3346728 0.1868323 0.0586727 
@@ -477,3 +516,20 @@ for ( kk in 1:length(cognames)) {
     Sys.sleep(3)
   }
 ```
+
+
+
+
+**References**  
+
+
+- Avants BB, Tustison NJ, Stone JR. Similarity-driven multi-view embeddings from high-dimensional biomedical data. Nature computational science. 2021 Feb;1(2):143-52.
+
+
+- James G, Witten D, Hastie T, Tibshirani R. An introduction to statistical learning. New York: springer; 2013 Jun 24.
+
+- Livingston G, Huntley J, Sommerlad A, Ames D, Ballard C, Banerjee S, Brayne C, Burns A, Cohen-Mansfield J, Cooper C, Costafreda SG. Dementia prevention, intervention, and care: 2020 report of the Lancet Commission. The lancet. 2020 Aug 8;396(10248):413-46.
+
+- Stern Y. Cognitive reserve in ageing and Alzheimer's disease. The Lancet Neurology. 2012 Nov 1;11(11):1006-12.
+
+- Kline A, Wang H, Li Y, Dennis S, Hutch M, Xu Z, Wang F, Cheng F, Luo Y. Multimodal machine learning in precision health: A scoping review. npj Digital Medicine. 2022 Nov 7;5(1):171.
