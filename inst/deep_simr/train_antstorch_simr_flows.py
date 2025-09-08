@@ -20,7 +20,7 @@ python3 train_antstorch_simr_flows.py \
             --jitter-alpha-end 0.005 \
             --jitter-alpha-mode cosine \
             --jitter-alpha-total-steps 2000 \
-            --best-selection-metric train_smooth \
+            --best-selection-metric smooth_total \
             --save-whitened --save-z
 """
 
@@ -106,7 +106,7 @@ def main():
     ap.add_argument("--early-stop-beta", type=float, default=0.98)
 
     # Misc
-    ap.add_argument("--best-selection-metric", default="val_bpd", choices=["val_bpd","train_smooth"])
+    ap.add_argument("--best-selection-metric", default="val_bpd", choices=["val_bpd","smooth_total"])
 
     # Checkpointing / resume
     ap.add_argument("--resume-checkpoint", type=str, default=None)
