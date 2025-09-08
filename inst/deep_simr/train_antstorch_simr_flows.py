@@ -29,6 +29,7 @@ import pandas as pd
 import numpy as np
 import torch
 from pathlib import Path
+import time
 
 from antstorch import normalizing_simr_flows_whitener, apply_normalizing_simr_flows_whitener
 
@@ -136,6 +137,8 @@ def main():
     if verbose: 
         print("\n=== Train ===")
 
+    start_time = time.perf_counter()
+
     result = normalizing_simr_flows_whitener(
         views=views,
         pca_latent_dimension=args.pca_latent_dimension,
@@ -187,6 +190,11 @@ def main():
         verbose=verbose,
     )
 
+    end_time = time.perf_counter()
+    elapsed_time = end_time - start_time
+
+    print(f"Time elapsed: {elapsed_time:.4f} seconds")
+ 
     # Print metrics
     if verbose: 
         print("\n=== Metrics ===")
