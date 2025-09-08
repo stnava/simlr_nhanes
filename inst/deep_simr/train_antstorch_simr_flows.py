@@ -113,7 +113,7 @@ def main():
     ap.add_argument("--save-checkpoint-dir", type=str, default=None)
     ap.add_argument("--checkpoint-interval", type=int, default=None, help="Defaults to --val-interval if omitted")
     ap.add_argument("--restore-best-for-final-eval", action="store_true", default=True)
-    ap.add_argument("--verbose", action="store_true", default=True)
+    ap.add_argument("--verbose", action="store_true", default=False)
 
     # Optional exports
     ap.add_argument("--save-z", action="store_true", help="Export raw flow latents z_*_view{i}.csv")
