@@ -131,6 +131,11 @@ def main():
     views = load_views(args.views)
 
     # Train
+
+    # Print metrics
+    if verbose: 
+        print("\n=== Train ===")
+
     result = normalizing_simr_flows_whitener(
         views=views,
         pca_latent_dimension=args.pca_latent_dimension,
@@ -189,8 +194,16 @@ def main():
             print(f"{k}: {v}")
 
     # Optional exports using the apply helper
+
     base_prefix = Path(args.output_prefix)
     if args.save_z or args.save_whitened or args.save_recon:
+
+        # Save
+        if verbose: 
+            print("\n=== Save outputs ===")
+            for k,v in result.get("metrics", {}).items():
+                print(f"{k}: {v}")
+
         # Forward transforms use the trainer dict (so it has embedded standardizers)
         if args.save_z:
             z_views = apply_normalizing_simr_flows_whitener(
@@ -205,7 +218,7 @@ def main():
             )
             z_paths = save_views(z_views, base_prefix, "z")
             if verbose:
-                print("[SAVE] z latents:")
+                print("  z latents:")
                 for p in z_paths:
                     print("  ", p)
 
@@ -222,7 +235,7 @@ def main():
             )
             wh_paths = save_views(wh_views, base_prefix, "whitened")
             if verbose:
-                print("[SAVE] whitened latents:")
+                print("  whitened pca latents:")
                 for p in wh_paths:
                     print("  ", p)
 
@@ -260,7 +273,7 @@ def main():
             )
             recon_paths = save_views(recon_views, base_prefix, "recon")
             if verbose:
-                print("[SAVE] reconstructions:")
+                print("  reconstructions:")
                 for p in recon_paths:
                     print("  ", p)
 
