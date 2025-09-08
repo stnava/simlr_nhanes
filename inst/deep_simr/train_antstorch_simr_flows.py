@@ -183,9 +183,10 @@ def main():
     )
 
     # Print metrics
-    print("\n=== Metrics ===")
-    for k,v in result.get("metrics", {}).items():
-        print(f"{k}: {v}")
+    if verbose: 
+        print("\n=== Metrics ===")
+        for k,v in result.get("metrics", {}).items():
+            print(f"{k}: {v}")
 
     # Optional exports using the apply helper
     base_prefix = Path(args.output_prefix)
@@ -203,9 +204,10 @@ def main():
                 verbose=verbose,
             )
             z_paths = save_views(z_views, base_prefix, "z")
-            print("[SAVE] z latents:")
-            for p in z_paths:
-                print("  ", p)
+            if verbose:
+                print("[SAVE] z latents:")
+                for p in z_paths:
+                    print("  ", p)
 
         if args.save_whitened:
             wh_views = apply_normalizing_simr_flows_whitener(
@@ -219,9 +221,10 @@ def main():
                 verbose=verbose,
             )
             wh_paths = save_views(wh_views, base_prefix, "whitened")
-            print("[SAVE] whitened latents:")
-            for p in wh_paths:
-                print("  ", p)
+            if verbose:
+                print("[SAVE] whitened latents:")
+                for p in wh_paths:
+                    print("  ", p)
 
         if args.save_recon:
             # Choose input space to match what we saved most recently; default to whitened if requested, else z
@@ -256,9 +259,10 @@ def main():
                 verbose=verbose,
             )
             recon_paths = save_views(recon_views, base_prefix, "recon")
-            print("[SAVE] reconstructions:")
-            for p in recon_paths:
-                print("  ", p)
+            if verbose:
+                print("[SAVE] reconstructions:")
+                for p in recon_paths:
+                    print("  ", p)
 
 
 if __name__ == "__main__":
