@@ -52,7 +52,7 @@ def save_views(dfs, base_prefix: Path, tag: str):
     paths = []
     for i, df in enumerate(dfs):
         out = Path(f"{base_prefix}_{tag}_view{i}.csv")
-        df.to_csv(out)
+        df.to_csv(out, index=False)
         paths.append(str(out))
     return paths
 
@@ -221,8 +221,7 @@ def main():
                 output_space="z",
                 use_training_standardization=True,
                 batch_size=args.val_batch_size,
-                device=args.cuda_device,
-                verbose=verbose,
+                device=args.cuda_device
             )
             z_paths = save_views(z_views, base_prefix, "z")
             if verbose:
@@ -238,8 +237,7 @@ def main():
                 output_space="whitened",
                 use_training_standardization=True,
                 batch_size=args.val_batch_size,
-                device=args.cuda_device,
-                verbose=verbose,
+                device=args.cuda_device
             )
             wh_paths = save_views(wh_views, base_prefix, "whitened")
             if verbose:
@@ -263,8 +261,7 @@ def main():
                         output_space="z",
                         use_training_standardization=True,
                         batch_size=args.val_batch_size,
-                        device=args.cuda_device,
-                        verbose=verbose,
+                        device=args.cuda_device
                     )
                 inv_data = z_views
 
@@ -276,8 +273,7 @@ def main():
                 use_training_standardization=True,
                 custom_standardizers=result.get("standardizers", None),
                 batch_size=args.val_batch_size,
-                device=args.cuda_device,
-                verbose=verbose,
+                device=args.cuda_device
             )
             recon_paths = save_views(recon_views, base_prefix, "recon")
             if verbose:
