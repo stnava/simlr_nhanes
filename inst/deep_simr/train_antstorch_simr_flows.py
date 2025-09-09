@@ -77,9 +77,9 @@ def main():
     ap.add_argument("--jitter-alpha-total-steps", type=int, default=20000)
 
     # Optimization
-    ap.add_argument("--lr", type=float, default=1e-4)
-    ap.add_argument("--batch-size", type=int, default=512)
-    ap.add_argument("--weight-decay", type=float, default=1e-5)
+    ap.add_argument("--lr", type=float, default=1e-5)
+    ap.add_argument("--batch-size", type=int, default=256)
+    ap.add_argument("--weight-decay", type=float, default=0.0)
     ap.add_argument("--max-iter", type=int, default=1200)
     ap.add_argument("--cuda-device", default="cuda:0")
     ap.add_argument("--seed", type=int, default=0)
