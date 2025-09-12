@@ -252,7 +252,7 @@ def main():
 
     # Optional exports using the apply helper
     base_prefix = Path(args.output_prefix)
-    os.makedirs(os.path.dirname(args.ouput_prefix), exist_ok=True)
+    os.makedirs(os.path.dirname(args.output_prefix), exist_ok=True)
     if args.save_z or args.save_whitened or args.save_recon:
 
         # Save
