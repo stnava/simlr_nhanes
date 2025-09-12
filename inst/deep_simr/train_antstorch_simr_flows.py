@@ -36,6 +36,7 @@ from pathlib import Path
 import time
 import inspect
 import warnings
+import os
 
 from antstorch import normalizing_simr_flows_whitener, apply_normalizing_simr_flows_whitener
 
@@ -251,6 +252,7 @@ def main():
 
     # Optional exports using the apply helper
     base_prefix = Path(args.output_prefix)
+    os.makedirs(os.path.dirname(args.ouput_prefix), exist_ok=True)
     if args.save_z or args.save_whitened or args.save_recon:
 
         # Save
