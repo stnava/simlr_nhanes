@@ -18,12 +18,12 @@ These are passed only if the underlying whitener function accepts them (signatur
 python3 train_antstorch_simr_flows.py \
   --views ./InputData/nh_list_2.csv ./InputData/nh_list_3.csv ./InputData/nh_list_4.csv ./InputData/nh_list_5.csv \
   --output-prefix ./runs/try1 \
-  --base-distribution GaussianPCA --pca-latent-dimension 8 --base-sigma 0.1 \
+  --base-distribution GaussianPCA --pca-latent-dimension 6 --base-sigma 0.1 \
   --K 8 --scale-cap 2.0 --spectral-norm-scales \
   --additive-first-n 2 --actnorm-every 1 --mask-mode rolling \
   --jitter-alpha 0.05 --jitter-alpha-end 0.005 --jitter-alpha-mode cosine \
   --best-selection-metric smooth_total \
-  --max-iter 1000 --val-interval 10 \
+  --max-iter 2000 --val-interval 10 \
   --save-z --save-whitened --verbose
 
 """
@@ -140,7 +140,7 @@ def main():
 
     # Optional exports
     ap.add_argument("--save-z", action="store_true", help="Export raw flow latents z_*_view{i}.csv")
-    ap.add_argument("--save-whitened", action="store_true", help="Export PCA-projected 'whitened' latents whitened_*_view{i}.csv")
+    ap.add_argument("--save-whitened", default="pca", choices=["pca","full"])
     ap.add_argument("--save-recon", action="store_true", help="Export inverse reconstructions recon_view{i}.csv (observed scale)")
 
     args = ap.parse_args()
@@ -256,8 +256,6 @@ def main():
         # Save
         if verbose:
             print("\n=== Save outputs ===")
-            for k, v in result.get("metrics", {}).items():
-                print(f"{k}: {v}")
 
         # Forward transforms use the trainer dict (so it has embedded standardizers)
         if args.save_z:
@@ -276,7 +274,7 @@ def main():
                 for p in z_paths:
                     print("  ", p)
 
-        if args.save_whitened:
+        if args.save_whitened == "pca":
             if args.base_distribution == "GaussianPCA":
                 wh_views = apply_normalizing_simr_flows_whitener(
                     trainer_output=result,
@@ -292,14 +290,35 @@ def main():
                     print("  whitened pca latents:")
                     for p in wh_paths:
                         print("  ", p)
+
+        elif args.save_whitened == "full":
+            if args.base_distribution == "GaussianPCA":
+                wh_views = apply_normalizing_simr_flows_whitener(
+                    trainer_output=result,
+                    data=views,
+                    direction="forward",
+                    output_space="whitened_full",
+                    use_training_standardization=True,
+                    batch_size=args.val_batch_size,
+                    device=args.cuda_device
+                )
+                wh_paths = save_views(wh_views, base_prefix, "whitened_full")
+                if verbose:
+                    print("  whitened full:")
+                    for p in wh_paths:
+                        print("  ", p)
             else:
-                warnings.warn("Requested --save-whitened with base_distribution=DiagGaussian. "
-                              "Whitened (PCA latent) is undefined.")                           
+                warnings.warn("Requested --save-whitened-full with base_distribution=DiagGaussian. "
+                              "Whitened is undefined.")                           
 
         if args.save_recon:
             # Choose input space to match what we saved most recently; default to whitened if requested, else z
-            if args.save_whitened and args.base_distribution == "GaussianPCA":
+            if args.save_whitened == "pca" and args.base_distribution == "GaussianPCA":
                 inv_input = "whitened"
+                inv_data = wh_views
+                warnings.warn("Requested reconstruction won't be accurate.")                           
+            elif args.save_whitened == "full" and args.base_distribution == "GaussianPCA":
+                inv_input = "whitened_full"
                 inv_data = wh_views
             else:
                 inv_input = "z"
