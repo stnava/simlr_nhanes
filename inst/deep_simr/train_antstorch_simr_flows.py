@@ -24,7 +24,7 @@ python3 train_antstorch_simr_flows.py \
   --jitter-alpha 0.05 --jitter-alpha-end 0.005 --jitter-alpha-mode cosine \
   --best-selection-metric smooth_total \
   --max-iter 2000 --val-interval 10 \
-  --save-z --save-whitened --verbose
+  --save-z --save-whitened pca --verbose
 
 """
 
