@@ -2,29 +2,15 @@
 """
 Train SIMR normalizing-flow whiteners using ANTsTorch and (optionally) export latents/reconstructions.
 
+Patched to work with dataset-owned normalization & the new apply() API.
+- Adds CLI flags to control dataset normalization/jitter.
+- Saves/loads per-view normalization stats ("dataset_normalizers").
+- Backward compatible with older antstorch apply() that expects "use_training_standardization".
+
 Exports (optional via flags):
   --save-z          : raw flow latents z (one CSV per view)
   --save-whitened   : PCA-projected / standardized latents (eps) (one CSV per view)
   --save-recon      : inverse-transformed reconstructions in observed scale (one CSV per view)
-
-Added stability knobs (forwarded to ANTsTorch whitener if supported):
-  --scale-cap, --spectral-norm-scales, --additive-first-n, --actnorm-every, --mask-mode
-  --base-min-log, --base-max-log, --base-sigma
-  --scale-penalty-weight
-
-These are passed only if the underlying whitener function accepts them (signature-checked).
-
-# Sample call
-python3 train_antstorch_simr_flows.py \
-  --views ./InputData/nh_list_2.csv ./InputData/nh_list_3.csv ./InputData/nh_list_4.csv ./InputData/nh_list_5.csv \
-  --output-prefix ./runs/try1 \
-  --base-distribution GaussianPCA --pca-latent-dimension 6 --base-sigma 0.1 \
-  --K 8 --scale-cap 2.0 --spectral-norm-scales \
-  --additive-first-n 2 --actnorm-every 1 --mask-mode rolling \
-  --jitter-alpha 0.05 --jitter-alpha-end 0.005 --jitter-alpha-mode cosine \
-  --best-selection-metric smooth_total \
-  --max-iter 2000 --val-interval 10 \
-  --save-z --save-whitened pca --verbose
 
 """
 
@@ -37,6 +23,7 @@ import time
 import inspect
 import warnings
 import os
+import json
 
 from antstorch import normalizing_simr_flows_whitener, apply_normalizing_simr_flows_whitener
 
@@ -45,7 +32,7 @@ def load_views(view_paths):
     views = []
     for p in view_paths:
         df = pd.read_csv(p)
-        # Force numeric; non-numeric will become NaN → trainer imputes with train means
+        # Force numeric; non-numeric will become NaN → trainer/dataset handles imputation/normalization
         df = df.apply(pd.to_numeric, errors="coerce")
         views.append(df)
     # Basic shape check
@@ -75,25 +62,33 @@ def main():
     ap.add_argument("--K", type=int, default=64)
     ap.add_argument("--leaky-relu-negative-slope", type=float, default=0.2)
 
-    # === New stability knobs (flow/builder) ===
+    # Flow/builder stability knobs
     ap.add_argument("--scale-cap", type=float, default=3.0, help="Bound for log-scale s via tanh; exp(s) in [e^-cap, e^cap]")
     ap.add_argument("--spectral-norm-scales", action="store_true", default=False, help="Apply spectral norm in scale MLP (if supported)")
     ap.add_argument("--additive-first-n", type=int, default=0, help="Use additive (no-scaling) couplings for first N layers")
     ap.add_argument("--actnorm-every", type=int, default=1, help="Insert ActNorm after every N couplings (1=after each)")
     ap.add_argument("--mask-mode", type=str, default="alternating", choices=["alternating", "rolling"], help="Mask alternation strategy")
 
-    # === New stability knobs (base distribution) ===
+    # Base distribution stability knobs
     ap.add_argument("--base-min-log", type=float, default=-5.0, help="Lower clamp for base log-scales (if supported)")
     ap.add_argument("--base-max-log", type=float, default=5.0, help="Upper clamp for base log-scales (if supported)")
     ap.add_argument("--base-sigma", type=float, default=0.1, help="Noise for GaussianPCA (if used)")
 
-    # Optional jitter knob (honored if your antstorch build supports it)
-    ap.add_argument("--jitter-alpha", type=float, default=0.0)
+    # === Dataset normalization & jitter (new) ===
+    ap.add_argument("--normalization", type=str, default="0mean", choices=["0mean","01","none"],
+                    help="Per-view normalization mode: 0mean | 01 | none (None)")
+    ap.add_argument("--add-noise-in", type=str, default="normalized", choices=["raw","normalized","none"],
+                    help="Domain for alpha-jitter if enabled: raw/normalized/none")
+    ap.add_argument("--impute", type=str, default="mean", choices=["none","mean","zero"],
+                    help="Imputation applied after normalization")
+    ap.add_argument("--dataset-normalizers-json", type=str, default=None,
+                    help="If set, dump dataset normalization stats to this JSON file (one list item per view)")
 
-    # Jitter annealing (temperature schedule)
+    # Jitter schedule
+    ap.add_argument("--jitter-alpha", type=float, default=0.0)
     ap.add_argument("--jitter-alpha-end", type=float, default=0.0)
     ap.add_argument("--jitter-alpha-mode", type=str, default="cosine", choices=["cosine", "linear", "exp"])
-    ap.add_argument("--jitter-alpha-total-steps", type=int, default=20000)
+    ap.add_argument("--jitter-alpha-total-steps", type=int, default=None)
 
     # Optimization
     ap.add_argument("--lr", type=float, default=1e-5)
@@ -115,7 +110,7 @@ def main():
     ap.add_argument("--bt-eps", type=float, default=1e-6)
     ap.add_argument("--penalty-warmup-iters", type=int, default=400)
 
-    # === New: scale regularizer weight (if supported by whitener) ===
+    # Scale regularizer
     ap.add_argument("--scale-penalty-weight", type=float, default=None,
                     help="Weight for mean|s| regularizer; passed only if whitener supports it")
 
@@ -173,6 +168,8 @@ def main():
         mask_mode=args.mask_mode,
     )
 
+    # Normalization flags → trainer kwargs
+    norm_mode = None if args.normalization == "none" else args.normalization
     train_kwargs = dict(
         jitter_alpha=args.jitter_alpha,
         jitter_alpha_end=args.jitter_alpha_end,
@@ -213,6 +210,12 @@ def main():
         save_checkpoint_dir=args.save_checkpoint_dir,
         checkpoint_interval=args.checkpoint_interval,
         verbose=verbose,
+
+        # New dataset-owned normalization/jitter knobs (only passed if supported)
+        normalization=norm_mode,
+        add_noise_in=args.add_noise_in,
+        impute=args.impute,
+        dataset_normalizers_dump_path=args.dataset_normalizers_json,
     )
 
     # Optional: scale penalty weight
@@ -250,103 +253,173 @@ def main():
         for k, v in result.get("metrics", {}).items():
             print(f"{k}: {v}")
 
+    # If trainer didn't dump JSON and user asked for it, try to write from returned stats
+    if args.dataset_normalizers_json and os.path.dirname(args.dataset_normalizers_json):
+        dn = result.get("dataset_normalizers", None)
+        if dn is not None:
+            os.makedirs(os.path.dirname(args.dataset_normalizers_json), exist_ok=True)
+            with open(args.dataset_normalizers_json, "w", encoding="utf-8") as f:
+                json.dump(dn, f, indent=2)
+
     # Optional exports using the apply helper
     base_prefix = Path(args.output_prefix)
     os.makedirs(os.path.dirname(args.output_prefix), exist_ok=True)
     if args.save_z or args.save_whitened or args.save_recon:
 
-        # Save
         if verbose:
             print("\n=== Save outputs ===")
 
-        # Forward transforms use the trainer dict (so it has embedded standardizers)
+        # Detect which apply() API we have
+        apply_sig = inspect.signature(apply_normalizing_simr_flows_whitener)
+        supports_new = "normalization_mode" in apply_sig.parameters
+
+        # Prepare normalization hints for apply()
+        norm_stats = result.get("dataset_normalizers", None)
+        apply_common = dict(
+            batch_size=args.val_batch_size,
+            device=args.cuda_device,
+        )
+
+        # Forward transforms
         if args.save_z:
-            z_views = apply_normalizing_simr_flows_whitener(
-                trainer_output=result,
-                data=views,
-                direction="forward",
-                output_space="z",
-                use_training_standardization=True,
-                batch_size=args.val_batch_size,
-                device=args.cuda_device
-            )
+            if supports_new:
+                z_views = apply_normalizing_simr_flows_whitener(
+                    trainer_output=result,
+                    data=views,
+                    direction="forward",
+                    output_space="z",
+                    normalization_mode=norm_mode,
+                    normalization_stats=norm_stats,
+                    fit_stats_on_data_if_missing=(norm_stats is None and norm_mode is not None),
+                    **apply_common,
+                )
+            else:
+                z_views = apply_normalizing_simr_flows_whitener(
+                    trainer_output=result,
+                    data=views,
+                    direction="forward",
+                    output_space="z",
+                    use_training_standardization=True,
+                    **apply_common,
+                )
             z_paths = save_views(z_views, base_prefix, "z")
             if verbose:
                 print("  z latents:")
                 for p in z_paths:
                     print("  ", p)
 
-        if args.save_whitened == "pca":
-            if args.base_distribution == "GaussianPCA":
+        wh_views = None
+        if args.save_whitened == "pca" and args.base_distribution == "GaussianPCA":
+            if supports_new:
+                wh_views = apply_normalizing_simr_flows_whitener(
+                    trainer_output=result,
+                    data=views,
+                    direction="forward",
+                    output_space="whitened",
+                    normalization_mode=norm_mode,
+                    normalization_stats=norm_stats,
+                    fit_stats_on_data_if_missing=(norm_stats is None and norm_mode is not None),
+                    **apply_common,
+                )
+            else:
                 wh_views = apply_normalizing_simr_flows_whitener(
                     trainer_output=result,
                     data=views,
                     direction="forward",
                     output_space="whitened",
                     use_training_standardization=True,
-                    batch_size=args.val_batch_size,
-                    device=args.cuda_device
+                    **apply_common,
                 )
-                wh_paths = save_views(wh_views, base_prefix, "whitened")
-                if verbose:
-                    print("  whitened pca latents:")
-                    for p in wh_paths:
-                        print("  ", p)
+            wh_paths = save_views(wh_views, base_prefix, "whitened")
+            if verbose:
+                print("  whitened pca latents:")
+                for p in wh_paths:
+                    print("  ", p)
 
-        elif args.save_whitened == "full":
-            if args.base_distribution == "GaussianPCA":
+        elif args.save_whitened == "full" and args.base_distribution == "GaussianPCA":
+            if supports_new:
+                wh_views = apply_normalizing_simr_flows_whitener(
+                    trainer_output=result,
+                    data=views,
+                    direction="forward",
+                    output_space="whitened_full",
+                    normalization_mode=norm_mode,
+                    normalization_stats=norm_stats,
+                    fit_stats_on_data_if_missing=(norm_stats is None and norm_mode is not None),
+                    **apply_common,
+                )
+            else:
                 wh_views = apply_normalizing_simr_flows_whitener(
                     trainer_output=result,
                     data=views,
                     direction="forward",
                     output_space="whitened_full",
                     use_training_standardization=True,
-                    batch_size=args.val_batch_size,
-                    device=args.cuda_device
+                    **apply_common,
                 )
-                wh_paths = save_views(wh_views, base_prefix, "whitened_full")
-                if verbose:
-                    print("  whitened full:")
-                    for p in wh_paths:
-                        print("  ", p)
-            else:
-                warnings.warn("Requested --save-whitened-full with base_distribution=DiagGaussian. "
-                              "Whitened is undefined.")                           
+            wh_paths = save_views(wh_views, base_prefix, "whitened_full")
+            if verbose:
+                print("  whitened full:")
+                for p in wh_paths:
+                    print("  ", p)
 
+        # Reconstructions
         if args.save_recon:
-            # Choose input space to match what we saved most recently; default to whitened if requested, else z
-            if args.save_whitened == "pca" and args.base_distribution == "GaussianPCA":
-                inv_input = "whitened"
+            # Choose input space to match what we saved; default to whitened if requested & available, else z
+            inv_input = "z"
+            inv_data = None
+            if args.base_distribution == "GaussianPCA" and wh_views is not None:
                 inv_data = wh_views
-                warnings.warn("Requested reconstruction won't be accurate.")                           
-            elif args.save_whitened == "full" and args.base_distribution == "GaussianPCA":
-                inv_input = "whitened_full"
-                inv_data = wh_views
+                inv_input = "whitened" if args.save_whitened == "pca" else "whitened_full"
             else:
-                inv_input = "z"
-                # If we didn't compute z already, do it now (cheap)
-                if not args.save_z:
-                    z_views = apply_normalizing_simr_flows_whitener(
-                        trainer_output=result,
-                        data=views,
-                        direction="forward",
-                        output_space="z",
-                        use_training_standardization=True,
-                        batch_size=args.val_batch_size,
-                        device=args.cuda_device
-                    )
-                inv_data = z_views
+                if args.save_z and 'z_views' in locals():
+                    inv_data = z_views
+                else:
+                    # compute z on the fly
+                    if supports_new:
+                        z_views = apply_normalizing_simr_flows_whitener(
+                            trainer_output=result,
+                            data=views,
+                            direction="forward",
+                            output_space="z",
+                            normalization_mode=norm_mode,
+                            normalization_stats=norm_stats,
+                            fit_stats_on_data_if_missing=(norm_stats is None and norm_mode is not None),
+                            **apply_common,
+                        )
+                    else:
+                        z_views = apply_normalizing_simr_flows_whitener(
+                            trainer_output=result,
+                            data=views,
+                            direction="forward",
+                            output_space="z",
+                            use_training_standardization=True,
+                            **apply_common,
+                        )
+                    inv_data = z_views
+                    inv_input = "z"
 
-            recon_views = apply_normalizing_simr_flows_whitener(
-                trainer_output=result["models"],   # can pass models directly
-                data=inv_data,
-                direction="inverse",
-                input_space=inv_input,
-                use_training_standardization=True,
-                custom_standardizers=result.get("standardizers", None),
-                batch_size=args.val_batch_size,
-                device=args.cuda_device
-            )
+            if supports_new:
+                recon_views = apply_normalizing_simr_flows_whitener(
+                    trainer_output=result["models"],   # list of models
+                    data=inv_data,
+                    direction="inverse",
+                    input_space=inv_input,
+                    normalization_mode=norm_mode,
+                    normalization_stats=norm_stats,
+                    fit_stats_on_data_if_missing=(norm_stats is None and norm_mode is not None),
+                    **apply_common,
+                )
+            else:
+                recon_views = apply_normalizing_simr_flows_whitener(
+                    trainer_output=result["models"],
+                    data=inv_data,
+                    direction="inverse",
+                    input_space=inv_input,
+                    use_training_standardization=True,
+                    custom_standardizers=result.get("standardizers", None),
+                    **apply_common,
+                )
             recon_paths = save_views(recon_views, base_prefix, "recon")
             if verbose:
                 print("  reconstructions:")
