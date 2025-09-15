@@ -1,0 +1,15 @@
+python3 ../train_antstorch_simr_flows.py \
+  --views UniformSimulatedData/uniform_10000x4.csv \
+  --output-prefix ./runs/uniform \
+  --base-distribution GaussianPCA --pca-latent-dimension 3 \
+  --base-sigma 0.1 \
+  --K 8 --scale-cap 2.0 --spectral-norm-scales \
+  --additive-first-n 2 --actnorm-every 1 --mask-mode rolling \
+  --jitter-alpha 0.05 --jitter-alpha-end 0.005 --jitter-alpha-mode cosine \
+  --best-selection-metric smooth_total \
+  --max-iter 1000 --val-interval 10 \
+  --save-whitened pca --save-z --verbose
+
+python3 ../plot_csv_distributions.py runs/uniform_z_view0.csv --ncols 4 -o ./
+python3 ../plot_csv_distributions.py runs/uniform_whitened_view0.csv -o ./
+
